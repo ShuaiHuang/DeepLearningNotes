@@ -1,0 +1,36 @@
+\chapter{Linear Algebra}
+
+本书的第二章内容主要介绍了深度学习相关的线性代数和矩阵理论基础知识，其中大部分知识比较简单，可以快速带过，这里重点记录一下自己不太熟悉的\textit{奇异值分解}（Singular Value Decomposition）以及线性代数知识在\textit{主成分分析}（Principal Components Analysis）推导过程中的实际应用\footnote{前面7节内容比较简单，这里略去}。
+
+\setcounter{section}{7}
+\section{Singular Value Decomposition}
+
+一般来说，一个方形矩阵可以分解为特征值与特征向量相乘的形式。\textit{特征值分解}从提供了将矩阵分解为相乘形式的另一种角度。
+
+根据特征值的性质，有
+\begin{equation}
+\mathbf A = \mathbf V\text{diag}(\mathbf\lambda)\mathbf V^{-1}
+\end{equation}
+其中$\mathbf V$是$\mathbf A$所有特征向量组成的矩阵；$\text{diag}(\mathbf\lambda)$是$\mathbf V$中与特征向对应的特征值组成的对角矩阵。
+
+同样的，有奇异值分解
+\begin{equation}\label{eq:svd}
+\mathbf A=\mathbf{UDV}^{T}
+\end{equation}
+其中$\mathbf A$是一个$m\times n$矩阵；$\mathbf U$是一个$m\times m$矩阵；$\mathbf V$是一个$n\times n$矩阵；$\mathbf D$是一个$m\times n$矩阵。$\mathbf U$和$\mathbf V$是正交矩阵，$\mathbf D$是对角矩阵。$\mathbf D$对角线上元素被称为奇异值；$\mathbf U$中的每一列被称为\textit{左奇异值向量}；$\mathbf V$中的每一列被称为\textit{右奇异值向量}。
+
+$\mathbf A$的左奇异值向量是$\mathbf {AA}^T$对应的特征向量；$\mathbf A$的右奇异值向量是$\mathbf{A}^T\mathbf A$对应的特征向量；非零奇异值是$\mathbf {AA}^T$或$\mathbf{A}^T\mathbf A$特征值的平方根。
+
+\section{The Moore-Penrose Pesudoinverse}
+
+$\mathbf A$的\textit{Moore-Penrose广义逆}被定义为
+\begin{equation}
+\mathbf A^+=\lim_{\alpha\to 0}(\mathbf{A}^T\mathbf A+\alpha\mathbf I)^{-1}\mathbf A^T
+\end{equation}
+但是通常情况下采用如下的方法进行计算
+\begin{equation}
+\mathbf A^+=\mathbf{VD}^+\mathbf U^T
+\end{equation}
+其中，$\mathbf{U}$，$\mathbf{D}$，$\mathbf{V}$的含义同式\ref{eq:svd}中的定义。$\mathbf D$的广义逆$\mathbf D^+$求取方法为对$\mathbf D$中非零元素取倒数再转置。
+
+使用广义逆求解$\mathbf {Ax=y}$即$\mathbf{x=A^+y}$。如果$\mathbf A$的列数大于行数，则$\|\mathbf x\|_2$在所有可能解中最小；如果$\mathbf A$的行数大于列数，则$\mathbf{Ax}$非常近似于$\mathbf y$即$\|\mathbf{Ax-y}\|_2$最小。
