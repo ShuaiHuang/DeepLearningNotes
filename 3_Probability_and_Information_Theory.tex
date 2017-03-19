@@ -1,0 +1,87 @@
+\chapter{Probability and Information Theory}
+
+\setcounter{section}{8}
+\section{Common Probability Distributions}
+
+\subsection{Bernoulli Distribution}
+\begin{equation}\begin{split}
+&P(x=1)=\phi\\
+&P(x=0)=1-\phi
+\end{split}\end{equation}
+
+\subsection{Multinoulli Distribution}
+
+Bernoulli分布的扩展，假设离散变量有$k$种不同状态。Bernoulli分布和Multinoulli分布在各自的定义域内可以描述任何分布。
+
+\subsection{Gaussian Distribution}
+
+\begin{equation}
+\mathcal N(\mathbf x;\mathbf{\mu,\beta^{-1}})=\sqrt{\frac{\text{det}(\mathbf\beta)}{(2\pi)^n}}\exp\Big(-\frac{1}{2}(\mathbf{x-\mu})^T\mathbf\beta(\mathbf{x-\mu})\Big)
+\end{equation}
+其中$\mathbf\beta$是精度矩阵，即协方差矩阵的逆矩阵。
+
+\subsection{Exponential and Laplace Distribution}
+
+指数分布：
+\begin{equation}
+p(x;\lambda)=\lambda\mathbf{1}_{x\ge 0}\exp(-\lambda x)
+\end{equation}
+其中$\mathbf{1}_{x\ge 0}$是指示函数。
+
+拉普拉斯分布
+\begin{equation}
+\text{Laplace}(x;\mu,\gamma)=\frac{1}{2\gamma}\exp\Big(-\frac{|x-\mu|}{\gamma}\Big)
+\end{equation}
+
+\subsection{The Dirac Distribution and Empirical Distribution}
+
+狄利克雷分布：
+\begin{equation}
+p(x)=\delta(x-\mu)
+\end{equation}
+
+经验分布：
+\begin{equation}
+\hat p(x)=\frac{1}{m}\sum_{i=1}^m\delta(\mathbf{x-x^{(i)}})
+\end{equation}
+其中，$\mathbf x^{(i)}$是从数据集中采样得到的样本集。
+
+\subsection{Mixtures of Distributions}
+
+\begin{equation}
+P(x)=\sum_iP(c=i)P(x|c=i)
+\end{equation}
+
+\section{Useful Properties of Common Functions}
+
+logistic sigmoid:
+\begin{equation}
+\sigma(x)=\frac{1}{1+\exp(-x)}
+\end{equation}
+
+softplus:
+\begin{equation}
+\zeta(x)=\log(1+\exp(x))
+\end{equation}
+
+\setcounter{section}{12}
+\section{Information Theory}
+
+事件$\mathbf x =x$的\textit{自信息}定义为
+\begin{equation}
+I(x)=-\log P(x)
+\end{equation}
+
+我们通常使用\textit{Shannon entropy}定义一个概率分布的不确定性
+\begin{equation}
+H(\mathbf x)=\mathbb E_{\mathbf x\sim P}[\log P(x)]
+\end{equation}
+使用\textit{Kullback-Leibler divergence}度量两个分布$P(\mathbf x)$和$Q(\mathbf x)$的差异程度
+\begin{equation}
+D_{\text{KL}}(P\|Q)=\mathbb E_{\mathbf x\sim P}\Big[\log\frac{P(x)}{Q(x)}\Big]=
+\mathbb E_{\mathbf x\sim P}[\log P(x)-\log Q(x)]\end{equation}
+
+与\textit{Kullback-Leibler divergence}类似的还有\textit{cross-entropy}
+\begin{equation}
+H(P,Q)=H(P)+D_{\text{KL}}(P\|Q)=-\mathbb E_{\mathbf x\sim P}\log Q(x)
+\end{equation}
