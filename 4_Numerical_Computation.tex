@@ -1,0 +1,54 @@
+\chapter{Numerical Computation}
+
+机器学习算法中涉及到大量的计算过程.通常情况下,机器学习算法没有解析解,只有通过迭代优化过程得到次优解.本章重点介绍机器学习的数值计算过程相关的知识点.
+
+\section{Overflow and Unferflow}
+数值上溢(Overflow)和下溢(Underflow)是两种不同的取整错误(rounding error).其中,下溢发生在数值接近于$0$的时候.有些函数对于接近于$0$和$0$的数字非常敏感.上溢发生在数值的绝对值非常大的时候,会被近似认为是$\infty$或者$-\infty$.在实际过程中,涉及到机器学习底层算法库开发时,必须考虑上溢和下溢的问题,并且在设计优化方法时进行规避.
+
+\section{Poor Condition}
+Conditioning是指一个函数的输入发生微小变化时,其对应的输出变化程度,即对输入变化的敏感程度.Poor Condition会放大计算误差.
+
+\section{Gradient-Based Optimization}
+大多数深度学习算法都会涉及到某些种类的优化过程.我们通常沿着目标函数的梯度下降方向搜索全局最小值但是如果参数选取不当的话,会收敛到局部极小值或者鞍点上.
+
+\subsection{Beyond the Gradient: Jacobian and Hessian Matrics}
+对于输入和输出都是向量的函数,如果要计算其偏导数,就需要用\textbf{Jacobian矩阵}进行表示.设$f:\mathbb R^m\rightarrow\mathbb R^n$,则有Jacboian矩阵$\mathbf J\in\mathbb R^{m\times n}$.其中,$J_{i,j}=\frac{\partial}{\partial x_j}f(\mathbf x)_i$.
+如果求二次偏导,则有\textbf{Hessian矩阵},即
+\begin{equation}
+\mathbf H(f)(\mathbf x)_{i,j}=\frac{\partial^2}{\partial x_i\partial x_j}f(\mathbf x)
+\end{equation}
+如果想计算某一个方向上的二阶偏导,则有$\mathbf{d}^T\mathbf{Hd}$其中,$\mathbf d$是一单位向量.特别的,如果$\mathbf d$是$\mathbf H$的特征向量,则$\mathbf d$方向上的二阶偏导就是$\mathbf H$对应于$\mathbf d$的特征值.在任何方向上的二阶偏导都在最大特征值和最小特征值的范围之间.
+
+二阶导数可以告诉我们梯度下降的程度.对$f(\mathbf x)$做二阶Taylor展开,有
+\begin{equation}
+f(\mathbf x)\approx f(\mathbf x^{(0)})+(\mathbf x-\mathbf x^{(0)})^T\mathbf g+\frac{1}{2}(\mathbf x-\mathbf x^{(0)})^T\mathbf H(\mathbf x-\mathbf x^{(0)})
+\end{equation}
+其中,$\mathbf g$和$\mathbf H$分别是$f(\mathbf x)$在$\mathbf x^{(0)}$点的梯度和Hessian矩阵.设学习率为$\epsilon$,则新到达的点为$\mathbf x^{(0)}-\epsilon\mathbf g$,在该点上取值为
+\begin{equation}
+f(\mathbf x^{(0)}-\epsilon\mathbf g)\approx f(\mathbf x^{(0)})-\epsilon\mathbf g^T\mathbf g+\frac{1}{2}\mathbf g^T\mathbf{Hg}
+\end{equation}
+上式中最后一项不能太大,否则新的数值将会比原值还要大.当$\mathbf g^T\mathbf{Hg}$等于或者小于$0$时,$\epsilon$可以取到很大的值;当$\mathbf g^T\mathbf{Hg}$大于$0$时,有
+\begin{equation}
+\epsilon^\ast=\frac{\mathbf g^T\mathbf g}{\mathbf g^T\mathbf{Hg}}
+\end{equation}
+
+优化算法可以按照一阶偏导和二阶偏导进行分类.只用到梯度的优化算法称为一阶优化算法,涉及到Hessian矩阵的优化算法称为二阶优化算法.深度学习的情况复杂,一般的优化算法无法保证结果,因此必须做出一些限制.通常用的限制为\textbf{Lipschitz continuous},即
+\begin{equation}
+\forall\mathbf x,\forall\mathbf y,|f(\mathbf x)-f(\mathbf y)|\le\mathcal L\|\mathbf{x-y}\|_2
+\end{equation}
+其中,$\mathcal L$是\textbf{Lipschitz常数}.
+
+凸优化由于有了更多的限制,因此其优化结果可以保证收敛.因此机器学习中在一些特定条件下使用凸优化算法进行优化.
+
+\section{Constrained Optimization}
+在机器学习中通常遇到的优化问题是有限制条件的优化问题.为了解决优化问题,一个简单的方法是在梯度下降时将限制条件考虑进去.另外一种更加成熟的方案就是将限制条件考虑进问题中,构造一个与原问题同解的无限制的优化问题.
+
+\textbf{Karush-Kuhn-Tucker}就提供了一种有限制优化问题的解决方法.有Lagrangian
+\begin{equation}
+L(\mathbf{x,\lambda,\alpha})=f(\mathbf x)+\sum_i\lambda_ig^{(i)}(\mathbf x)+\sum_j\alpha_jh^{(j)}(\mathbf x)
+\end{equation}
+其中,$g^{(i)}$和$h^{(j)}$分别是等式限制和不等式限制.则原问题与
+\begin{equation}
+\min_{\mathbf x}\max_{\mathbf\lambda}\max_{\mathbf{\alpha,\alpha}\ge 0}L(\mathbf{x,\lambda,\alpha})
+\end{equation}
+同解.
