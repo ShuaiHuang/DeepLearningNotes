@@ -1,0 +1,307 @@
+\chapter{Machine Learning Basics}
+
+\section{Learning Algorithms}
+
+Mitchell将机器学习定义为
+\begin{quote}
+A computer program is said to learn from experience \textit E with respect to some class of tasks \textit T and performance measure \textit P, if its performance at tasks in \textit T, as measured by \textit P, improves with experience \textit E.
+\end{quote}
+本节分别从上述定义中的\textit{T,P,E}三个角度对机器学习的相关知识点进行介绍.
+
+\subsection{The Task, \textit T}
+
+机器学习所关注的任务是人类很难通过具体规则进行编程实现进行解决的任务.学习过程本身不是任务,它只是我们赋予计算机解决问题能力的过程.可以通过机器学习得到解决的任务有
+\begin{itemize}
+\item 分类问题
+\item 有缺失值的分类问题
+\item 回归问题
+\item 转译(Transcription):输入非结构化表示的数据,输出离散化文字化的数据.
+\item 机器翻译
+\item 结构化输出(Structured Output)
+\item 异常检测
+\item 合成与采样
+\item 缺失值处理
+\item 去噪
+\item 概率密度估计或概率分布函数估计
+\end{itemize}
+
+\subsection{The Performance Measure, \textit P}
+
+为了可以量化地衡量机器学习算法的表现,通常根据不同的任务类型设计相应的性能度量方式.最常见的是度量模型的\textit{准确率}(accuracy).与此等价的度量指标还有\textit{错误率}(error rate)和\textit{$0$-$1$损失期望}(expected $0$-$1$ loss).对于概率密度估计任务,通常使用在某些样本上的对数概率均值去衡量.
+
+机器学习算法的表现衡量的是算法泛化能力,通常是通过在测试集上的表现去近似估计.选择机器学习算法的度量方法很有技巧性,度量系统的哪一个方面很难决定.即使知道了度量系统的哪些因素,如何量化这些因素也是一大挑战.
+
+\subsection{The Experience, \textit E}
+
+\textbf{根据学习过程中获取到的经验种类,机器学习可以分为\textit{有监督学习}和\textit{无监督学习}两大类.}并且机器学习所获取到的经验是从整个数据集上获取到的.从数学模型上来看,无监督学习所学到的模型是样本的分布$p(\mathbf x)$,有监督学习所学到的模型是根据样本$\mathbf x$求其对应样本标记$\mathbf y$的分布$p(\mathbf y|\mathbf x)$.
+
+有监督学习和无监督学习并没有严格的区分界限.假设有向量$\mathbf x\in\mathbb R^n$,根据概率链式法则
+\begin{equation}
+p(\mathbf x)=\prod_{i=1}^np(x_i|x_1,\cdots,x_{i-1})
+\end{equation}
+则可以得出,无监督学习可以分解为有监督学习的子问题.同样地,我们可以使用无监督学习的方法学得联合概率分布$p(\mathbf x, \mathbf y)$,进而求得$p(\mathbf y|\mathbf x)$.
+\begin{equation}
+p(\mathbf y|\mathbf x)=\frac{p(\mathbf{x,y})}{\sum_{\mathbf y'}p(\mathbf x,\mathbf y')}
+\end{equation}
+
+除了有监督学习和无监督学习,还有诸如\textit{多样例学习}(multi-instance learning)和\textit{强化学习}(reinforcement learning)等不同形式的学习算法.
+
+\textbf{绝大部分机器学习算法是从数据集中获取到经验的.}通常使用\textit{设计矩阵}(design matrix)对数据集进行表示,其中设计矩阵的每一行对应一个样本,每一列对应一个特征值.这就要求每一个样本所对应的特征维度必须相同.\footnote{9.7和10涉及到异构特征的组织方式.}对于有监督学习,样本还需要包含对应的标签.需要注意的是,标签可能不只使用一个数字进行表示.
+
+\section{Capacity, Overfitting and Underfitting}
+
+机器学习算法最终是在未知样本上执行的,算法在未知样本上也能够取得良好表现效果的能力被称为\textit{泛化能力}(generalization).通常我们通过计算机器学习算法在测试集上的错误率来评估其泛化能力.\textbf{但是如何能够仅仅通过观察算法在训练集上的表现来估计其在训练集上的表现呢?}
+
+通常可以假设训练集和测试集是由同一个数据分布生成的,即训练集和测试集是独立同分布,这被称为\textit{独立同分布假设}(i.i.d. assumptions).假设有一个随机的分布模型,由此分布模型进行数据采样,分别得到训练集合测试集,则期望训练误差和期望测试误差相等.但是在实际中,模型的参数未定,所以测试误差大于或等于训练误差.因此,决定机器学习算法泛化能力的因素有:
+\begin{enumerate}
+\item 训练误差足够小;
+\item 训练误差和测试误差之间的差异足够小.
+\end{enumerate}
+上述两点分别对应机器学习的两大挑战:欠拟合(underfitting)和过拟合(overfitting).
+
+\textbf{通过对机器学习算法的\textit{容量}(capacity)进行调整,可以对机器学习算法的过拟合或欠拟合情况进行调整.}调整容量的方法有很多,其中一种是选择机器学习算法的\textit{假设空间}(hypothesis space),即机器学习算法允许选择的函数集合.在容量和实际任务以及训练集规模匹配的情况下,机器学习算法会取得最好的效果.但是这是一个依赖经验和技巧的选择过程.除此之外,给定模型函数,通过改变函数参数达到训练目标的过程被称为模型\textit{表示容量}(representational capacity),通过对模型添加限制形成模型\textit{有效容量}(effective capacity),有效能量将会比表示容量小得多.
+
+ 提升机器学习模型泛化能力的理论是一个逐步完善的过程.今天的统计学习理论是对\textit{奥卡姆剃刀}(Occam's razor)的进一步完善.\textbf{统计学习理论提供了量化模型容量的多种方法.}其中最有名的是\textit{VC维}(Vapnik-Chervonenkis dimension)\footnote{被假设空间打散的最大示例集大小.}.通过量化模型的容量,统计学习理论可以量化出训练误差和泛化误差差值的上限.但是在实际中,很少通过这种方式对训练误差和泛化误差的差值进行评估.从整体上看,尽管简单模型有较好的泛化能力,但是还是需要选择足够复杂的模型去降低测试集上的误差\footnote{书中用无参模型的极端例子说明复杂度较高的模型可以有较低的训练误差.}.
+
+产生数据集的最本质分布和通过数据集观察到的真实分布$P(\mathbf x, y)$之间的误差被称为\textit{贝叶斯误差}(Bayes error)\footnote{开个脑洞:真理与认识之间的差异.}对于无参模型,可以通过增加样本集规模使得泛化能力提升并使错误率趋近贝叶斯误差.但是对于通常的有参数模型,通常可以达到的错误率下限是一个比贝叶斯错误率更高的下限.
+
+\subsection{The No Free Lunch Theorem}
+
+机器学习算法可以从有限规模训练集中得到泛化能力较好的模型,从统计学习理论的角度看来是很违背常理的.机器学习算法仅仅给出一个能够使得我们所关注的集合中绝大多数样本近似正确的规则.
+
+机器学习中的\textit{没有免费午餐定义}(no free lunch theorem)说明了,对于所有可能的\textbf{数据生成分布}做同等重要性考虑,会导致所有的学习算法取得同样的错误率.在实际中,我们通常只针对特定的数据生成分布感兴趣,并且机器学习的目的不是对所有任务寻找通解.
+
+\subsection{Regularization}
+
+\textbf{通常的机器学习算法中都包含了偏好}.机器学习算法所需要关注的不仅仅只是其表示容量,函数的可选种类也非常重要.在假设空间中,机器学习算法被赋予一个偏好,使其对特定的函数有所侧重.
+
+偏好还有的目的之一是为了控制机器学算法的过拟合和欠拟合的程度.一般情况下,偏好以正则化项的形式进行表示.偏好还有一个目的是控制模型假设空间的容量.\textbf{正则化是表达机器学习算法偏好的所有方法统称}.
+
+NFL定理从本质上表明没有普适的正则化标准,需要根据不同的任务制定不同的正则化方法.
+
+\section{Hyperparameters and Validation Sets}
+
+机器学习算法通过\textit{超参数}(hyperparameter)控制学习算法的行为,超参数一般是手动调整的.超参数一般是难以通过学习算法进行优化的参数,同时也是难以通过训练集学习得到的参数.
+
+超参数一般通过\textit{验证集}(validation set)进行选取.需要进行区分的是,测试集用来估计泛化误差,不能用来评价超参数的选取或者进行模型选择.
+
+\subsection{Cross-Validation}
+
+当数据集规模较小时,将其进行固定分割会使得测试集规模较小,带来统计误差.交叉验证可以解决这一问题.
+
+\section{Estimators, Bias, and Variance}
+
+统计学可以帮助机器学习从训练集上学得具有较好泛化能力的模型.参数估计,偏差,方差被用来描述模型的泛化能力,欠拟合和过拟合.
+
+\subsection{Point Estimation}
+
+点估计是根据训练样本的分布对兴趣点或者向量提供一个"最好"的预测结果,即
+\begin{equation}
+\hat\theta_m=g(\mathbf x^{(1)},\cdots,\mathbf x^{(m)})
+\end{equation}
+这个定义比较宽泛.一个好的估计可以产生非常接近数据生成的参数$\mathbf\theta$.需要强调的是,这个是频率主义的观点,即认为模型的参数是固定且未知的.
+
+点估计还可以用来估计样本和标记之间的关系,这被称为\textit{函数估计}(Function Estimation).即假设有$y=f(\mathbf x)+\epsilon$,其中$\epsilon$是$y$不能从$\mathbf x$中预测到的部分.函数估计是根据模型估计出$f$的估计量$\hat f$.
+
+\subsection{Bias}
+
+偏差的定义为
+\begin{equation}
+\text{bias}(\hat\theta_m)=\mathbb E(\hat\theta_m)-\theta
+\end{equation}
+其中$\theta$是产生数据模型的真实参数;$\hat\theta$是估计量.如果有$\text{bias}(\hat\theta_m)=0$,则称估计是\textit{无偏的}(unbiased).如果有$\lim_{m\to\infty}\text{bias}(\hat\theta_m)=0$,则称估计是\textit{渐进无偏的}(asymptotically unbiased).
+
+通过书中的举例可以看出,无偏估计符合大多数算法的要求,但是他们并不是"最好"的估计.我们通常使用有偏估计去满足算法的其他特性.
+
+\subsection{Variance and Standard Error}
+
+\textit{方差}(variance)反映了数据的散布范围,其平方根被称为\textit{标准差}(standard error).它们分别被定义为$\text{Var}(\hat\theta)$和$\text{SE}(\hat\theta)$.同一个分布产生的不同数据集会带来统计量的差异,这种方差的期望值是一个误差来源,如果能量化这个误差来源,对研究机器学习算法也有帮助.
+
+对于标准差,无论是对样本的方差开根号还是对方差的无偏估计开根号,其结果都不是无偏估计,但是它有很重要的用途.在机器学习中,标准差常用来计算平均值的置信区间,并根据置信区间的大小评价算法的好坏.
+
+\subsection{Trading off Bias and Variance to Minimize Mean Squared Error}
+
+偏差和方差描述了两种不同类型的统计量,在实际的机器学习算法中需要对这两者进行适当的权衡.常用的两种方式为:交叉验证和均方误差比较.
+\begin{equation}\begin{split}
+\text{MSE}&=\mathbb E[(\hat\theta_m-\theta)^2]\\
+&=\text{Bias}(\hat\theta_m)^2+\text{Var}(\hat\theta_m)
+\end{split}\end{equation}
+理想估计的偏差和方差都很小,直接反映就是均方差小.
+
+偏差和方差与模型的容量有关,模型容量上升会导致偏差下降方差上升.
+
+\subsection{Consistency}\label{subsec:consistency}
+
+通常我们比较关注的情形是,随着训练样本的数量上升,估计量是否趋近于真实值?即
+对于$\forall\epsilon>0$,当$m\to0$时,有$P(|\hat\theta_m-\theta|>\epsilon)\to0$.
+
+一致性保证了样本数量增加的情况下,估计量偏差会逐渐降低.但是反过来不一定成立.
+
+\section{Maximum Likelihood Estimation}
+
+通常使用\textit{极大似然估计}(Maximum Likelihood Estimation)对待估计参数进行估计.假设$p_{\text{model}}(\mathbf x;\theta)$是由样本估计出的整体分布,以$\theta$为参数.其目的就是将$\mathbf x$映射到真实的分布$p_{\text{data}}(\mathbf x)$.极大似然度估计定义为
+\begin{equation}\begin{split}
+\theta_{ML}&={\arg\max}_{\theta}p_{\text{model}}(\mathbb X;\theta)\\
+&={\arg\max}_{\theta}\prod_{i=1}^mp_{\text{model}}(\mathbf x^{(i)};\theta)
+\end{split}\end{equation}
+进行适当的尺度变换和归一化后,可以得到
+\begin{equation}
+\theta_{ML}={\arg\max}_{\theta}\mathbb E_{\mathbf x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\mathbf x;\theta)
+\end{equation}
+其中,$\hat p_{\text{data}}$是样本在训练集上的经验分布(empirical distribution).定性地看,极大似然估计是通过选择$\theta$使得$p_{\text{model}}$逐步逼近$\hat p_{\text{data}}$.上述两个分布间差异程度可以通过KL散度进行量化:
+\begin{equation}
+D_{KL}=(\hat p_{\text{data}}\|p_{\text{model}})=\mathbb E_{\mathbf x\sim\hat p_{\text{data}}}[\log\hat p_{\text{data}}(\mathbf x)-\log p_{\text{model}}(\mathbf x)]
+\end{equation}
+令上式最小,即最小化
+\begin{equation}
+-\mathbb E_{\mathbf x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\mathbf x)
+\end{equation}
+也就是最小化交叉熵.需要强调的是,任何一个包含负对数似然的损失函数都是训练集经验分布和模型真实分布之间的交叉熵.
+
+实际上,我们可以让模型分布逼近经验分布,但是无法逼近真实分布.
+
+\subsection{Conditional Log-Likelihood and Mean Squared Error}
+
+极大似然估计可以推广到更加一般的条件分布的情形.
+\begin{equation}\begin{split}
+\theta_{ML}&={\arg\max}_\theta P(\mathbf Y|\mathbf X;\theta\\
+&={\arg\max}_\theta\sum_{i=1}^m\log P(\mathbf y^{(i)}|\mathbf x^{(i)};\theta)
+\end{split}\end{equation}
+需要注意的是,第二行等式成立的条件是所有样本满足i.i.d条件.
+
+\subsection{Properties of Maximum Likelihood}
+
+如果极大似然估计满足
+\begin{enumerate}
+\item 真实分布$p_{data}$被包含在模型分布族$p_{model}(\cdot;\theta)$中;
+\item 真实分布$p_{data}$对应的$\theta$有唯一值.
+\end{enumerate}
+则估计量满足\ref{subsec:consistency}中提到的一致性.由一致性还可以推导出其他估计量性质,不同的估计量有不同的统计效率(statistic efficiency).最小均方误差(MSE)最为一致性估计具有比较好的性质,被广泛应用于各种算法中,有时还被加上各种归一化项.
+
+\section{Bayesian Statistics}
+
+上节中提到的极大似然估计是频率学派的观点.与之对应的是\textit{贝叶斯学派}(Baysian)认为知识的确定性需要用概率来进行表示.
+
+确定参数$\theta$的过程首先选取一个不确定性最大即熵最大的分布$p(\theta)$,然后通过观测样本,利用贝叶斯公式求取$\theta$的后验概率分布.从本质上来说,这是一个熵降低的过程.
+
+贝叶斯估计与极大似然估计有两点不同:
+\begin{enumerate}
+\item 极大似然估计对$\theta$进行点估计,而贝叶斯估计根据$\theta$的全分布去做预测;
+\item 贝叶斯估计中的先验分布暗含了参数偏好.
+\end{enumerate}
+
+一般情况下,如果训练样本较少,贝叶斯估计会有较好的泛化能力,但是它也存在着计算代价较高的缺点.
+
+\subsection{Maximum A \textit{Posteriori} (MAP) Estimation}
+
+由于贝叶斯统计量估计出的是参数的全分布,但是一般希望导出的是一个点估计.所以使用MAP得到一个对应的点估计.
+\begin{equation}
+\theta_{MAP}={\arg\max}_\theta p(\theta|\mathbf x)={\arg\max}_\theta\log p(\mathbf x|\theta)+\log p(\theta)
+\end{equation}
+由于$p(\theta)$是预先选定的,所以只要关心$p(\mathbf x|\theta)$即可.
+
+MAP贝叶斯推断利用了训练集中所不包含的先验知识进行推断,可以减少方差,但同时也会增加偏差.
+
+许多正则化策略在本质上就是MAP贝叶斯推断(在估计过程中添加先验知识$p(\theta)$).并且由于MAP贝叶斯推断提供了一个设计复杂可解释正则化项的方法.
+
+\section{Supervised Learning Algorithms}
+
+本节介绍了几种典型的有监督学习模型.
+
+\subsection{Probabilistic Supervised Learning}
+
+有监督学习可以等价为求取后验概率$p(y|\mathbf x)$的问题.线性回归问题可以进行扩展用来解决分类任务.在logistic regression中,借助于logistic sigmoid函数,可以将线性回归进行扩展以解决二分类问题.
+
+由于上述方法没有闭式解,所以需要通过使用梯度下降法最小化负对数似然进行迭代求解.这也是解决其他有监督学习的求解方法.
+
+\subsection{Support Vector Machine}
+
+logistic regression与SVM都被用来解决二分类任务.但是LR给出的是一个概率,SVM直接输出标签.
+
+SVM引入kernel方法后,其性能得到大大提升.核化方法有两大优势:
+\begin{enumerate}
+\item 将非线性模型进行映射,借助于凸优化求解问题;
+\item 比计算原始高维向量更具有优势.
+\end{enumerate}
+
+最常用的核函数是\textit{高斯核}(Gaussian kernel),也被称为\textit{径向基函数核}(radial basis function kernel).
+\begin{equation}
+k(\mathbf{u,v})=\mathcal N(\mathbf{u-v};0,\sigma^2\mathbf I)
+\end{equation}
+其中$\mathcal N(\mathbf x;\mu,\Sigma)$是标准正态密度.RBF实质上就是一种模板匹配,算法训练的过程就是如何生成模板.
+
+除了SVM,其他的算法也可以使用核方法.同时核方法的缺点也很明显,损失评估函数是训练样本的线性叠加.但是SVM可以稀疏地叠加部分训练样本.此外,核方法的计算代价也比较高.
+
+\subsection{Other Simple Supervised Learning Algorithms}
+
+$k$-近邻可用于回归任务或者分类任务,其在大规模数据集上可以达到很高的准确率,并趋近于贝叶斯错误率.但是它的计算代价很高,并且不能学习或者选择出区分度高的特征.
+
+\section{Unsupervised Learning Algorithms}
+
+有监督学习和无监督学习之间并没有严格的区分界限.最典型的无监督学习是找到数据"最佳"的表示方式.最佳表示方式一般遵循三条原则:
+\begin{itemize}
+\item 低维度表示 lower dimensional representations
+\item 稀疏表示 sparse representations
+\item 独立成分表示 independent representations
+\end{itemize}
+这三条原则并不是互相排斥的.特征表示是深度学习的一个核心思想,其他的特征表示学习算法也以不同的方式去运用上述三种不同的原则.
+
+\subsection{Principal Component Analysis}
+
+PCA是一种非监督特征学习方法,利用到低维度表示独立成分表示两条原则.PCA只是去除了特征间的线性关系,如果要使得特征间完全独立,还需要去除变量间的非线性关系.PCA在本质上是将原空间中的主成分与新空间的基进行对齐.为进一步去除数据元素间的耦合关系,需要由线性变换向前更进一步.
+
+\subsection{k-means Clustering}
+
+$k$-均值聚类的样本标记可以用one-hot code进行表示,这是一种稀疏表示方式.one-hot code在统计和计算上有很大的优势.
+
+$k$-均值聚类训练过程是一个迭代过程,但它也是一个病态问题,因为没有一个衡量标准去度量聚类结果与真实情况之间的契合程度.实际中可能会存在多种聚类方式从不同方面契合真实情况.
+
+从表示方式上来看,我们更加偏向于\textit{分布式表示}(distributed representations).分布式表示可以减轻算法选择人类喜好特征的负担.
+
+\section{Stochastic Gradient Descent}
+
+\textit{随机梯度下降法}(SGD)是梯度下降法的延伸,对于深度学习的发展起到推动作用.
+
+大规模的训练数据集会带来比较强的泛化性能,但同时也会增加计算代价.一般的损失函数会计算所有样本在损失函数下的和,梯度下降法会在损失函数上计算梯度.
+
+SGD将梯度视为一个期望,即可以通过样本子集的梯度加和估计整体的梯度.
+
+梯度下降对于非凸问题是低效并且是不可靠的,但它可以让损失函数在极短时间内下降,从而使得模型可用.在深度学习领域更是需要借助梯度下降法快速获得可用的模型.
+
+随机梯度下降法还被用于深度学习以外的领域.当训练集样本数量上升时,SGD会逐渐收敛,但其复杂度被认为是$O(1)$.
+
+\section{Building a Machine Learning Algorithm}
+
+深度学习算法的组成元素很简单:数据集的特征组合方式,代价函数,优化方法和模型.通过替换各个元素,可以组合出多种算法.对于非监督学习,这个方法同样适用.
+
+对于代价函数,只要可以计算损失函数的梯度,不计算算是函数也可以进行优化.
+
+大部分机器学习算法都可以从上述几个部分进行归纳\footnote{抽空总结一下},只不过有些算法的组成部分并不明显.
+
+\section{Challenges Motivating Deep Learning}
+
+传统算法在AI领域内处理高维数据的能力和泛化能力都存在缺陷,深度学习有效地克服了这一问题.
+
+\subsection{The Curse of Dimensionality}
+
+涉及到高维特征的机器学习算法会变得异常困难,这被称为\textit{维度诅咒}(curse of dimensionality).
+
+\subsection{Local Constancy and Smoothness Regularization}
+
+通过先验知识和学习所得到的分布函数决定了模型的泛化能力.分布函数可以通过显式或者隐式的方式进行选择.其中,隐式地选择方式有:\textit{平滑先验}(smoothness prior)或者\textit{局部一致性先验}(local constancy prior).但是仅仅依靠上述的先验而排除掉其他类型的先验是不够的.
+
+平滑先验和非参数学习算法可以再样本分布符合一定条件的情况下取得较好的泛化能力.但是在高维度情况下,平滑的分布函数可能在某个维度上变得不平滑.如果分布函数比较复杂,这个结论是否还能够成立?答案是肯定的.在限定了数据分布的情况下,平滑假设依然成立.
+
+深度学习算法通过提供不同任务上的通用合理假设以利用这些便利条件.另外一种方法是针对特定任务设定不同的假设,但是这些假设不会被嵌入到深度学习模型之中.深度学习的核心思想是假设样本数据是在多种因素在分层次作用生成的,这就使得样本数量和样本分布空间呈指数关系.
+
+\subsection{Manifold Learning}
+
+在机器学习领域中,流形用以指代小范围内的点集组成的连通域.在流形上,每一个点的维度都有可能不一样.
+
+许多机器学习的任务在全局内学习分布函数的代价很大,流形学习通过添加空间限制克服了这一困难.由于流形是嵌入在高维空间内的,为何不直接使用低维空间或者高维对数据进行表示有两方面的原因:
+\begin{enumerate}
+\item AI领域内的任务中,图像,文字和声音的分布相对集中,同时噪声在整个空间上的分布很分散,均匀.
+\item 这些样本的领域和变换方式很直观,虽然可能不严谨.
+\end{enumerate}
+
+使用流形的坐标轴去度量流形具有很深刻的现实意义,并且对于提升机器学习算法很有帮助.但同时也具有很大的挑战性.
