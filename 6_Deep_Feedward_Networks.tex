@@ -1,6 +1,6 @@
 \chapter{Deep Feedforward Networks}
 
-\textit{深度前向神经网络}(Deep Feedforward Network)是深度神经网络的经典模型,它通过学习参数$\theta$来估计映射函数$y=f(\mathbf x)$.在前向神经网络中,信息向前流动没有反馈,有反馈的网络被称为\textit{recurrent neural network}(RNN).从工程角度看,前向神经网络是许多工业用途的神经网络的基础,因而它十分重要.前向深度神经网络通过有向无环图直观表示如何将不同的函数进行组合,进而形成网络.
+\textit{深度前向神经网络}(Deep Feedforward Network)是深度神经网络的经典模型,它通过学习参数$\theta$来估计映射函数$y=f(\mathbf x)$.在前向神经网络中,信息向前流动没有反馈,有反馈的网络被称为\textit{recurrent neural network}(RNN).从工程角度看,前向神经网络是许多工业用途的神经网络的基础,因而它十分重要.前向深度神经网络通过有向无环图直观表示如何将不同的函数进行嵌套组合,进而形成网络.
 
 在发展之初,神经网络是一个神经科学模型,但如今它在数学和工程领域内得以发展,也就脱离了原始的神经科学的范畴.
 
@@ -11,7 +11,7 @@
 \item 使用机器学习的方法学习出映射$\phi$
 \end{enumerate}
 
-使用前向神经网络以外的其他模型学习特征的基本准则是深度学习的一项重要内容.
+使用特征学习来提升模型性能的方法不仅仅只是局限于前向神经网络.特征学习是深度学习中一个广泛的课题.
 
 \section{Example: Learning XOR}
 
@@ -23,3 +23,279 @@
 \begin{equation}
 g(z)=\max\{0,z\}
 \end{equation}
+
+\section{Gradient-Based Learning}
+
+神经网络使用梯度下降法进行优化.由于神经网络的损失函数非凸,没有闭式解,通常使用梯度下降法进行迭代,是损失函数达到一个很小的值.需要注意的是,这个很小的值一般不是全局最小值,但是这个值可以使模型达到实际可用的程度.深度学习算法使用\textit{随机梯度下降法}(stochastic gradient descent, SGD)提升计算效率,但是SGD不保证收敛且计算结果与初始值的选取有很大关联性.深度学习领域内的优化过程均是梯度下降法基础上发展出来的变体.与其他模型相比,深度神经网络的训练过程并无实质性差别,尽管梯度下降法可能使得训练过程稍显复杂,但是整体上来说还是比较高效准确的.此外,与其他模型一样,必须结合深度神经网络的特殊场景设计损失函数.
+
+\subsection{Cost Function}
+
+如果模型定义了分布$p(\mathbf y|\mathbf x;\theta)$,则使用交叉熵作为损失函数(\ref{sec:cost_func_distribution}).如果模型是为了估计$\mathbf y$的某些统计量,则使用针对任务特别设计的损失函数.上述损失函数的基本型还需要加上正则化项形成完整的损失函数(\ref{sec:cost_func_statistics}).
+
+\subsubsection{Learning Conditional Distributions with Maximum Likelihood}\label{sec:cost_func_distribution}
+
+交叉熵损失函数定义为
+\begin{equation}
+J(\theta)=-\mathbb E_{\mathbf{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}}(\mathbf y|\mathbf x)
+\end{equation}
+其中$\log p_{\text{model}}(\cdot)$的具体形式与模型本身有关.
+
+交叉熵损失函数的优点是,不用设计损失函数,根据模型分布$p(\mathbf y|\mathbf x)$就可以确定损失函数的具体形式.负对数似然项满足损失函数梯度值域区间大的要求.缺点是损失函数不一定存在最小值点,但是可以通过添加正则项来规避这一问题.
+
+\subsubsection{Learning Conditional Statistics}\label{sec:cost_func_statistics}
+
+如果模型的目的是为了学习全分布相关的统计量而非全分布本身,那么可以使用根据实际任务设计损失函数.深度学习模型本身可以看做一个函数族,并且函数族中每一个函数的参数取值都不是固定值.那么就可以把损失函数视为\textit{functional}.解决上述问题的工具被称为\textit{calculus of variations}.
+
+如果通过最小化均方误差的方法求取$\mathbf y$的均值$\mathbf x$,则可以解下面的问题
+\begin{equation}
+f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(\mathbf x)\|^2
+\end{equation}
+等价于
+\begin{equation}
+f^\ast(\mathbf x)=\mathbb E_{\mathbf y\sim p_{\text{data}}(\mathbf y|\mathbf x)}[\mathbf y]
+\end{equation}
+
+通过最小化\textit{绝对均值误差}(mean absolute error)求取$\mathbf y$的中值$\mathbf x$,可以使用下面的优化问题
+\begin{equation}
+f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(\mathbf x)\|_1
+\end{equation}
+
+上述上述两种问题的缺点是,MSE和MAE使用梯度优化的表现并不好.
+
+\subsection{Output Units}
+
+本节主要介绍各种类型的输出函数.损失函数与输出函数关系紧密.需要注意的是,本节介绍的输出单元也可用作隐层单元.
+
+\subsubsection{Linear Units for Gaussian Distributions}
+
+线性单元只对输入做放射变换
+\begin{equation}
+\mathbf{\hat y=W^Th+b}
+\end{equation}
+常用来估计条件正态分布的均值.并且由于在正态分布条件下,MSE等价于极大对数似然,损失函数为MSE.如果要估计条件正态分布的协方差,就需要添加限制条件.
+
+线性单元的优点是不会达到saturate状态,用梯度优化算法没有太大困难.
+
+\subsubsection{Sigmoid Units for Bernoulli Output Distributions}
+
+使用Sigmoid函数替代原始Bernoulli分布以便使用梯度优化.Sigmoid单元定义为
+\begin{equation}
+\hat y=\sigma(\mathbf w^T\mathbf h+b)
+\end{equation}
+则有分布
+\begin{equation}
+P(y)=\frac{\exp{(yz)}}{\sum_{y'=0}^1\exp(y'z)}
+\end{equation}
+相应的损失函数为
+\begin{equation}
+J(\theta)=-\log P(y|\mathbf x)=\zeta((1-2y)z)
+\end{equation}
+
+如果使用其他的损失函数,Sigmoid可能会saturate.定量来看,Sigmoid的对数完备且有限.
+
+\subsubsection{Softmax Units for Multinoulli Output Distributions}
+
+如果使用softmax单元,sigmoid可以视为其一般形式.当然,softmax也可用在隐层做$n$选$1$的选择.Sigmoid定义为
+\begin{equation}
+\text{softmax}(z)_i=\frac{\exp(z_i)}{\sum_j\exp(z_j)}
+\end{equation}
+其中$z_i$为向量$\mathbf{z=W^Th+b}$第$i$个元素.
+
+Softmax单元使用对数最大似然进行训练.如果不使用对数似然作为损失函数的话,很难处理softmax函数.softmax函数也可能saturate.
+
+Softmax函数中参数$\mathbf z$的产生方法有两种.第一种是由前一层神经元产生$n$个参数,第二种是通过添加限制产生$n-1$个参数.这两种方法并没有太大的差别.
+
+从神经科学角度看softmax单元,可以将其视为竞争关系.极端情况下就是$\textit{winner-take-all}$形式.
+
+Softmax名称可以解释为\textit{"softened" version of the} $\arg \max$.
+
+\subsubsection{Other Output Types}
+
+本节主要介绍的是估计$\mathbf y$相关统计量是用到的输出层单元类型.其核心思想是,线性,sigmoid和softmax可以作为任何神经网络的输出层,最大似然度准则提供了设计损失函数的方法.最大似然度准则使用对数似然作为损失函数的具体实现形式.一般的,\textbf{神经网络表示函数$f(\mathbf x;\theta)$,与预测值并无直接关系.但它为$\mathbf y$的分布提供参数.}假设有$f(\mathbf x;\theta)=\mathbf w$,则损失函数可以被写成$-\log p(\mathbf y;\mathbf{w(x)})$.
+
+\section{Hidden Units}
+
+怎样选择前向神经网络中隐层神经元类型并无定式,需要根据具体情况去分析.
+
+某些隐层神经元甚至不能满足处处可导的性质,但是仍然使用梯度优化算法是因为大部分情况下,训练过程并不能达到不可导位置,即使达到了不可导位置,也可以对到达不可导点位置的样本进行忽略.
+
+\subsection{Rectified Linear Units for Their Generalizations}
+
+Rectified单元的激活函数为
+\begin{equation}
+g(z)=\max\{0,z\}
+\end{equation}
+它与线性单元很像,但是非常便于求梯度.Rectified单元通常用在仿射变换上
+\begin{equation}
+\mathbf h=g(\mathbf{W^Tx+b})
+\end{equation}
+从经验上来说,通常把$\mathbf b$中每个元素的初始值都设置的非常小,可以取得较好的效果.
+
+Rectified单元的缺点很明显,当样本映射变换后的值为$0$时,函数不可导,不可进行梯度优化.
+
+为了避免上述缺陷,当$z_i<0$时,使用非$0$斜率$\alpha_i$
+\begin{equation}
+h_i=g(z,\mathbf\alpha)_i=\max(0,z_i)+\alpha_i\min(0,z_i)
+\end{equation}
+并在此基础上有三种变体:
+\begin{itemize}
+\item \textit{Absolute value rectification}:固定$\alpha_i=-1$,获得$g(z)=|z|$;
+\item \textit{Leaky ReLU}: 固定$\alpha_i$到一个非常小的值;
+\item \textit{Parametric ReLU(PReLU)}:将$\alpha_i$当做一个可学习的参数.
+\end{itemize}
+
+更进一步,有\textit{maxout units}
+\begin{equation}
+g(z)_i=\max_{j\in\mathbb G^{(i)}}z_j
+\end{equation}
+其中$\mathbb G^{(i)}$第$i$组输入下标集合,$\{(i-1)k+1,\cdots,ik\}$.Maxout的本质是在空间上拟合出分段线性方程,也可视为自己学习激活函数.相比于rectified,maxout需要更多正则化项,但是数据较多且$k$较小时,可以省去正则化项.
+
+Maxout的优势为,参数少统计便利;可以用作无损特征融合或降维;有冗余,避免\textit{灾难性遗忘}(catastrophic forgetting).
+
+上述rectified及其变体的特性为,如果它们的行为接近线性,就会非常容易进行优化.
+
+\subsection{Logistic Sigmoid and Hyperbolic Tangent}
+
+许多神经网络单元使用sigmoid激活函数
+\begin{equation}
+g(z)=\sigma(z)
+\end{equation}
+或者\textit{hyper tangent}激活函数
+\begin{equation}
+g(z)=\tanh(z)
+\end{equation}
+这两种激活函数很类似,因为有$\tanh(z)=2\sigma(2z)-1$.
+
+Sigmoid函数大部分时候会saturate,只有在$0$附近时才会sensitive,不适宜使用梯度优化.因此不推荐使用sigmoid单元作为前向神经网络的隐层单元.Sigmoid在前向神经网络之外的网络中使用比较多.
+
+Hyperbolic tangent单元在前向神经网络的隐层中表现稍微好一些.
+
+\subsection{Other Hidden Units}
+
+其他种类的隐层单元使用很少,只有表现特别突出的隐层单元才会受到关注.但是通常情况下,表现平平的隐层单元很多,它们并没有受到太多的关注.这里列举几种比较特别的隐层单元类型:
+\begin{itemize}
+    \item 没有激活函数的隐层单元
+    \item softmax隐层单元
+    \item 径向基函数隐层单元$h_i=\exp\Big(-\frac{1}{\delta^2}\|\mathbf{W_{:,i}-x}\|^2\Big)$
+    \item Softplus隐层单元$g(a)=\zeta(a)=\log(1+e^a)$(a smooth version of the rectifier)
+    \item Hard tanh$g(a)=\max(-1,\min(1,a))$
+\end{itemize}
+
+隐层单元的类型到目前为止还是一个比较热门的研究方向.
+
+\section{Architecture Design}
+
+网络的结构包括两个方面:网络的层数和神经元之间的连接方式.绝大部分的神经网络是按层组织的,层数的选择包括每一层中的神经元数目,这个是通过验证集上的错误率决定的.
+
+\subsection{Universal Approximation Properties and Depth}
+
+大多数情况下,神经网络学习的目标是一个非线性函数.\textbf{前向神经网络有一个\textit{通用结构估计框架}(universal approximation theorem)}.假如一个神经网络有线性输出层以及任意一种隐层,就可以学习出一个从有限维输入空间到有限维输出空间的\textit{Borel可度量函数}(Borel measureable function),并且假如有足够多隐层单元,就可以有足够低的非零错误率.更进一步,有限离散空间的映射以及其他类型的函数均可代入上述框架.但是当
+\begin{enumerate}
+\item 优化算法找不到目标函数的最优参数;
+\item 过拟合导致选择错误的函数类型.
+\end{enumerate}
+时,通用结构估计框架不能保证算法一定能学习出目标函数.但是需要注意的是,通用结构估计框架估计出的网络规模可能会很大,因此前向神经网络可能不会被正确训练.
+
+另外,\textbf{特定函数可以通过估计得出至少需要$d$层网络进行训练学习}.如果使用rectifier单元,网络层数增加,神经网络的参数会呈指数级增长.有$d$个输入,深度为$l$和每层隐层有$n$个单元的深度rectifier网络可以划分出
+\begin{equation}
+O\Big(\big(^n_d\big)^{d(l-1)n^d}\Big)
+\end{equation}
+个线性区域.但是在实际中,并不能保证函数满足上述条件.
+
+从上述定理可以看出,深度神经网络暗含了一个先验知识,我们所要学习的函数通常可以由几个稍微简单一些的子函数组合形成.
+
+\subsection{Other Architectural Considerations}
+
+实际使用的网络结构类型多样,并且会根据实际任务在细节上做一些调整.比如,网络各层之间不一定是链式连接;神经元之间也不一定是全连接,会有较少的参数引入,但是同样也有可能引入一些问题.
+
+\section{Back-Propagation and Other Differentiation Algorithms}
+
+\textit{逆向传播算法}(back-propagation)前向传播过程是指训练数据在神经网络中向前传播得到损失函数的过程.逆向传播过程是指从损失函数向后传播更新网络模型参数的过程.传统的梯度数值计算代价很大,BP传播算法避免了高昂的计算代价.需要注意的是BP算法仅指梯度的计算方法.
+
+\subsection{Computational Graphs}
+
+为了更加精确地描述BP算法,本节引入了\textit{计算图}(computational graph)的概念.
+
+\subsection{Chain Rule of Calculus}
+
+链式法则计算是指通过计算子函数获得整个函数导数的方式.BP算法使用链式法则可以提升效率.链式法则可以用来计算函数对\textit{数值},\textit{向量},\textit{张量}(tensor)的导数.
+
+\subsection{Recursively Applying the Chain Rule to Obtain Backprop}
+
+虽然梯度的计算公式很直观,但是在编程实现的过程中,还有其他的因素需要考虑.比如,许多子公式需要计算多次,为了提升计算效率避免重复计算,最好将这些计算结果记录下来.本节接下来的内容主要介绍了直接计算BP算法的过程.BP算法设计初衷是为了减少子式的重复计算次数.同样的,也存在其他的算法可以达到同样的目的,或者为了节省内存进行重复计算.
+
+\subsection{Back-Propagation Computation in Fully-Connected MLP}
+
+书中的Algorithm 6.3和Algorithm 6.4是针对MLP问题适用的BP算法.而编程实现的BP算法是基于计算图的一般化方法.
+
+\subsection{Symbol-to-Symbol Derivatives}
+
+代数公式和计算图对符号进行操作,只有在实际运算中才会将符号替换成数字.实际计算导数有两种方式,一种是Torch和Caffe所使用的\textit{符号到数字}(symbol-to-number)方式.这种方式接收数字作为计算土的参数,并且返回一个梯度数值;另一种是Theno所使用的\textit{符号到符号}(symbol-to-symbol)方式,它通过在计算图中添加额外的节点以描述希望计算的导数.
+
+其实从本质上来看,symbol-to-number方式可以归入symbol-to-symbol方式之中.
+
+\subsection{General Back-Propagation}
+
+一般地,在链式法则的某个环节,梯度等于上一环节的梯度乘以当前操作所涉及到的变量的Jacobian矩阵.在编程实现BP算法时,通常针对同一个环节提供operation和bprop两个操作.bprop操作实质上是计算所有输入变量的Jacobian矩阵.
+
+一般情形下的梯度计算需要$O(n^2)$次操作.但是大部分神经网络的损失函数是链式结构,因此计算梯度只需要$O(n)$次操作.并且还可以通过动态规划方法对子问题进行填表,避免重复计算.
+
+\subsection{Example: Back-Propagation for MLP Training}
+
+在这一节中,以MLP为例,使用计算图计算BP算法.虽然举例中涉及到的计算图很庞大,但是可以很方便地计算出梯度.
+
+\subsection{Complications}
+
+前面几个章节所描述的BP算法仅仅是理论上的分析.为了编程实现BP算法,还需要考虑:
+\begin{itemize}
+    \item 操作返回多个张量的情形;
+    \item 内存消耗管理;
+    \item 数据类型;
+    \item 梯度无意义的情形.
+\end{itemize}
+
+\subsection{Differentiation outside the Deep Learning Community}
+
+\textit{自动化微分}(automatic differentiation)专门研究微分的算法.BP是其研究方向之一,被称为\textit{反向模式累积}(reverse mode accumulation).还有其他的方法通过调整微分次序以获得高效解法,但获得最优解是一个NP难问题.
+
+提升BP算法效率的途径有
+\begin{enumerate}
+    \item 寻找导数计算的等价形式
+    \item 简化图结构
+\end{enumerate}
+
+但是需要注意的是,针对深度学习的特定的梯度算法有助于提升学习算法的效率和稳定性.因此虽然还有其他的梯度计算方法,但是BP算法在深度学习领域被广泛使用.
+
+\subsection{Higher-Order Derivatives}
+
+深度学习中常用到Hessian矩阵,但是当参数很多时,计算代价很高.常用\textit{Krylov方法}(Krylov methods)简化Hessian矩阵的计算.可以通过直接计算
+\begin{equation}
+\mathbf{Hv}=\nabla_{\mathbf x}\Big[\big(\nabla_{\mathbf x}f(x)\big)^T\mathbf v\Big]
+\end{equation}
+其中$\mathbf v$是一个任意向量.为了能够计算任意Hessian与任意向量的乘积,可以计算$\mathbf{He}^{(i)}$,其中$i=1,\cdots,n$;$e^{(i)}$是一个one-hot向量.
+
+\section{Historical Notes}
+
+本章介绍的前向神经网络是对非线性函数进行估计的模型,它使用梯度下降法最小化误差.相关的技术发展历程为:
+\begin{enumerate}
+    \item 链式法则:17世纪
+    \item 梯度下降法:18世纪
+    \item 线性神经网络:20世纪40年代
+    \item 非线性神经网络:20世纪60到70年代
+    \item \textit{Parallel Distributed Processing}文献中提出BP算法
+    \item 神经网络发展高潮:20世纪90年代
+    \item 前向神经网络:20世纪80年代
+\end{enumerate}
+
+从1986年到2015年,前向神经网络得到了很大发展,其原因有:
+\begin{itemize}
+    \item 数据规模更大
+    \item 神经网络规模更大
+\end{itemize}
+相应的算法上改进有:
+\begin{itemize}
+    \item 交叉熵取代MSE
+    \item 分段线性的隐层单元取代sigmoid隐层神经元
+\end{itemize}
+
+在今天,前向神经网络扭转了以往的差评局面,但是仍然有很大的发展空间.
