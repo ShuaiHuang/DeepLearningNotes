@@ -1,0 +1,68 @@
+\chapter{Regularization for Deep Learning}
+
+正则化项主要用来降低测试误差,借以提升模型的泛化能力,是机器学习领域内的一个重要研究方向.本章的正则化特指为了降低泛化误差而对学习算法进行的修改.正则化项有两种作用方式:对先验知识进行编码;降低模型复杂度.深度学习中使用的正则化策略绝大部分是基于正则化估计量的策略.学习算法训练出的模型可能会出现
+\begin{enumerate}
+    \item 将真实数据生成过程排除在模型外;
+    \item 符合真实的数据生成过程;\label{enum:2}
+    \item 包含了真实的数据生成过程,但是也包含了其他可能的生成过程.\label{enum:3}
+\end{enumerate}
+正则化的目的就是将上述\ref{enum:3}中的情况转化为\ref{enum:2}的情况.在深度学习的场景中,与真实情况最匹配的模型可能是一个包含正则化项的复杂模型.
+
+\section{Parameter Norm Penalties}
+
+正则化出现的时间比深度学习要早,通过在\textit{目标函数}(objective function)$J$中添加\textit{范数补偿}(norm penalty)$\Omega(\theta)$达到限制模型capacity的目的.正则化后的目标函数为
+\begin{equation}
+\tilde J(\theta;\mathbf{X,y})=J(\theta;\mathbf{X,y})+\alpha\Omega(\theta)
+\end{equation}
+其中$\alpha\in[0,\infty)$是平衡正则化项权重的超参数.在深度学习中,可以对神经网络的每一层分别设置参数$\alpha$,但是这样计算代价太大,通常将每一层的参数设置成相同的.
+
+\subsection{$L^2$ Parameter Regularization}
+
+$L^2$正则化又被称为\textit{岭回归}(ridge regression)或者\textit{Tikhonov正则化}(Tikhonov regularization).其定义为
+\begin{equation}
+\tilde J(\mathbf w;\mathbf{X,y})=J(\mathbf w;\mathbf{X,y})+\frac{\alpha}{2}\mathbf w^T\mathbf w
+\end{equation}
+对应的权重$\mathbf w$更新公式为
+\begin{equation}
+\mathbf w\leftarrow(1-\epsilon\alpha)\mathbf w-\epsilon\nabla_{\mathbf w}J(\mathbf {w;X,y})
+\end{equation}
+可以看出正则化对于单步优化的影响为减小了步长.
+
+通过对损失函数在点$\mathbf w^\ast={\arg\min}_\mathbf wJ(\mathbf w)$做二次展开,并求展开式对$\mathbf w$的导数,设在$\tilde{\mathbf w}$导数为0,有
+\begin{equation}\begin{split}
+\tilde{\mathbf w}&=(\mathbf H+\alpha\mathbf I)^{-1}\mathbf{Hw}^\ast\\
+&=\mathbf Q(\mathbf\Lambda+\alpha\mathbf I)^{-1}\mathbf\Lambda\mathbf Q^T\mathbf w^\ast
+\end{split}\end{equation}
+可以看出,与$\mathbf H$的第$i$个特征向量对应的$\mathbf w^\ast$缩小比例为$\frac{\lambda_i}{\lambda_i+\alpha}$.当$\lambda_i\gg\alpha$时,正则化影响很小;当$\lambda_i\ll\alpha$时,缩小至$0$附近.也就是说,正则化项只有对目标函数下降比较明显的方向上的分量才会做完整的保留.
+
+对线性回归问题,正则化项加上均方误差为
+\begin{equation}
+\mathbf{(Xw-y)^T(Xw-y)}+\frac{1}{2}\alpha\mathbf{w^Tw}
+\end{equation}
+对应的对$\mathbf w$导数为$0$的点为
+\begin{equation}
+\mathbf{w=(X^TX}+\alpha\mathbf{I)^{-1}X^Ty}
+\end{equation}
+正则化项对输入中方差较高项进行了保留.
+
+\subsection{$L^1$ Regularization}
+
+$L^1$正则化项被定义为
+\begin{equation}
+\Omega(\theta)=\|\mathbf w\|_1=\sum_i|w_i|
+\end{equation}
+相应的目标函数为
+\begin{equation}
+\tilde J(\mathbf{w;X,y})=\alpha\|\mathbf w\|_1+J(\mathbf{w;X,y})
+\end{equation}
+正则化项对于梯度的贡献只有符号.为了简化对$1$-范数求导,假设Hessian矩阵是对角矩阵$\mathbf H=diag([H_{1,1},\cdots,H_{n,n}])$,其中$H_{i,i}>0$.有
+\begin{equation}
+\hat J(\mathbf{w;X,y})=J(\mathbf{w^\ast;X,y})+\sum_i\Big[\frac{1}{2}H_{i,i}(\mathbf{w_i-w_i^\ast})^2+\alpha|w_i|\Big]
+\end{equation}
+极小值为
+\begin{equation}
+w_i=\text{sign}(w_i^\ast)\max\{|w_i^\ast|-\frac{\alpha}{H_{i,i}},0\}
+\end{equation}
+可以看出,$L^1$正则化让解更稀疏.所以它常被用来作特征选择.
+
+此外,$L^2$正则化等价于高斯先验的MAP贝叶斯推断;$L^1$正则化等价于各向同性Laplace分布先验的MAP贝叶斯推断\footnote{TODO:复习与MAP贝叶斯推断的等价关系}.
