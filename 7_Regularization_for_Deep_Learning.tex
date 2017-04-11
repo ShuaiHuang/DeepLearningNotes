@@ -11,7 +11,7 @@
 \section{Parameter Norm Penalties}
 
 正则化出现的时间比深度学习要早,通过在\textit{目标函数}(objective function)$J$中添加\textit{范数补偿}(norm penalty)$\Omega(\theta)$达到限制模型capacity的目的.正则化后的目标函数为
-\begin{equation}
+\begin{equation}\label{eq:cost_func}
 \tilde J(\theta;\mathbf{X,y})=J(\theta;\mathbf{X,y})+\alpha\Omega(\theta)
 \end{equation}
 其中$\alpha\in[0,\infty)$是平衡正则化项权重的超参数.在深度学习中,可以对神经网络的每一层分别设置参数$\alpha$,但是这样计算代价太大,通常将每一层的参数设置成相同的.
@@ -66,3 +66,70 @@ w_i=\text{sign}(w_i^\ast)\max\{|w_i^\ast|-\frac{\alpha}{H_{i,i}},0\}
 可以看出,$L^1$正则化让解更稀疏.所以它常被用来作特征选择.
 
 此外,$L^2$正则化等价于高斯先验的MAP贝叶斯推断;$L^1$正则化等价于各向同性Laplace分布先验的MAP贝叶斯推断\footnote{TODO:复习与MAP贝叶斯推断的等价关系}.
+
+\section{Norm Penalties as Constrained Optimization}
+
+在前一节中提到的式\ref{eq:cost_func}中的优化问题可以通过Lagrangian函数转化为有限制条件的优化问题
+\begin{equation}\label{eq:explicit_constrain}
+\mathcal L(\theta,\alpha;\mathbf{X,y})=J(\theta;\mathbf{X,y})+\alpha(\Omega(\theta)-k)
+\end{equation}
+相应的,解为
+\begin{equation}
+\theta^\ast={\arg\min}_\theta\max_{\alpha,\alpha\ge 0}\mathcal L(\theta,\alpha)
+\end{equation}
+定性地分析,最优值$\alpha^\ast$会使$\Omega(\theta)$的值不断减小,但还没有到达让$\Omega(\theta)$小于$k$的程度.因此,我们可以将范数补偿视为在目标函数上增加限制条件.如果不知道限制区域的大小,可以通过调节$\alpha$对限制区域的大小进行调节.
+
+上述显式限制条件有两个优点
+\begin{itemize}
+    \item 如果知道限制条件,即式\ref{eq:explicit_constrain}中的$k$,那么可以直接对$J(\theta)$使用梯度下降法求下降方向,然后在最小值点附近寻找满足$\Omega(\theta)<k$的点.这样就避免了搜索与$k$相匹配的$\alpha$的过程;
+    \item 显式限制条件可以避免因为引入补偿项而导致的非凸优化过程陷入局部极小点.而reprojection方法可以避免这种现象;
+    \item 增加优化过程的稳定性.
+\end{itemize}
+
+在实际中,常将\textit{列范数限制}(column norm limitation)与显式限制条件相结合使用.
+
+\section{Regularization and Under-Constrained Problems}
+
+在机器学习中,正则化项需要根据实际问题进行妥善定义,因为正则化项需要保证未定问题迭代优化过程的收敛性.
+
+在机器学习以外的领域,也有通过添加正则化项来解决优化问题的方法,如Moore-Penrose广义逆.
+
+\section{Dataset Augmentation}
+
+在机器学习中,可以通过创造"假"数据的方法来增大数据集.这种方法适用于分类问题,但是在其他领域内不太适用,因为可能会改变数据的原始分布.
+
+Dataset augmentation对物体识别问题特别有效.需要注意的是,dataset augmentation不能改变样本的真实标记.
+
+Dataset augmentation在语音识别领域也被广泛应用.
+
+对不同算法进行性能评估比较时,必须将dataset augmentation也考虑进去,在同样的条件下进行比较.
+
+\section{Noise Robustness}
+
+在某些神经网络模型上,给输入添加合适的噪声等价于对权重的范数补偿.这种方法相比于限制权重的大小更加有效,特别是将噪声添加到隐层的输入上.
+
+另外,在网络连接的权重上增加噪声也等价于对模型进行正则化.
+
+增加噪声间接导致了模型学习出稳定的函数.
+
+\subsection{Injection Noise at the Output Targets}
+
+由于某些数据集中部分样本的标注不是完全正确,所以当$y$错误时,直接最大化$\log p(y|\mathbf x)$可能会出现问题.因此\textit{label smoothing}被广泛应用,它使用softmax对模型的0-1硬标记进行替换.
+
+\section{Semi-Supervised Learning}
+
+\textit{半监督学习}是指使用$P(\mathbf x)$中采样得到的未标记样本和从$P(\mathbf{x, y})$中得到的有标记样本共同预测$P(\mathbf{y|x})$的过程.
+
+深度学习中半监督学习的目的是学习特征表示,这样相同类别的样本就会有相似的特征表示.
+
+与传统的有监督学习和无监督学习分离的方法相比,半监督学习通过$P(\mathbf{x,y})$或$P(\mathbf x)$和$P(\mathbf{y|x})$共享参数的方法将两个过程进行融合.
+
+\section{Multi-Task Learning}
+
+多任务学习通过合并不同任务中的样本提升泛化性能.训练出的模型参数分为两类
+\begin{itemize}
+    \item 任务特定参数
+    \item 通用参数
+\end{itemize}
+
+由于通用参数的存在,模型的泛化能力得到提升,泛化误差下降.但是多任务学习也有一项前提假设:不同的任务受到同一因素影响,并且这个因素可以通过数据观察得到.
