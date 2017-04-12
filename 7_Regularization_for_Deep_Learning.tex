@@ -45,7 +45,7 @@ $L^2$正则化又被称为\textit{岭回归}(ridge regression)或者\textit{Tikh
 \end{equation}
 正则化项对输入中方差较高项进行了保留.
 
-\subsection{$L^1$ Regularization}
+\subsection{$L^1$ Regularization}\label{sec:l1_regularization}
 
 $L^1$正则化项被定义为
 \begin{equation}
@@ -133,3 +133,41 @@ Dataset augmentation在语音识别领域也被广泛应用.
 \end{itemize}
 
 由于通用参数的存在,模型的泛化能力得到提升,泛化误差下降.但是多任务学习也有一项前提假设:不同的任务受到同一因素影响,并且这个因素可以通过数据观察得到.
+
+\section{Early Stopping}
+
+早停是指泛化误差达到最小值后,参数更新到达指定迭代次数后终止优化算法,并将参数恢复至泛化误差最小点所对应的参数.通过早停策略可以减少验证集上的误差,从而提升泛化性能.
+
+早停是一种高效的超参数选择方法,它可以选择合适的优化算法迭代次数(超参数),并且不会对原始的算法产生影响.但是同时它也会增加计算代价和存储代价.
+\begin{itemize}
+    \item \textbf{计算代价}:在优化过程中,每隔一定迭代轮数,需要计算当前模型在验证集上的误差;
+    \item \textbf{存储代价}:在优化过程中需要时刻保存一份最优参数.
+\end{itemize}
+
+早停策略也可以与其他正则化策略一起使用.
+
+为了充分利用所有的训练数据,可以进行二次训练:
+\begin{enumerate}
+    \item 重新初始化模型,按照第一轮的超参数进行训练;
+    \item 保持第一轮的最优参数,加入新的数据继续进行训练.
+\end{enumerate}
+
+从本质上来说,早停将超参数限制在初始值附近的空间中.在一定条件下,早停与$L^2$正则化等价.但是从优化过程上来看,早停自动决定了正则化程度,而$L^2$正则化需要调整超参数.
+
+\section{Parameter Tying and Parameter Sharing}
+
+有时我们需要将正则化之外的先验条件整合到模型中去.此外,我们可以知道模型的结构和相关领域的知识,这样模型之间的参数可能会有一些从属关系(dependency).最常见的模型间的参数从属关系是共享参数.
+
+共享参数的一个重要优势是其存储优势,从而借助于共享参数,可以提升网络的层数.\footnote{TODO: 仔细理解共享参数.CNN是如何实现共享参数的?}
+
+\section{Sparse Representation}
+
+另一种正则化方法是对激活函数添加补偿项使其输出稀疏化.表示方法正则化与参数正则化的机制一致,即
+\begin{equation}
+\tilde J(\theta;\mathbf{X,y})=J(\theta;\mathbf{X,y})+\alpha\Omega(\mathbf h)
+\end{equation}
+其中,$\Omega(\mathbf h)$不仅仅可以使用\ref{sec:l1_regularization}节中提到的$L^1$正则补偿项的形式,还可以借助于其他的一些形式实现稀疏化表达.
+
+除了上述添加补偿项实现表示稀疏,还可以通过在激活值上添加硬限制条件实现稀疏表达.典型的方法有\textit{orthogonal matching pursuit}.
+
+从理论上来说,任何有隐层的模型都可以进行稀疏化表示.
