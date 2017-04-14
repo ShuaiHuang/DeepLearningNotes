@@ -195,3 +195,84 @@ Dropout与bagging的不同之处在于
     \item Bagging中学习器间相互独立;而dropout各个子模型之间的参数是共享的;
     \item Bagging中各个学习器经过训练都会达到收敛状态;而dropout大部分子模型都没有被充分地训练(由于参数共享,可以保证模型有较高的泛化能力).
 \end{itemize}
+
+集成学习中的Bagging模型需要将所有子模型对新样本的预测结果收集起来进行综合判断,这一个过程被称为\textit{推断}(inference).特别地,针对dropout算法,需要首先建立起计算模型
+\begin{equation}
+\sum_{\mathbf\mu}p(\mathbf\mu)p(y|\mathbf{x,\mu})
+\end{equation}
+其中$p(\mathbf\mu)$是训练时mask vector的概率密度函数.其次在实际中,只需要对$\mathbf\mu$进行采样就可以近似估计出推断结果.
+
+尽管采样可以近似估计出推断结果,但是还有更好的推断方式:使用几何平均数代替算术平均数.
+\begin{equation}
+\tilde p_{ensemble}(y|\mathbf x)=\sqrt[2^d]{\prod_{\mathbf\mu}p(y|\mathbf{x,\mu})}
+\end{equation}
+进行归一化,有
+\begin{equation}
+p_{ensemble}(y|\mathbf x)=\frac{\tilde p_{ensemble}(y|\mathbf x)}{\sum_{y'}\tilde p_{ensemble}(y'|\mathbf x)}
+\end{equation}
+这种推断方式被称为\textit{weighted scaling inference rule}.
+
+需要注意的是,我们通常将\textit{包含概率}\footnote{The probability becoming part of the sample during the drawing of a single sample.}(inclusion probability)设为$\frac{1}{2}$,所以所以需要在训练过程结束后将神经元的连接权重除以$2$.也可以在训练过程中将每个神经元的状态(states)乘$2$\footnote{TODO: figure it out.}.
+
+实验证明, weighted scaling inference rule与蒙特卡洛估计相比,各有好坏,需要根据实际情况选择最优的策略.但是总体来说, weighted scaling inference rule的优势有
+\begin{itemize}
+    \item 计算效率高,可以与其他形式的正则化方法结合使用;
+    \item 计算代价低;
+    \item 对模型和训练过程几乎没有影响.
+\end{itemize}
+同时,也需要认识到它的劣势
+\begin{itemize}
+    \item effective capacity受限,为了解决这个问题,需要增大模型的规模;
+    \item dropout在小规模数据集上的表现不好.
+\end{itemize}
+
+前面提到的dropout的随机性并不是dropout方法有效的关键,随机性仅仅是一种估计的手段.\textit{fast drop}方法就是通过减少梯度计算时的随机性来加速算法收敛的.另外, dropout的随机性对其正则化的作用也不充分.
+
+Dropout催生出了许多正则化方法,它们都借助于指数级别的子模型来共享参数.因此,dropout是迄今为止应用最为广泛的集成学习方法.
+
+Dropout本质上是一种共享参数的bagging方法.所以, dropout的mask并不一定是严格的$0$-$1$分布,它也可以是诸如$\mathcal N(1,\mathbf I)$的正态分布.
+
+dropout还是隐层单元共享参数的方法.它通过随机屏蔽隐层单元,使得学习到的特征更具有鲁棒性.本质上来说, dropout可视为神经元输入信息的损失,而非原始信息的损失.相比之下,传统的噪声注入并不能有效抹除上下文相关信息. Dropout充分利用分布表达的优势,充分利用上下文信息.
+
+同时从另外一方面来说, dropout会使噪声加倍,如果噪声过大的话,就没必要使用dropout进行正则化了.
+
+\section{Adversarial Training}
+
+如果想要评估高精度模型对任务的理解程度,就需要特别关注误分样本和\textit{对立样本}(adversarial example).同时,还可以借助于对立样本对训练集的扰动对模型进行\textit{对立训练}(adversarial training),以降低测试误差.
+
+对立样本产生的原因是因为模型过度线性化.对立训练使模型在训练样本周围达到局部平坦,从而避免模型因局部线性而对扰动特别敏感的特性.
+
+对立训练有助于提升函数族强大的正则化能力.
+
+对立样本还有助于完成半监督学习.假设不同类别的样本分布于不连通的流形上,一个很小的扰动不会使得样本从其所在的流形跳到其他流形上.
+
+\section{Tangent Distance, Tangent Prop, and Manifold Tangent Classifier}
+
+\textit{切面距离算法}(tangent distance algorithm)是一种非参数最近邻算法.与最近邻算法不同的是,它使用的是流形距离.即假设不同类别的样本分别位于不同的流形上,两个不同类别的样本间的距离需要通过优化问题进行求解.为了简化距离计算,可以将两个样本在流形上的切面间的距离作为样本间的距离.
+
+在此基础上,\textit{切面传播算法}(tangent prop algorithm)训练出一个神经网络分类器,并在其损失函数上添加补偿项
+\begin{equation}
+\Omega(f)=\sum_i\Big((\nabla_{\mathbf x}f(\mathbf x))^T\mathbf v^{(i)}\Big)^2
+\end{equation}
+使得$f(\mathbf x)$对已知的变量不敏感.补偿项就包含了先验知识,使得输出函数在训练样本附近平坦. Tangent prop算法不仅被用于有监督学习,还被用于强化学习.
+
+Tangent prop与data augmentation相比,它们的相同之处为:编码先验知识,使得输入有扰动时,输出不变.不同之处在于
+\begin{itemize}
+    \item data augmentation中,对输入样本做多种转换,保持输出正确;而tangent prop只做输出局部平坦的先验,并不要求输出达到新的点;
+    \item tangent prop的较少种类的扰动对rectified单元求导造成了困难;而data augmentation由于扰动种类较多,所以斌不会对rectified单元求导造成太大苦难.
+\end{itemize}
+
+Tangent prop与double backprop\footnote{TODO: More details need to be specified.}以及对立学习很相似.
+\begin{itemize}
+    \item Double backprop通过正则化将Jacobian变得很小,对立训练通过对输入增加扰动,使模型输出不变;
+    \item Tangent prop与data augmentation都使得输入有扰动时,输出不变;
+    \item Double backprop和对立训练都要求输入样本在所有方向上有扰动时,输出的变化很小;
+    \item Data augmentation相比于tangent prop,输入变换的种类较多;
+    \item 对立训练相比于double backprop,变换的方式有很多.
+\end{itemize}
+
+\textit{流形切面分类器}(manifold tangent classifier)避免了使用流形的切向量作为先验知识的麻烦.它的算法很简单
+\begin{enumerate}
+    \item 使用autoencoder模型,无监督学习流行的结构;
+    \item 使用切面正则化神经网络分类器(参考tangent prop算法).
+\end{enumerate}
