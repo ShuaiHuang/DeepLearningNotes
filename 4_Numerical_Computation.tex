@@ -12,9 +12,12 @@ Conditioning是指一个函数的输入发生微小变化时,其对应的输出�
 大多数深度学习算法都会涉及到某些种类的优化过程.我们通常沿着目标函数的梯度下降方向搜索全局最小值但是如果参数选取不当的话,会收敛到局部极小值或者鞍点上.
 
 \subsection{Beyond the Gradient: Jacobian and Hessian Matrics}
-对于输入和输出都是向量的函数,如果要计算其偏导数,就需要用\textbf{Jacobian矩阵}进行表示.设$f:\mathbb R^m\rightarrow\mathbb R^n$,则有Jacboian矩阵$\mathbf J\in\mathbb R^{m\times n}$.其中,$J_{i,j}=\frac{\partial}{\partial x_j}f(\mathbf x)_i$.
+对于输入和输出都是向量的函数,如果要计算其偏导数,就需要用\textbf{Jacobian矩阵}进行表示.设$f:\mathbb R^m\rightarrow\mathbb R^n$,则有Jacboian矩阵$\mathbf J\in\mathbb R^{m\times n}$.其中,
+\begin{equation}\label{eq:jacobian_matrix}
+J_{i,j}=\frac{\partial}{\partial x_j}f(\mathbf x)_i
+\end{equation}
 如果求二次偏导,则有\textbf{Hessian矩阵},即
-\begin{equation}
+\begin{equation}\label{eq:hessian_matrix}
 \mathbf H(f)(\mathbf x)_{i,j}=\frac{\partial^2}{\partial x_i\partial x_j}f(\mathbf x)
 \end{equation}
 如果想计算某一个方向上的二阶偏导,则有$\mathbf{d}^T\mathbf{Hd}$其中,$\mathbf d$是一单位向量.特别的,如果$\mathbf d$是$\mathbf H$的特征向量,则$\mathbf d$方向上的二阶偏导就是$\mathbf H$对应于$\mathbf d$的特征值.在任何方向上的二阶偏导都在最大特征值和最小特征值的范围之间.

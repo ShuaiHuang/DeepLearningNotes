@@ -6,7 +6,7 @@
     \item 符合真实的数据生成过程;\label{enum:2}
     \item 包含了真实的数据生成过程,但是也包含了其他可能的生成过程.\label{enum:3}
 \end{enumerate}
-正则化的目的就是将上述\ref{enum:3}中的情况转化为\ref{enum:2}的情况.在深度学习的场景中,与真实情况最匹配的模型可能是一个包含正则化项的复杂模型.
+正则化的目的就是将上述情况\ref{enum:3}转化为情况\ref{enum:2}.在深度学习的场景中,与真实情况最匹配的模型可能是一个包含正则化项的复杂模型.
 
 \section{Parameter Norm Penalties}
 
@@ -14,7 +14,7 @@
 \begin{equation}\label{eq:cost_func}
 \tilde J(\theta;\mathbf{X,y})=J(\theta;\mathbf{X,y})+\alpha\Omega(\theta)
 \end{equation}
-其中$\alpha\in[0,\infty)$是平衡正则化项权重的超参数.在深度学习中,可以对神经网络的每一层分别设置参数$\alpha$,但是这样计算代价太大,通常将每一层的参数设置成相同的.
+其中$\alpha\in[0,\infty)$是平衡正则化项权重的超参数.在深度学习中,可以对神经网络的每一层分别设置参数$\alpha$,但是这样计算代价太大,通常将所有层的参数设置成相同的.
 
 \subsection{$L^2$ Parameter Regularization}
 
@@ -28,7 +28,7 @@ $L^2$正则化又被称为\textit{岭回归}(ridge regression)或者\textit{Tikh
 \end{equation}
 可以看出正则化对于单步优化的影响为减小了步长.
 
-通过对损失函数在点$\mathbf w^\ast={\arg\min}_\mathbf wJ(\mathbf w)$做二次展开,并求展开式对$\mathbf w$的导数,设在$\tilde{\mathbf w}$导数为0,有
+通过对$J$在点$\mathbf w^\ast={\arg\min}_\mathbf wJ(\mathbf w)$做二次展开,并加上正则化项求导,设在$\tilde{\mathbf w}$导数为0,有
 \begin{equation}\begin{split}
 \tilde{\mathbf w}&=(\mathbf H+\alpha\mathbf I)^{-1}\mathbf{Hw}^\ast\\
 &=\mathbf Q(\mathbf\Lambda+\alpha\mathbf I)^{-1}\mathbf\Lambda\mathbf Q^T\mathbf w^\ast
@@ -65,7 +65,7 @@ w_i=\text{sign}(w_i^\ast)\max\{|w_i^\ast|-\frac{\alpha}{H_{i,i}},0\}
 \end{equation}
 可以看出,$L^1$正则化让解更稀疏.所以它常被用来作特征选择.
 
-此外,$L^2$正则化等价于高斯先验的MAP贝叶斯推断;$L^1$正则化等价于各向同性Laplace分布先验的MAP贝叶斯推断\footnote{TODO:复习与MAP贝叶斯推断的等价关系}.
+此外,$L^2$正则化等价于高斯先验的MAP贝叶斯推断;$L^1$正则化等价于各向同性Laplace分布先验的MAP贝叶斯推断\footnote{正则化项等价于式\ref{eq:map_estimation}中的$\log p(\theta)$项,即将参数的先验分布整合进目标函数中进行优化.但并不是所有的正则化项都等价于MAP贝叶斯推断.}.
 
 \section{Norm Penalties as Constrained Optimization}
 
@@ -81,9 +81,9 @@ w_i=\text{sign}(w_i^\ast)\max\{|w_i^\ast|-\frac{\alpha}{H_{i,i}},0\}
 
 上述显式限制条件有两个优点
 \begin{itemize}
-    \item 如果知道限制条件,即式\ref{eq:explicit_constrain}中的$k$,那么可以直接对$J(\theta)$使用梯度下降法求下降方向,然后在最小值点附近寻找满足$\Omega(\theta)<k$的点.这样就避免了搜索与$k$相匹配的$\alpha$的过程;
-    \item 显式限制条件可以避免因为引入补偿项而导致的非凸优化过程陷入局部极小点.而reprojection方法可以避免这种现象;
-    \item 增加优化过程的稳定性.
+    \item 如果知道限制条件,即式\ref{eq:explicit_constrain}中$k$的数值,那么可以直接对$J(\theta)$使用梯度下降法求下降方向,然后在最小值点附近寻找满足$\Omega(\theta)<k$的点.这种reprojection过程就避免了搜索与$k$相匹配的$\alpha$的过程;
+    \item 显式限制条件可以避免隐式限制条件因为引入补偿项而导致的非凸优化过程陷入局部极小点.而reprojection方法可以避免这种现象;
+    \item 增加优化过程的稳定性,避免因为学习率参数较高导致的权重参数溢出.
 \end{itemize}
 
 在实际中,常将\textit{列范数限制}(column norm limitation)与显式限制条件相结合使用.
@@ -158,7 +158,7 @@ Dataset augmentation在语音识别领域也被广泛应用.
 
 有时我们需要将正则化之外的先验条件整合到模型中去.此外,我们可以知道模型的结构和相关领域的知识,这样模型之间的参数可能会有一些从属关系(dependency).最常见的模型间的参数从属关系是共享参数.
 
-共享参数的一个重要优势是其存储优势,从而借助于共享参数,可以提升网络的层数.\footnote{TODO: 仔细理解共享参数.CNN是如何实现共享参数的?}
+共享参数的一个重要优势是其存储优势,从而借助于共享参数,可以在不增加样本的情况下提升网络的层数.\footnote{CNN网络中,不同位置的出现的特征共享参数,可以在物体检测任务中得到与空间无关的结果.}
 
 \section{Sparse Representation}
 
@@ -262,9 +262,9 @@ Tangent prop与data augmentation相比,它们的相同之处为:编码先验知�
     \item tangent prop的较少种类的扰动对rectified单元求导造成了困难;而data augmentation由于扰动种类较多,所以斌不会对rectified单元求导造成太大苦难.
 \end{itemize}
 
-Tangent prop与double backprop\footnote{TODO: More details need to be specified.}以及对立学习很相似.
+Tangent prop与double backprop\footnote{A new training algorithm termed double backpropagation improves generalization by simultaneously minimizing the normal energy term found in backpropagation and an additional energy term that is related to the sum of the squares of the input derivatives (gradients).}以及对立学习很相似.
 \begin{itemize}
-    \item Double backprop通过正则化将Jacobian变得很小,对立训练通过对输入增加扰动,使模型输出不变;
+    \item Double backprop通过正则化将Jacobian\footnote{见\pageref{eq:jacobian_matrix}页式\ref{eq:jacobian_matrix}.}变得很小,对立训练通过对输入增加扰动,使模型输出不变;
     \item Tangent prop与data augmentation都使得输入有扰动时,输出不变;
     \item Double backprop和对立训练都要求输入样本在所有方向上有扰动时,输出的变化很小;
     \item Data augmentation相比于tangent prop,输入变换的种类较多;

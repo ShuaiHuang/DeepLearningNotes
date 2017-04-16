@@ -195,7 +195,7 @@ D_{KL}=(\hat p_{\text{data}}\|p_{\text{model}})=\mathbb E_{\mathbf x\sim\hat p_{
 \subsection{Maximum A \textit{Posteriori} (MAP) Estimation}
 
 由于贝叶斯统计量估计出的是参数的全分布,但是一般希望导出的是一个点估计.所以使用MAP得到一个对应的点估计.
-\begin{equation}
+\begin{equation}\label{eq:map_estimation}
 \theta_{MAP}={\arg\max}_\theta p(\theta|\mathbf x)={\arg\max}_\theta\log p(\mathbf x|\theta)+\log p(\theta)
 \end{equation}
 由于$p(\theta)$是预先选定的,所以只要关心$p(\mathbf x|\theta)$即可.
