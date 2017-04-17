@@ -27,8 +27,8 @@ J_{i,j}=\frac{\partial}{\partial x_j}f(\mathbf x)_i
 f(\mathbf x)\approx f(\mathbf x^{(0)})+(\mathbf x-\mathbf x^{(0)})^T\mathbf g+\frac{1}{2}(\mathbf x-\mathbf x^{(0)})^T\mathbf H(\mathbf x-\mathbf x^{(0)})
 \end{equation}
 其中,$\mathbf g$和$\mathbf H$分别是$f(\mathbf x)$在$\mathbf x^{(0)}$点的梯度和Hessian矩阵.设学习率为$\epsilon$,则新到达的点为$\mathbf x^{(0)}-\epsilon\mathbf g$,在该点上取值为
-\begin{equation}
-f(\mathbf x^{(0)}-\epsilon\mathbf g)\approx f(\mathbf x^{(0)})-\epsilon\mathbf g^T\mathbf g+\frac{1}{2}\mathbf g^T\mathbf{Hg}
+\begin{equation}\label{eq:second_order_taylor_expansion}
+f(\mathbf x^{(0)}-\epsilon\mathbf g)\approx f(\mathbf x^{(0)})-\epsilon\mathbf g^T\mathbf g+\frac{1}{2}\epsilon^2\mathbf g^T\mathbf{Hg}
 \end{equation}
 上式中最后一项不能太大,否则新的数值将会比原值还要大.当$\mathbf g^T\mathbf{Hg}$等于或者小于$0$时,$\epsilon$可以取到很大的值;当$\mathbf g^T\mathbf{Hg}$大于$0$时,有
 \begin{equation}

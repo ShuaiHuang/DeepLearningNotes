@@ -1,0 +1,81 @@
+\chapter{Optimization for Training Deep Models}
+
+深度学习过程涉及到的优化过程耗时长且有着重要的地位.本章重点介绍深度神经网络训练过程中的优化算法.一般情况下,训练过程中的优化目标是包含正则化项的损失函数.本章将从以下几个方面介绍优化算法
+\begin{enumerate}
+    \item 机器学习中的优化问题与传统优化问题的区别;
+    \item 深度学习中优化问题面临的挑战;
+    \item 自适应学习率或损失函数二阶求导;
+    \item 通过简单优化组合出复杂优化的策略.
+\end{enumerate}
+
+\section{How Learning Differs from Pure Optimization}
+
+对于机器学习算法中的损失函数$J$,其目的是用来提升机器学习效果$P$的,但是对于传统优化问题来说,$J$仅仅只是一个优化目标.通常情况下,损失函数是在所有训练样本上取平均
+\begin{equation}
+J(\theta)=\mathbb E_{(\mathbf x,y)\sim\hat p_{data}}L(f(\mathbf x;\theta),y)
+\end{equation}
+但是我们希望得到的是在数据生成模型分布上的期望泛化误差
+\begin{equation}\label{eq:expected_generalization_error}
+J^\ast(\theta)=\mathbb E_{(\mathbf x,y)\sim p_{data}}L(f(\mathbf x;\theta),y)
+\end{equation}
+
+\subsection{Empirical Risk Minimization}
+
+机器学习的目标是降低期望泛化误差,又被称为\textit{风险}(risk),但是通过观察式\ref{eq:expected_generalization_error}可以看出,真实数据分布$p_{data}$未知,因此期望泛化误差不能通过计算直接得到.因此一个替代方案就是最小化\textit{经验风险}(empirical risk)
+\begin{equation}
+\mathbb E_{(\mathbf x,y)\sim\hat p_{data}}\left[L(f(\mathbf x;\theta),y)\right]=\frac{1}{m}\sum_{i=1}^mL(f(\mathbf x^{(i)};\theta),y^{(i)})
+\end{equation}
+其中$m$是训练样本的数目.
+
+但是直接使用经验风险最小化策略容易产生过拟合,另外由于$0$-$1$损失函数不能直接求导的原因,深度学习中不使用经验风险最小化策略.
+
+\subsection{Surrogate Loss Functions and Early Stopping}
+
+一般从优化问题效率角度出发使用\textit{代理损失函数}(surrogate loss function)对经验风险函数进行替代.代理损失函数可以延长学习的过程,增强训练出的模型的鲁棒性.同时为了避免过拟合,通常使用早停策略,不会将代理损失函数优化到局部极小值点.
+
+\subsection{Batch and Minibatch Algorithms}
+
+机器学习中的优化问题使用部分样本的损失函数加和去估计整体损失函数,进而对参数进行迭代更新.在实际中,从训练集中采样部分样本评估整体风险的做法很常见.使用采样策略对风险进行评估相比于计算准确的风险,会使得算法收敛速度更快.同时,再重复样本上计算梯度会有大量的冗余.
+
+在全部样本上计算梯度的方法被称为\textit{batch/deterministic gradient method},如果使用单个样本计算梯度的方法被称为\textit{stochastic/online method}.深度学习算法中的优化问题介于两者之间,被称为\textit{minibatch stochastic method}.
+
+minibatch尺寸的选择因素有
+\begin{itemize}
+    \item 从尺寸增大与回报中做平衡;
+    \item 从处理器核的数目做考虑;
+    \item 从内存角度做考虑;
+    \item $2$的倍数;
+    \item 小尺寸有正则化的作用.
+\end{itemize}
+
+不同的算法会以不同的形式使用minibatch,并使用其中的不同信息.
+
+需要注意的是,minibatch的随机性很重要.实际中常对样本进行随机打乱来保证随机性.如果样本分解到位,可以使用异步并行的方式更新模型参数.
+
+在样本没有重复的条件下,minibatch方法与梯度下降方法的泛化误差同步下降,但是当样本重复(即开始使用样本进行第二轮迭代)后,偏差会上升.在线学习由于会有数据源源不断地输入进来,所以在泛化误差下降的方面更具有优势.在非在线学习的情形下,第一轮是用样本是无偏梯度估计,之后的迭代是为了减小训练误差与测试误差之间的差异.当训练数据集很大时,每个样本只被使用一次,主要关注的是欠拟合和计算效率问题.
+
+\section{Challenges and Neural Network Optimization}
+
+\subsection{Ill-Conditioning}
+
+在优化问题是凸优化的条件下,也会存在挑战.Hessian矩阵病态条件就是其中之一.如式\ref{eq:second_order_taylor_expansion}中的
+\begin{equation}
+-\epsilon\mathbf g^T\mathbf g+\frac{1}{2}\epsilon^2\mathbf g^T\mathbf{Hg}
+\end{equation}
+就有可能存在$\frac{1}{2}\epsilon^2\mathbf g^T\mathbf{Hg}>\epsilon\mathbf g^T\mathbf g$的病态情况.
+
+其他领域内解决病态的问题的方法不能直接用来解决深度学习中的病态问题,需要做一些调整.
+
+\subsection{Local Minima}
+
+在凸优化问题中,局部极小值等价于全局最小值.匪徒问题局部极小并非全局最小,但这并不是主要问题.
+
+如果一个足够大的训练数据集可以训练出唯一一组模型参数,那么就可以说这个模型是\textit{可辨识模型}(model identifiability).神经网络和其他具有隐变量的模型都是不可辨识的.神经网络具有不可辨识性的原因有
+\begin{description}
+    \item [weight space symmetry]对隐层调神经元不影响最终结果;
+    \item [等价缩放]对某一层的神经元做输入输出的等价缩放,不影响最终结果.
+\end{description}
+
+不可辨识性导致局部极小值点很多,但是这些局部极小值点有很多具有等价性.
+
+如果局部极小值点的cost function比全局最小值点的cost function数值高,就会有问题.但是如何定量衡量这种差异还没有一个明确的标准.但是现在,研究者们表示,大多数局部极小值点都会一个比较低的cost function数值.
