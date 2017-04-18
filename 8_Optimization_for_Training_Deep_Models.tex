@@ -79,3 +79,63 @@ minibatch尺寸的选择因素有
 不可辨识性导致局部极小值点很多,但是这些局部极小值点有很多具有等价性.
 
 如果局部极小值点的cost function比全局最小值点的cost function数值高,就会有问题.但是如何定量衡量这种差异还没有一个明确的标准.但是现在,研究者们表示,大多数局部极小值点都会一个比较低的cost function数值.
+
+\subsection{Plateaus, Saddle Points and Other Flat Regions}
+
+\textit{鞍点}(saddle point)可以视为代价函数在某个横截面上的极小值点,同时也是另外一个横截面的极大值点.
+
+对于许多随机函数来说,高维空间中的鞍点数目很多.同时,许多随机函数的Hessian矩阵正特征值越多,越有可能达到代价函数的取值越小.这个性质对于神经网络来说同样适用.
+
+鞍点对基于梯度的优化算法影响并不显著,这些算法可以迅速逃离鞍点位置.相比之下,牛顿法容易陷入鞍点.因此,需要使用二阶优化的saddle-free牛顿法.
+
+牛顿法同样容易陷入极大值点以及平坦区域.
+
+\subsection{Cliffs and Exploding Gradients}
+
+梯度优化算法遇到cliff时,步长会变得很长.为了避免这种\textit{gradient clipping}现象,一个简单的解决方案就是使用固定的步长,除非到了极小值附近的区域.
+
+\subsection{Long-Term Dependencies}
+
+当计算图结构较深时,优化算法就遇到了挑战.如在RNN中,相同的操作被重复多次,就出现了\textit{梯度消失和爆炸问题}(vanishing and exploding gradient problem).但是前向神经网络不存在相同操作被重复多次的结构,因此就不会有梯度消失和爆炸问题.
+
+\subsection{Inexact Gradients}
+
+在实际中,通常只能获取到不精确的Hessian矩阵的估计值.当目标函数很难处理时,梯度也很难被精确计算.因此只能通过使用代理函数来避免上述问题.
+
+\subsection{Poor Correspondence between Local and Global Structure}
+
+当梯度的优化方向不正确,前面所描述的问题即使都被妥善解决,也不能提升优化效果.在深度神经网络的训练过程中,大部分时间都被用来选择合适的步长.在实际中,神经网络并不会恰好达到极大值点,极小值点或者鞍点.
+
+大部分研究关注的是如何选取初始值点,以获的较好的优化结果,而不是在优化算法中使用非局部移动策略.
+
+梯度下降和所有的神经网络训练算法都是基于局部移动策略,如果选取正确的初始值点,就可以得到较好的优化效果.
+
+\subsection{Theoretical Limits of Optimization}
+
+针对神经网络设计的优化算法一般都有效果上限.这些优化算法对神经网络的实际应用影响很小\footnote{TODO: 看一下中文版,搞清楚以这一节是什么意思.}.
+
+\section{Basic Algorithms}
+
+\subsection{Stochastic Gradient Descent}
+
+在\textit{随机梯度下降}(stochastic gradient descent)中,很重要的一个参数就是学习率$\epsilon$.实际使用中,这个参数是动态调整的.
+
+因为SGD通过对样本的采样引入了梯度的噪声,即使损失函数达到了最小值点,噪声也不会消失,为了保证SGD能够收敛,学习率$\epsilon$需要满足
+\begin{equation}\begin{split}
+\sum_{k=1}^\infty\epsilon_k&=\infty\\
+\sum_{k=1}^\infty\epsilon_k^2&<\infty
+\end{split}\end{equation}
+
+在迭代过程中,$\epsilon$的调整策略为
+\begin{equation}
+\epsilon_k=(1-\alpha)\epsilon_0+\alpha\epsilon_\tau
+\end{equation}
+其中$\alpha=\frac{k}{\tau}$.当迭代轮数达到$\tau$之后,$\epsilon$保持常量.
+
+一般通过代价函数的时间曲线选取合适的$\epsilon$值.
+
+SGD的计算时间不会随着样本数量的增加而增加,同时还可以保证算法的收敛性.为了研究优化算法的收敛性,引入度量指标\textit{excess error}
+\begin{equation}
+J(\mathbf\theta)-\min_{\mathbf\theta}J(\mathbf\theta)
+\end{equation}
+对于SGD算法,在第$k$轮迭代后,其excess error为$O(\frac{1}{\sqrt{k}})$,当优化问题是凸优化时,excess error为$O(\frac{1}{k})$.除非引入新的前提假设,这个上限是不会被提升的.但是如果收敛速度超过$O(\frac{1}{k})$时,就会导致过拟合.
