@@ -245,7 +245,7 @@ Adam算法可以视为RMSProp算法和动量算法的结合.最简单的结合�
 
 \subsection{Newton's Method}
 
-二阶方法使用二阶导数改善优化效果,最广泛使用的是牛顿法.对$J(\theta)$在$\theta_0$附近进行二阶展开,有
+二阶方法使用二阶导数改善优化效果\footnote{TODO: 建立起优化方法的简单知识体系.},最广泛使用的是牛顿法.对$J(\theta)$在$\theta_0$附近进行二阶展开,有
 \begin{equation}
 J(\theta)\approx J(\theta_0)+(\theta-\theta_0)^T\nabla_\theta J(\theta_0)+\frac{1}{2}(\theta-\theta_0)^T\mathbf H(\theta-\theta_0)
 \end{equation}
@@ -289,3 +289,60 @@ $\beta_{t}$的选取方法有
 BFGS算法的优势在于通过线性搜索减少线性搜索的时间.缺点在于Hessian逆矩阵的存储,需要$O(n^2)$的存储空间.
 
 \textit{Limited Memory BFGS}或L-BFGS改进了BFGS的存储限制.它添加了一个假设为$\mathbf M^{(t-1)}$初始值为单位矩阵,并且在迭代过程中仅存储用来更新$\mathbf M$的向量.
+
+\section{Optimization Strategies and Meta-Algorithms}
+
+\subsection{Batch Normalization}
+
+\textit{批归一化}(batch normalizai)\footnote{TODO: 看相关论文,深化理解.}是一种自适应\textit{再参数化}(reparamterization)方法,主要用来解决深度模型中遇到的困难.
+
+梯度算法有一个前提就是除了当前层,其他所有层的参数都不会改变.但是实际上,所有层的参数都是同步更新的.某一层参数的更新会影响其它所有层的更新.二阶优化将二阶交互考虑进优化算法中,但是计算代价太大.批归一化提供了一种再参数化深度神经网络的方法.
+
+假设$\mathbf H$是将要被归一化的网络层的最小批激活函数(以设计矩阵形式排列),为了归一化$\mathbf H$,将其替换为
+\begin{equation}
+\mathbf H'=\frac{\mathbf{H-\mu}}{\mathbf\sigma}
+\end{equation}
+其中,$\mathbf\mu$是神经元的均值向量;$\mathbf\sigma$是每一个神经元对应的标准差.训练过程中,当进行逆向传播时,进行归一化,避免梯度增大标准差或者均值.在测试时,使用训练得到的参数$\mathbf\mu$,$\mathbf\sigma$.
+
+归一化去除了一阶和二阶统计量的影响,但是允许神经元间和非线性统计量的更新.
+
+归一化会降低神经网络的表示能力,因此通常将$\mathbf H'$替换为$\gamma\mathbf H'+\beta$.其中$\gamma$和$\beta$通过学习得到.与原始的$\mathbf H$表示不同,新的表示形势下,均值仅由参数$\beta$决定.
+
+\subsection{Coordinate Descent}
+
+\textit{coordinate descent}和\textit{block coordinate descent}方法分别是指一次优化一个或者一组变量,使目标函数收敛.这两种方法在不同变量相互孤立或者某些变量优化效率较高的情况下才会特别有效.在变量间有相互影响的情况下,并不是一个特别好的解决方案.
+
+\subsection{Polyak Averaging}
+
+\textit{Polyak Averaging}是指对优化路径上的点取平均保证算法的收敛性.非凸问题的优化路径很复杂,Polyak平均的形式为
+\begin{equation}
+\hat\theta^{(t)}=\alpha\hat\theta^{(t-1)}+(1-\alpha)\theta^{(t)}
+\end{equation}
+
+\subsection{Supervised Pretraining}
+
+\textit{预训练}(pretraining)是指在用以解决复杂任务的模型之前,首先训练简化的模型用以解决简单的任务.
+
+\textit{贪心}(greedy)算法不能保证组合问题的最优解,但是它的计算效率很高.通过贪心算法解决了组合优化问题后,还可以进行fine-tunning.
+
+将贪心算法和预训练结合起来就得到了\textit{贪心有监督预训练}(greedy supervised pretraining)方法.
+
+\textbf{原始的贪心有监督预训练}对神经网络进行逐层预训练.它之所以有效的原因是因为它为中间层提供了一种有效的指导方式.一般来说,预训练可以帮助优化问题收敛和提升泛化能力.此外,迁移学习也与与训练有关联.
+
+\textbf{FitNets方法是另一种预训练方法}.它使用小型的表现良好的网络指导更加复杂的深层神经网络进行训练.不仅预测最终结果,还对中间结果进行预测.
+
+\subsection{Designing Models to Aid Optimization}
+
+本节主要从模型设计的角度去简化优化算法.在实际中,选择函数族比使用优化算法更重要.
+
+当前的神经网络普遍使用线性变换和激活函数进行组合,组合后的函数几乎处处可导并且有较大的斜率.
+
+另外神经元之间的跳跃连接也可以简化优化算法.
+
+\subsection{Continuation Methods and Curriculum Learning}
+
+通常我们希望将初始值选在最优解附近.\textit{continuation methods}是一种策略族,可以确保参数值初始值选取位于目标点附近,以简化优化过程.
+
+传统的continuation methods算法基于平滑目标函数的方法,在保留全局最小值的情况下,尽可能去除局部极小值.这样,一些非凸优化问题可以近似为凸优化问题.尽管在深度学习中,局部极小值点不是优化的主要困难,但是continuation methods仍然是一个帮助提升深度神经网络的主要方法.
+
+\textit{curriculum learning}或者\textit{shaping}方法可以视为一种continuation method.它的基本思路是在学习简单概念的基础上不断迭代,进而学习更加复杂的概念,最终达到所期望的目标概念.在RNN中使用的\textit{stochastic curriculum}将简单的概念和复杂概念进行随机混合用来训练模型,但是在每一轮迭代中,简单概念所占比例逐步降低.与\textit{deterministic curriculum}策略相比,stochastic curriculum的表现要好得多.
