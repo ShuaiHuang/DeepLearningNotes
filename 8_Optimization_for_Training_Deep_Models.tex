@@ -139,3 +139,153 @@ SGD的计算时间不会随着样本数量的增加而增加,同时还可以保�
 J(\mathbf\theta)-\min_{\mathbf\theta}J(\mathbf\theta)
 \end{equation}
 对于SGD算法,在第$k$轮迭代后,其excess error为$O(\frac{1}{\sqrt{k}})$,当优化问题是凸优化时,excess error为$O(\frac{1}{k})$.除非引入新的前提假设,这个上限是不会被提升的.但是如果收敛速度超过$O(\frac{1}{k})$时,就会导致过拟合.
+
+\subsection{Momentum}
+
+SGD算法的学习速率较慢,\textit{动量算法}(Momentum Algorithm)是用来加速学习速率的.在动量算法中,引入了速度$\mathbf v$的概念,用来指示在参数空间中搜索最优参数的速率和方向.为了简便,在这里将动量定义为速度和单位质量质点的乘机.因此有迭代更新公式
+\begin{equation}\begin{split}
+\mathbf v&\leftarrow\alpha\mathbf v-\epsilon\nabla_\theta\Big(\frac{1}{m}\sum_{i=1}^mL(\mathbf f(\mathbf x^{(i)};\theta),\mathbf y^{(i)})\Big)\\
+\theta&\leftarrow\theta+\mathbf v
+\end{split}\end{equation}
+其中,$\alpha\in\left[0,1\right)$用来指示历史梯度均值对当前的影响程度.$\alpha$也可以通过学习算法进行自适应调整.
+
+与物理领域内的动量定义一样,这里的动量也与力$\mathbf f(t)$和速度$\mathbf v(t)$有关联.
+\begin{equation}\begin{split}
+\mathbf f(t)&=\frac{\partial^2}{\partial t^2}\theta(t)\\
+\mathbf v(t)&=\frac{\partial}{\partial t}\theta(t)\\
+\mathbf f(t)&=\frac{\partial}{\partial t}\mathbf v(t)
+\end{split}\end{equation}
+从上式可以看出,动量算法需要解微分方程,可以借助\textit{Euler方法}(Euler's method)\footnote{TODO: 查一下}实现.
+
+动量算法中的力可以视为两个力的合力,一个力正比于损失函数负梯度方向$-\nabla_\theta J(\theta)$;另一个力(粘滞阻力)正比于$-\mathbf v(t)$.当然还有其他形式的阻力,但是最好还是用粘滞阻力的形式.
+
+\subsection{Nesterov Momentum}
+
+\textit{Nesterov Momentum}与标准动量不同之处在于梯度的计算方式.
+\begin{equation}\begin{split}
+\mathbf v&\leftarrow\alpha\mathbf v-\epsilon\nabla_\theta\Big(\frac{1}{m}\sum_{i=1}^mL(\mathbf f(\mathbf x^{(i)};\theta+\alpha\mathbf v),\mathbf y^{(i)})\Big)\\
+\theta&\leftarrow\theta+\mathbf v
+\end{split}\end{equation}
+
+Nesterov Momentum将凸优化的exxcess error从$O(\frac{1}{k})$提升至$O(\frac{1}{k^2})$.但是对于非凸问题,则没有提升.
+
+\section{Parameter Initialization Strategies}
+
+有些优化算法直接将目标函数优化到最优点;另外有些优化算法通过迭代的方式将目标函数优化到最优点,并且不需要特别选取优化起始点.深度学习中的优化并没有上述的优势,其优化过程是一个迭代过程,并且优化结果很容易受到起始点的初始值影响.
+
+选取起始点是一个很艰难的任务,因为
+\begin{enumerate}
+    \item 由于对网络结构没有一个深刻的认识,改进初始化策略很难;
+    \item 不知道哪些性质对于深度学习优化是真正有效果的;
+    \item 起始点对于泛化能力也有影响,但是并没有一个严格的选取准则.
+\end{enumerate}
+现在比较明确的一个规则是打破隐层神经元之间的对称性,使得隐层神经元可以学习到更多的上下文信息.显式地去搜索隐层神经元所代表的函数代价太高,因此转而去搜索隐层神经元的权重向量,使其正交.
+
+\textbf{权重初始分布范围对优化过程和模型的泛化能力都会产生影响.}对于优化过程来说,如果出事权重值较大
+\begin{itemize}
+    \item 有助于打破对称性;
+    \item 避免冗余神经元;
+    \item 避免前向或者后向传播时信号丢失.
+\end{itemize}
+但是权重也不能过大,比如在RNN中,权重过大将会使得模型对于输入扰动异常敏感(chaos).但是从泛化能力的角度来看,大权重将会使得迭代过程中权重改变量较小,最终优化结果离起始点更近.一般情况下,带有早停策略的梯度下降法并不等同于权重下降,但是它提供了一种对于初始值选取的简单模拟.
+
+选取权重范围的一个简单策略是从分布$U(-\frac{1}{\sqrt{m}},\frac{1}{\sqrt{m}})$随机采样,其中$m$是网络输入个数,$n$是网络输出的个数.此外还推荐使用\textit{normalized initialization}
+\begin{equation}
+W_{i,j}\sim U\Big(-\sqrt{\frac{6}{m+m}},\sqrt{\frac{6}{m+m}}\Big)
+\end{equation}
+上述初始化方法在每层初始激活函数方差相同和所有层初始梯度方差相同之间做了折中.\footnote{TODO: 没明白,看论文怎么说.}
+
+为神经网络中每一层的非线性函数选择合适的\textit{增益因子}(scaling or gain factor $g$),可以保证收敛性与层数独立.在前向神经网络中,激活函数或者梯度的增大或者缩小是一个随机行走行为.如果保持每一层权重的范数,就可以避免梯度消失或者爆炸.但是这些最优的权重初始化准则并不能保证最优的优化效果,原因有
+\begin{itemize}
+    \item 我们可能使用了错误的准则,即所选取的准则于神经网络的本质并不匹配;
+    \item 选取的准则中所使用的特性在优化过程中并没有得到保持;
+    \item 选取的准则可能对于优化问题适用,但是对于降低泛化误差并不适用.
+\end{itemize}
+
+所有初始权重拥有相同标准差也存在缺陷,当网络层数较多时,每一个权重会比较小.适用\textit{sparse initialization}可以避免这一问题.
+
+在计算资源允许时,将每一层权重的范围设成一个超参数进行搜索,是一个很好的方案.此外,根据单个minibatch数据选择权重范围,也是一个很好地方案,它不会影响泛化误差.
+
+\textbf{除了权重参数外,还需要关注bias的初始化}.通常biase的初始化策略与权重的初始化相匹配.大多数情况下将其初始化为$0$,除此之外,还有
+\begin{itemize}
+    \item 对于输出层的神经元,将biase初始化为统计量的边缘分布;
+    \item 选取bias的初始值时,还需要避免产生saturation;
+    \item 有时某个神经元会控制其他神经元是否参与到方程中进行计算,因此将大部分bias设置为$h\approx 1$.
+\end{itemize}
+
+\textbf{此外还有方差或者精度的初始化.}一般可以将其设置为$1$.
+
+除了上述方法,还可以使用机器学习的方法初始化参数;使用相关领域内的任务初始化参数(不相关领域的也行).
+
+\section{Algorithms with Adaptive Learning Rates}
+
+\textit{学习率}(learning rate)是一个重要的超参数,因为它对于模型的表现有显著影响.动量算法避免了学习率超参数设置问题,但是它引入了另外一个超参数.如果我们认为不同坐标轴方向上的敏感程度不同,因此就有必要在每个坐标轴方向上设置一个不同的学习率超参数.
+
+\textit{delta-bar-delta算法}(delta-bar-delta algorithm)是一种早期的学习率选取策略,它根据损失函数的偏导符号对学习率进行选取.但它是full batched优化算法.
+
+\subsection{AdaGrad}
+
+AdaGrad对学习率参数做缩放,正比于历史值平方和平方根的倒数.AdaGrad对于某些深度学习模型比较有效,但不是全部模型都有效.
+
+\subsection{RMSProp}
+
+RMSProp算法对AdaGrad算法在非凸问题情形下进行了改进.它在累积平方和中加入了权重.目前RMSProp算法是深度学习算法中一个标准选项.
+
+\subsection{Adam}
+
+Adam算法可以视为RMSProp算法和动量算法的结合.最简单的结合方法是在RMSProp中梯度缩放环节中加入动量算法.Adam还在一阶动量估计和二阶动量初始化中加入了biase修正.
+
+\subsection{Choosing the Right Optimization Algorithm}
+
+选择哪种类型的学习率优化算法并没有共论,这个与使用者的偏好有关.
+
+\section{Approximate Second-Order Methods}
+
+本章的目标函数是经验风险,实际中还有其他形式的目标函数.
+
+\subsection{Newton's Method}
+
+二阶方法使用二阶导数改善优化效果,最广泛使用的是牛顿法.对$J(\theta)$在$\theta_0$附近进行二阶展开,有
+\begin{equation}
+J(\theta)\approx J(\theta_0)+(\theta-\theta_0)^T\nabla_\theta J(\theta_0)+\frac{1}{2}(\theta-\theta_0)^T\mathbf H(\theta-\theta_0)
+\end{equation}
+其中$\mathbf H$是$J$对$\theta$在$\theta_0$点附近的Hessian矩阵.如果求取critical point,有
+\begin{equation}\label{eq:newtown_cirtical_point}
+\theta^\ast=\theta_0-\mathbf H^{-1}\nabla_\theta J(\theta_0)
+\end{equation}
+因此对于二次函数,通过缩放$\mathbf H^{-1}$可以直接到达最小值点.对于凸优化非二次问题,在Hessian矩阵正定的情况下,需要通过迭代算法获取最优解.
+
+深度学习中的Hessian矩阵并不保证正定,牛顿法的优化方向可能会产生错误,因此需要添加正则化项
+\begin{equation}
+\theta^\ast=\theta_0-\left[H(f(\theta_0))+\alpha\mathbf I\right]^{-1}\nabla_\theta f(\theta_0)
+\end{equation}
+正则化后的牛顿法有两个缺陷:
+\begin{itemize}
+    \item 为保证正定,$\alpha$可能会很大,这样步长就会减小;
+    \item 需要计算Hessian矩阵的逆矩阵,计算代价大.
+\end{itemize}
+
+\subsection{Conjugate Gradients}
+
+\textit{共轭梯度}(conjugate gradient)通过迭代选取共轭梯度方向来避免对Hessian矩阵求逆.在共轭梯度算法中,我们每一次选取的搜索方向都是与上一次搜索方向共轭的方向.搜索方向$\mathbf d_t$的迭代形式为
+\begin{equation}
+\mathbf d_t=\nabla_\theta J(\theta)+\beta_{t-1}\mathbf d_{t-1}
+\end{equation}
+$\beta_{t}$的选取方法有
+\begin{description}
+    \item [Fletcher-Reeves] \begin{equation}\beta_t=\frac{\nabla_\theta J(\theta_t)^T\nabla_\theta J(\theta_t)}{\nabla_\theta J(\theta_{t-1})^T\nabla_\theta J(\theta_{t-1})}\end{equation}
+    \item [Polak-Ribiere] \begin{equation}\beta_t=\frac{(\nabla_\theta J(\theta_t)-\nabla_\theta J(\theta_{t-1}))^T\nabla_\theta J(\theta_t)}{\nabla_\theta J(\theta_{t-1})^T\nabla_\theta J(\theta_{t-1})}\end{equation}
+\end{description}
+
+共轭梯度法经过修改可用于非线性的情形.\textit{nonlinear conjugate gradients}算法就是应用于非线性情形的算法.
+
+\subsection{BFGS}
+
+\textit{Broyden-Fletcher-Goldfarb-Shanno (BGFS)}算法的目的是为了减少牛顿法中的计算负担.它通过迭代法估计式\ref{eq:newtown_cirtical_point}中的$\mathbf H^{-1}$,得到估计量$\mathbf M_t$.并且通过$\mathbf M_t$决定优化方向$\mathbf\rho_t=\mathbf M_t\mathbf g_t$
+\begin{equation}
+\theta_{t+1}=\theta_t+\epsilon^\ast\mathbf\rho_t
+\end{equation}
+
+BFGS算法的优势在于通过线性搜索减少线性搜索的时间.缺点在于Hessian逆矩阵的存储,需要$O(n^2)$的存储空间.
+
+\textit{Limited Memory BFGS}或L-BFGS改进了BFGS的存储限制.它添加了一个假设为$\mathbf M^{(t-1)}$初始值为单位矩阵,并且在迭代过程中仅存储用来更新$\mathbf M$的向量.
