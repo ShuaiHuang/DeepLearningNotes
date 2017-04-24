@@ -1,0 +1,47 @@
+\chapter{Convolutional Networks}
+
+\textit{卷积神经网络}(convolutional networks)是一种专门用来处理grid-like拓扑关系数据的神经网络.神经网络中至少有一层神经元使用卷积代替矩阵乘法操作.
+
+\section{The Convolution Operation}
+
+最一般形式的卷积的形式为
+\begin{equation}
+s(t)=\int x(a)w(t-a)da
+\end{equation}
+其中,$s(t)$被称为\textit{feature map};$x(t)$被称为\textit{input};$w(t)$被称为\textit{kernel}.
+
+在深度神经网络中,常使用离散形式
+\begin{equation}
+s(t)=(x*w)(t)=\sum_{a=-\infty}^\infty x(a)w(t-a)
+\end{equation}
+在实际中大多时候是在有限区间上求和.
+
+对于二维空间上的卷积,有
+\begin{equation}\begin{split}
+S(i,j)=(I*K)(i,j)&=\sum_m\sum_nI(m,n)K(i-m,j-n) \\
+&=\sum_m\sum_nI(i-m,j-n)K(m,n)
+\end{split}\end{equation}
+可见其具有\textit{可交换性}(commutative),这也是为什么进行卷积运算时kernel进行翻转的原因.kernel翻转在数学证明上有很大的便利,但是对于机器学习来说并没有太多的含义.但是在实际中,常根据可交换性,对输入的数据进行翻转而保持kernel不变.
+
+同时需要注意与\textit{cross-correlation}的区别
+\begin{equation}
+S(i,j)=(I*K)(i,j)=\sum_m\sum_nI(i+m,j+n)K(m,n)
+\end{equation}
+
+卷积运算也可以看做是与某个特定矩阵的乘法运算,但是需要注意的是这个特定矩阵是有限制的
+\begin{itemize}
+    \item 矩阵中的某些项与其他项相等(如\textit{Toeplitz matrix}, \textit{doubly block circulant matrix});
+    \item 矩阵是稀疏的,因为与输入图像相比,kernel尺寸是非常小的.
+\end{itemize}
+
+\section{Motivation}
+
+在神经网络中引入卷积就引入了\textit{稀疏交互}(sparse interations),\textit{参数共享}(parameter sharing)和\textit{同变性}(equivariant representations).同时,卷积也给神经网络提供了处理可变长输入数据的能力.
+\begin{description}
+    \item [稀疏交互]
+    稀疏交互的原因是因为kernel的尺寸小于输入的尺寸.在神经网络中,稀疏交互相当于\textbf{间接地}与更多的输入进行交互,这样有助于对概念进行抽象.
+    \item [参数共享]
+    参数共享是指在模型中有多于一个的函数使用相同的参数.在卷积神经网络中,kernel在输入的各个位置上共享.参数共享虽然不能减少计算代价,但是可以降低存储代价.
+    \item [同变性]
+    参数共享直接导致了对于变换的同变性.如果输入发生变化,那么输出就会以相同的形式进行变化.需要注意的是,卷积并非对于所有的变换都具有同变性,它仍然需要借助于其他的机制去处理不具有同变性的变换.
+\end{description}
