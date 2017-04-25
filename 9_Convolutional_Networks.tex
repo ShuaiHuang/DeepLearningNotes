@@ -45,3 +45,37 @@ S(i,j)=(I*K)(i,j)=\sum_m\sum_nI(i+m,j+n)K(m,n)
     \item [同变性]
     参数共享直接导致了对于变换的同变性.如果输入发生变化,那么输出就会以相同的形式进行变化.需要注意的是,卷积并非对于所有的变换都具有同变性,它仍然需要借助于其他的机制去处理不具有同变性的变换.
 \end{description}
+
+\section{Pooling}
+
+一层典型的卷积神经网络可以分为三个处理阶段:
+\begin{itemize}
+    \item 卷积计算
+    \item detector stage
+    \item pooling function
+\end{itemize}
+其中pooling用以统计特定区间内的统计量.Pooling有不同的类型\footnote{如何选取不同的类型?各种不同类型pooling的适用范围是什么?}
+
+Pooling对于输入中的微小变换具有近似不变性.本质上来说,Pooling相当于在学习的函数中加入非常强的先验.在实际中,可以在同一个位置pooling不同的卷积结果,这样就可以学习到对于变换具有不变性的特征.
+
+Pooling相当于降维以提高计算效率,同时降低存储开销.
+
+Pooling也是用于处理可变长输入的手段.
+
+Pooling的选取策略有
+\begin{itemize}
+    \item 不同区域使用不同类型的pooling
+    \item 通过学习的方式,在所有区域使用相同类型的pooling
+\end{itemize}
+
+Pooling使用top-down信息使得网络结构趋于复杂化.
+
+\section{Convolution and Pooling as Infinitely Strong Prior}
+
+先验可以分为强先验和弱先验两类.弱先验具有较高的熵,强先验具有较低的熵.
+
+卷积神经网络相当于给全连接神经网络加入了极强先验.如果把卷积神经网络当做具有极强先验的全连接神经网络,并在此基础上进行编程实现,将会带来巨大的计算量.但是可以借助于这种观点对卷积神经网络进行数学分析
+\begin{itemize}
+    \item 卷积神经网络和pooling容易导致欠拟合;
+    \item 从学习效果统计量的角度来看,只能用卷积神经网络模型去与其他的卷积神经网络模型作对比.
+\end{itemize}
