@@ -79,3 +79,35 @@ Pooling使用top-down信息使得网络结构趋于复杂化.
     \item 卷积神经网络和pooling容易导致欠拟合;
     \item 从学习效果统计量的角度来看,只能用卷积神经网络模型去与其他的卷积神经网络模型作对比.
 \end{itemize}
+
+\section{Variants of the Basic Convolution Function}
+
+数学领域内的卷积与神经网络领域内的卷积有一些不同.
+
+神经网络中单层神经网络会使用不同类型的kernel提取出不同类型的特征,神经网络的输入有可能是多维的(有多个channel).多维卷积只有在输入和输出channel相等的情况下才是可交换的(因为channel之间的元素也可能存在线性操作).
+
+可以略过kernel中某些位置计算卷积,以达到降采样的目的.
+
+为了保证输出的尺寸,还需要在输入数据的边缘进行补零操作:
+\begin{itemize}
+    \item valid convolution 不使用zero-padding;
+    \item same convolution 加入zero-padding保证输入和输出的尺寸相同;
+    \item full convolution 加入zero-padding保证输入数据的每个位置都被访问$k$次($k$是kernel中的元素个数).
+\end{itemize}
+对于full convolution,不能只用一种类型的kernel学习特征.最优的卷积通常介于valid convolution与same convolution之间.
+
+\textit{局部连接层}(locally connected layer)在结构上(邻接矩阵adjacency matrix)上与卷及神经网络结构相同,但是它没有参数共享,有时它也被称为\textit{unshared convolution}.也可以对卷积层或者局部连接层加上严格的限制,以降低存储以及统计的消耗.\textit{tiled convolution}相当于在在这两者之间做了一个折中,卷积的类型在空间上有周期性的规律.
+\begin{equation}
+Z_{i,j,k}=\sum_{l,m,n}V_{i,j+m-1,k+n-1}K_{i,l,m,n,j\%t+1,k\%t+1}
+\end{equation}
+如果detector单元有不同类型的输入,并且max-pooled学习到了不同类型的输入并且学习到了不变性特征,那么整个卷积层也就有相应的不变性性质.
+
+在前文中提到了,可以使用输入与单个矩阵相乘的观点看待卷积操作.在误差逆传播过程中,相当于乘以上述单个矩阵的转置的操作\footnote{TODO: 补充一下}.卷积,从输出到权重的逆传播,从输入到输入的逆传播这三种操作满足任何类型的前向卷积神经网络的训练过程.
+
+通常还会在非线性变换之前加入bias,bias共享参数的策略有
+\begin{itemize}
+    \item 局部连接矩阵不共享参数;
+    \item tiled卷积神经网络相同的tiling pattern共享参数;
+    \item 卷及神经网络共享相同的参数;
+    \item 如果输入是已知的并且尺寸大小固定,则可以通过学习得到不同的参数.虽然这样降低了统计效率,但是可以修正图像在不同位置的统计偏差.
+\end{itemize}
