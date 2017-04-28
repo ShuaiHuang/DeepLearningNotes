@@ -151,3 +151,53 @@ Z_{i,j,k}=\sum_{l,m,n}V_{i,j+m-1,k+n-1}K_{i,l,m,n,j\%t+1,k\%t+1}
 随机filter在卷积神经网络上效果很好,可以借助这个方法进行模型选择,以较低的计算开销计算模型选择.
 
 另一种间接的特征学习方法是不适用全部的前向与逆向传播(类似于前向神经网络中的贪心逐层初始化).进一步地,在卷积神经网络中使用局部初始化进行特征学习.但是这种方法使用较少.
+
+\section{The Neuroscientific Basis for Convolutional Networks}
+
+神经网络本质的设计规则是从神经科学中得到的.其中卷积神经网络与人脑V1区域相对应,卷积神经网络符合V1的三种特性
+\begin{enumerate}
+    \item V1神经元按照空间映射关系进行排列;
+    \item V1中包含\textit{简单神经元}(simple cells),与卷积神经网络中的detector units对应;
+    \item V1中包含\textit{复杂神经元}(complex cells),与卷积神经网络中的pooling units以及cross-channel pooling strategies相对应.
+\end{enumerate}
+
+高层的脑神经对概念有反馈,并且对于各种几何变换具有不变性.与卷积神经网络中的最后一层特征曾比较相似的脑区域是inferotemporal cortex(IT).
+
+同时卷积神经网络与人类视觉系统有以下区别
+\begin{enumerate}
+    \item 人眼除了被称为\textit{fovea}的patch外的分辨率很低;
+    \item 人类视觉系统常常与其他感官系统结合;
+    \item 人类视觉系统的任务不仅仅只是物体识别;
+    \item 即使是简单的V1区域仍然深深地受到高层神经元的影响.在神经网络模型中,反馈被广泛应用,但是并没有有实质性的发展;
+    \item 前向IT捕捉到的信息与卷积神经网络捕捉到的特征很相似,但是它们的中间过程的相似程度仍然未知.
+\end{enumerate}
+
+脑神经科学并没有给出如何训练卷积神经网络的方法.
+
+通常通过\textit{reverse correlation}理解单个神经元对应的函数.对于大部分V1神经元细胞,reverse correlation展示出它们与Gabor函数很类似.
+\begin{equation}\label{eq:gabor_function}
+w(x,y;\alpha,\beta_x,\beta_y,f,\phi,x_0,y_0,\tau)=\alpha\exp(-\beta_xx'^2-\beta_yy'^2)\cos(fx'+y)
+\end{equation}
+其中
+\begin{equation}\begin{split}
+x'&=(x-x_0)\cos(\tau)+(y-y_0)\sin(\tau)\\
+y'&=-(x-x_0)\sin(\tau)+(y-y_0)\cos(\tau)
+\end{split}\end{equation}
+$\alpha,\beta_x,\beta_y,f,\phi,x_0,y_0,\tau$是Gabor函数的控制参数.式\ref{eq:gabor_function}中Gaussian乘子可以被视为门禁因子;余弦乘子$\cos(fx'+\phi)$用来控制简单细胞对$x'$方向上的亮度变化的反应.
+
+值得注意的是,通过机器学习得到的特征与V1得到的特征很接近.
+
+\section{Convolutional Networks and the History of Deep Learning}
+
+卷积神经网络在深度神经发展历史中具有重要意义
+\begin{itemize}
+    \item 卷积神经网络具有坚实的理论基础;
+    \item 卷积神经网络是首先被训练出的深度学习模型之一;
+    \item 卷积神经网络具有广阔的商业应用前景.
+\end{itemize}
+
+卷积神经网络在各种图像相关竞赛中表现出众.
+
+卷积神经网络是BP算法首先被成功应用的模型之一.
+
+总体来看,卷积神经网络被广泛用来处理具有清晰网络拓扑结构的数据(一般是二维数据).下一章介绍的RNN专门用来处理一维数据.
