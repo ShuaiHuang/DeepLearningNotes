@@ -1,0 +1,33 @@
+\chapter{Sequence Modeling: Recurrent and Recursive Nets}
+
+\textit{Recurrent neural networks}(RNN)是专门用来处理序列数据的神经网络.它使用共享参数使得模型可以对不同格式(长度)的数据进行处理.RNN还在一维时域做卷积.
+
+\section{Unfolding Computational Graphs}
+
+计算图中的unfolding操作是将迭代操作转换为重复结构非递归操作的过程.RNN有多种形式,任意一种包含递归的函数均可使用RNN来表示.RNN的典型形式为
+\begin{equation}
+\mathbf h^{(t)}=f(\mathbf h^{(t-1)}, \mathbf x^{(t)};\theta)
+\end{equation}
+其中$\mathbf h$是状态变量.由此可见,RNN将$t$时刻任务相关的历史信息经过有损压缩整合成$\mathbf h^{(t)}$.
+
+RNN模型有两种图的表现形式:第一种是使用一个包含所有成分的结点;第二种是将前一种形式的结点进行展开.
+
+结点展开有两个优点:
+\begin{enumerate}
+    \item 不管序列的长度有多长,学习到的模型始终有相同的输入长度;
+    \item 每一步都可以使用相同的转移函数$f$以及相同的参数.
+\end{enumerate}
+其中,共享参数可以提升模型的泛化能力.
+
+两种形式的计算图各有用处,并无绝对的优劣之分.
+
+\section{Recurrent Neural Networks}
+
+RNN有三种形式
+\begin{itemize}
+    \item 隐层单元间有recurrent连接,每一步都会输出结果;
+    \item 输出层与隐层单元间有recurrent连接,每一步都会输出结果;
+    \item 隐层单元间有recurrent连接,但是只有接受了全部的输入后才会输出结果.
+\end{itemize}
+
+在RNN反向传播过程中,损失函数的梯度计算代价很高,不能并行化.此外,正向传播时的状态必须一直记录直到反向传播,因此存储代价也很高.因此,需要考虑替代方案.
