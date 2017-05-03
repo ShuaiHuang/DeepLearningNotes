@@ -30,4 +30,47 @@ RNN有三种形式
     \item 隐层单元间有recurrent连接,但是只有接受了全部的输入后才会输出结果.
 \end{itemize}
 
-在RNN反向传播过程中,损失函数的梯度计算代价很高,不能并行化.此外,正向传播时的状态必须一直记录直到反向传播,因此存储代价也很高.因此,需要考虑替代方案.
+在RNN反向传播过程中,损失函数的梯度计算代价很高,不能并行化.此外,正向传播时的状态必须一直记录直到反向传播,因此存储代价也很高.因此,需要考虑替代方案.在此,将对unrolled graph上进行并且有$O(\tau)$复杂度的逆向传播算法称为\textit{back-propagation through time}(BPTT).
+
+\subsection{Teacher Forcing and Networks with Output Recurrence}
+
+仅仅在从前一个时间状态的输出单元到后一个时间状态的隐层单元存在连接的RNN网络的学习能力是非常弱的.因为这种类型的网络缺少从隐层到隐层的周期性连接.为了取得较好的效果,就要求输出必须能够捕捉全面的历史信息.由于损失函数中与时间相关的步骤没有耦合,可以对训练过程进行并行化操作.
+
+\textit{Teacher forcing}操作在每一步都是用上一步的正确输出标记作为当前步骤的输入.引入teacher forcing的目的是为了避免BPTT操作.但是,一旦隐层单元所表示的函数是历史时间状态的函数,就必须进行BPTT计算.
+
+\textit{Teacher forcing}的劣势也很明显,在\textit{open-loop}模式下,当网络的输出作为输入的一部分时,输出反馈的输入在训练环节的分布可能和测试环节时的分布有很大差异.对于这个问题,有两种解决方案:
+\begin{itemize}
+    \item 模型训练时的输入包含teacher forcing输入和free-running输入;
+    \item 随机选择使用生成的数值或者实际数据的数值作为输入,以尽量弥补训练时的输入和测试时的输入.
+\end{itemize}
+
+\subsection{Computing the Gradient in a Recurrent Neural Network}
+
+RNN中梯度的计算很直接.需要注意的是,由于参数共享,所以共享参数的梯度是将所有时刻的梯度值进行相加求取.
+
+\subsection{Recurrent Networks as Directed Graphical Models}
+
+对于RNN理论上可以使用任何一种损失函数,最常用的是交叉熵损失函数.
+
+一般地,RNN对应的有向图是一个完备图,任何一对输出节点之间都会有有向依赖关系.通常会对图中交互关系较弱的两个节点之间的边进行简化处理.将隐层单元视为随机变量,这样就可以与历史状态进行解耦合.但是,某些操作仍然会有计算代价,比如缺失值填充和参数优化操作.
+
+RNN中的参数共享意味着$t$与$t+1$时刻的条件分布的参数是固定的.
+
+如果从图中进行采样,RNN必须确定序列的长度.具体方法有
+\begin{itemize}
+    \item 在原始序列中插入特殊分隔符;
+    \item 通过伯努利分布判定序列是否结束;
+    \item 将长度$\tau$作为预测目标进行学习预测.
+\end{itemize}
+
+\subsection{Modeling Sequences Conditioned on Context with RNNs}
+
+RNN对于条件概率分布有着不同的实现方式.当随机变量$\mathbf x$是一个固定长度的向量时,有以下方式将其作为附加信息加入RNN模型用以产生$\mathbf y$序列:
+\begin{itemize}
+    \item 作为每一个时间步骤的额外输入;
+    \item 作为一个初始状态$\mathbf h^{(0)}$;
+    \item 以上两种方法的结合.
+\end{itemize}
+添加的额外信息$\mathbf x$可以视为前向神经网络中的bias.
+
+当有多个输入$\mathbf x^{(t)}$时,可以将$t$时刻的输出作为$t+1$时刻的隐层单元的输入.但是限制条件是,这些序列的长度必须相同.
