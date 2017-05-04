@@ -74,3 +74,27 @@ RNN对于条件概率分布有着不同的实现方式.当随机变量$\mathbf x
 添加的额外信息$\mathbf x$可以视为前向神经网络中的bias.
 
 当有多个输入$\mathbf x^{(t)}$时,可以将$t$时刻的输出作为$t+1$时刻的隐层单元的输入.但是限制条件是,这些序列的长度必须相同.
+
+\section{Bidirectional RNNs}
+
+除了上文提到的当前状态与输入序列中历史值相关的情形,还存在着当前状态与整个输入序列有依赖关系的情形.因此需要引入双向RNN来解决这一问题.在双向RNN中,当前状态对历史状态和未来的状态都存在着依赖关系.
+
+同样地,可以将双向RNN的输入拓展到二维空间,这样就需要在四个方向上分别训练一个RNN.
+
+\section{Encoder-Decoder Sequence-to-Sequence Architectures}
+
+在许多应用情形中,输入序列和输出序列的长度不一定相同.\textit{encoder-decoder}专门用来处理输入输出序列长度不同的情形.其中,encoder用于生成context,decoder用于生成输出序列.context的长度不一定和decoder隐层长度相同.同时encoder-decoder结构还存在一个缺陷,如果context太短的话就不能完整总结较长的输入序列的信息.
+
+\section{Deep Recurrent Networks}
+
+RNN网络中的计算包含3中类型的变换
+\begin{itemize}
+    \item 从输入到隐状态的变换;
+    \item 从前一个隐状态到下一个隐状态的变换;
+    \item 从隐状态到输入的变换.
+\end{itemize}
+RNN中三种操作是一种"浅"变换.为训练出任务所需要的变换,就需要增加深度.
+
+\section{Recursive Neural Networks}
+
+Recursive neural networks与RNN的链式结构不同,它是一种深度树结构.主要被用来处理数据结构.Recursive神经网络中树的深度大大减少,并且可以用来处理长期依赖.数的结构可以独立于数据进行选取.还有外部方法可以用来选择树的结构.除此之外,recursive还有其他的变化类型.
