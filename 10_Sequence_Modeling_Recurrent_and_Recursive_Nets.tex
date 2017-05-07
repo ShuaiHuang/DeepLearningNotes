@@ -98,3 +98,126 @@ RNN中三种操作是一种"浅"变换.为训练出任务所需要的变换,就�
 \section{Recursive Neural Networks}
 
 Recursive neural networks与RNN的链式结构不同,它是一种深度树结构.主要被用来处理数据结构.Recursive神经网络中树的深度大大减少,并且可以用来处理长期依赖.数的结构可以独立于数据进行选取.还有外部方法可以用来选择树的结构.除此之外,recursive还有其他的变化类型.
+
+\section{The Challenge of Long-Term Dependencies}
+
+长期交互相比于短期交互,权重水平明显要低.由于RNN中存在着参数共享,所以在状态传递的过程中,特征值会消失或者爆炸.这种情况只存在于RNN网络中,同时也是不可避免的.由此可见,长期依赖是难以学习的.
+
+\section{Echo State Networks}
+
+在RNN中,从输入单元到隐层单元的权重以及隐层单元到隐层单元的权重很难学习.\textit{Echo state networks}(ESN)或者\textit{liquid state machines}通过使用\textit{reservoir computing}机制设定上述上重权重,进而只要学习输出层的权重即可.reservoir computing在思路上类似于核方法,将长度不定的输入序列转换为定长向量,然后借助于线性判别器对目标任务进行解决.
+
+设置权重的策略为通过设置合适的权重,将状态到状态转移函数的Jacobian矩阵的特征值接近于$1$.但是如果引入了非线性单元,许多环节中的梯度会接近于$0$.这种收缩性映射会导致网络遗忘历史状态.
+
+固定权重使得信息可以向前传播但不会爆炸.
+
+ESN设置权重的方法可以用来初始化RNN网络的参数.
+
+\textit{Leaky Units and Other Strategies for Multiple Time Scales}
+
+为处理长期依赖,模型要在不同时间尺度上处理状态.常用的方法有
+\begin{itemize}
+    \item 添加跳跃连接\textit{skip connection}
+    \item 通过\textit{leaky unit}以不同权重整合信号
+    \item 去除精细时间尺度上的某些连接
+\end{itemize}
+
+\subsection{Adding Skip Connections through Time}
+
+为了获取粗略时间尺度上的信息,可以直接从过去的变量上直接添加连接到当前的变量上.但是这种方式并不能很好地处理所有长期的依赖关系.
+
+\subsection{Leaky Units and a Specturm of Different Time Scales}
+
+另一种方式是在节点上增加线性自连接.增加了线性自连接的隐层单元类似于\textit{running average},
+\begin{equation}
+\mu^{(t)}\leftarrow \alpha\mu^{(t-1)}+(1-\alpha)v^{(t)}
+\end{equation}
+其中,$v^{(t)}$是历史状态的累积量,$\mu^{(t-1)}$是当前的状态,$\alpha$是时间常数.时间常数有两种设置方法:第一,固定为常量;第二,设置为参数,通过学习算法进行学习.
+
+这种处理方式方式可以使得信号更加平滑灵活.
+
+\subsection{Removing Connections}
+
+这种方式主要是通过去除短期的连接增加长期的连接,进而使得信息可以流畅地进行传播.
+
+\section{The Long Short-Term Memory and Other Gated RNNs}
+
+在实际中使用频率比较高的RNN网络是\textit{门限RNN}(gated RNNs).门限RNN会构建出导数不会消失或者爆炸的路径.因此连接权重在每一步都会产生变化.同时,门限RNN将会选择合适对历史状态进行清零.
+
+\subsection{LSTM}
+
+LSTM模型的核心在于
+\begin{itemize}
+    \item 引入自循环构建梯度传播路径,保证梯度可以维持较长时间;
+    \item 自适应调节自循环的权重;
+    \item 时间范围可以动态调整.
+\end{itemize}
+
+在LSTM单元中,有不同的门限
+\begin{itemize}
+    \item \textit{forget gate}单元
+    \begin{equation}
+    f_i^{(t)}=\sigma\Big(b_i^f+\sum_jU_{i,j}^fx_j^{(t)}+\sum)_jW_{i,j}^fh_j^{(t-1)}\Big)
+    \end{equation}
+    \item \textit{external input gate}单元
+    \begin{equation}
+    g_i^{(t)}=\sigma\Big(b_i^g+\sum_jU_{i,j}^gx_j^{(t)}+\sum)_jW_{i,j}^gh_j^{(t-1)}\Big)
+    \end{equation}
+    \item \textit{output gate}单元
+    \begin{equation}
+    q_i^{(t)}=\sigma\Big(b_i^o+\sum_jU_{i,j}^ox_j^{(t)}+\sum)_jW_{i,j}^oh_j^{(t-1)}\Big)
+    \end{equation}
+\end{itemize}
+其中,$\mathbf x^{(t)}$是当前输入向量;$\mathbf h^{(t)}$是当前隐层神经元向量;$\mathbf{b,U,W}$分别是偏置,输入权重,门限的循环权重.
+
+LSTM更容易捕捉到长期依赖.
+
+\subsection{Other Gated RNNs}
+
+与LSTM不同的是,\textit{gated recurrent units}(GRU)用一个门禁同时控制遗忘单元和更新单元.LSTM和GRU在多种任务上都有很好的表现,并且超越其他变型.
+
+\section{Optimization for Long-Term Dependencies}
+
+在优化问题中,二阶导数和一阶导数可能会同时消失.但使用二阶导数优化方法会有诸多缺陷.Mesterov动量法在精心选取初始化参数后,通过一阶方法也有可能达到同样的效果.\footnote{机器学习中,设计一个更容易优化的模型比设计一个性能更好的优化方法更常见.}
+
+\subsection{Clipping Gradients}
+
+梯度下降过快会导致步长很长,进而可能会导致目标函数值上升.因此引入\textit{梯度截断}(clipping the gradient).
+\begin{itemize}
+    \item 一种方法是在最小批上对参数梯度进行截断(element-wise);
+    \item 另一种方法是在参数更新前对梯度范数进行截断(jointly).
+\end{itemize}
+
+当梯度的范数超过阈值时,随机选择一步,效果也会很好.
+
+但是不同最小批上的平均范数阶段梯度并不等价于真实梯度的截断.
+
+\subsection{Regularizing to Encourage Information Flow}
+
+解决梯度消失的方法有
+\begin{itemize}
+    \item 使用LSTM或者其他自循环以及门限机制;
+    \item 另一种方法是正则化或者限制参数,以维持信息传递.
+\end{itemize}
+
+通常我们希望,
+\begin{equation}
+(\nabla_{\mathbf h^{(t)}}L)\frac{\partial\mathbf h^{(t)}}{\partial\mathbf h^{(t-1)}}
+\end{equation}
+与
+\begin{equation}
+\nabla_{\mathbf h^{(t)}}L
+\end{equation}
+的大小相同.因此,引入正则化项
+\begin{equation}
+\Omega=\sum_t\Big(\frac{\|(\nabla_{\mathbf h^{(t)}}L)\frac{\partial\mathbf h^{(t)}}{\partial\mathbf h^{(t-1)}}\|}{\|\nabla_{\mathbf h^{(t)}}L\|}-1\Big)^2
+\end{equation}
+上式中的正则化项比较复杂,还有近似的估计形式.
+
+这种方法的缺点很明显,在数据比较丰富的情况下,有效性不如LSTM.
+
+\section{Explicit Memory}
+
+知识可以分为显式知识和隐式知识两种类型.人工神经网络在记忆显式知识的时候很吃力.愿意在于其缺少\textit{工作记忆}(working memory)系统用来存储样本.为了解决这一问题,\textit{记忆网络}引入记忆单元,可通过寻址机制对记忆单元进行访问.\textit{神经网络图灵机}(neural Turning machine)使用无监督的方式对记忆单元进行访问,它可以同时读或者写多个记忆单元,并且在每个记忆单元中存储的是向量.这与人类的记忆方式比较类似.
+
+在记忆内容被复制后,信息可以被传递而不用关心梯度是否消失或者爆炸.
