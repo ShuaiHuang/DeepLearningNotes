@@ -37,3 +37,74 @@
 \section{Selecting Hyperparamters}
 
 超参数有两种选择方式:手工选择与自动选择.
+
+\subsection{Manual Hyperparameter Tuning}
+
+手动设定超参数需要对超参数与训练错误率,泛化误差,计算代价的关系有深刻的了解.
+
+手动设定超参数的目的就在运行时间以及内存允许的前提下达到最低泛化误差.除此之外,手动设定超参数还有一个目的是为了使得模型的capacity与任务的复杂度相匹配.
+
+一般来说,泛化错误率高有两种原因:第一种是因为模型欠拟合;第二种是由于训练误差和测试误差之间的差距较大.
+
+按照超参数调节的优先级来说,学习率调节的优先级最高.调节学习率以外的参数要同时监控训练集和测试集.
+
+其他的大多数参数是根据它们增大或者减少模型的capacity来设定的.
+
+正则化只是降低测试误差的一种方式,还有其他的方式可以降低测试误差.
+
+\subsection{Automatic Hyperparameter Optimization Algorithm}
+
+人工设定超参数的前提是人工设定的其实范围比较接近最优解,但是这个前提并不是一直都成立.因此从理论上来说,可以设计一个优化算法自动选择超参数.但是这样就会引入新的超参数.但是新的超参数相比于原有的超参数更加容易设定.
+
+\subsection{Grid Search}
+
+当超参数的数量小于或等于$3$个时,通常使用网格搜索方法设定超参数.
+
+超参数搜索的范围需要根据先验知识进行设定.
+
+网格搜索有一个很明显的缺点就是其计算代价随着参数数目的增长呈指数级增长.
+
+\subsection{Random Search}
+
+相比于网格搜索,随机搜索更加易于实现,方便部署,收敛速度快.
+
+不同于网格搜索,随机搜索中的超参数不用进行离散化或者二值化操作.
+
+随机搜索效率较高的原因是其不用进行实验性的搜索测试.
+
+\subsection{Model-Based Hyperparameter Optimization}
+
+自动超参数优化算法需要计算梯度,为了避免进行梯度计算,建立验证集错误率模型,通过这个模型评估超参数的泛化误差.
+
+Bayesian超参数优化方法很常见,但并不是一种具有普遍适用性的方法.
+
+基于模型的超参数优化方法需要实验性测试来提取出实验中的有效信息.因此效率并不是特别高.
+
+\section{Debugging Strategies}
+
+机器学习模型很难进行调试,同时也很难确定出现的问题是算法的原因还是软件实现的原因.
+
+由于算法的行为很难进行预估,这一点加剧了调试的难度.如果模型各个子模块具有自适应性,调试就会更加困难.
+
+大多数调试策略避开了上述两项困难.
+
+一些主要的调试策略包括:
+\begin{itemize}
+    \item 模型动作可视化;
+    \item 最差结果可视化;
+    \item 通过训练错误率和测试错误率对软件进行推断;(如果训练错误率低但是测试错误率高,那么就很有可能训练算法正常但是模型过拟合;如果训练误差和测试误差都很高,那么就很难判断软件有问题还是欠拟合.)
+    \item 在小规模数据集上进行测试;
+    \item 将逆传播导数与数值导数进行比对,例如将
+    \begin{equation}
+    f'(x)=\lim_{\epsilon\to 0}\frac{f(x+\epsilon)-f(x)}{\epsilon}
+    \end{equation}
+    与
+    \begin{description}
+        \item [finite difference] \begin{equation}f'(x)\approx\frac{f(x+\epsilon)-f(x)}{\epsilon}\end{equation}
+        \item [centered difference] \begin{equation}f'(x)\approx\frac{f(x+\frac{1}{2}\epsilon)-f(x-\frac{1}{2}\epsilon)}{\epsilon}\end{equation}
+    \end{description}
+    进行对比.此外还有对向量以及对复数的比对.
+    \item 监控激活函数和梯度的直方图.
+\end{itemize}
+
+深度学习的算法还提供了一些对结果的保证.
