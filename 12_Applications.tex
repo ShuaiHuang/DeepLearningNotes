@@ -1,0 +1,31 @@
+\chapter{Applications}
+
+\section{Large-Scale Deep Learning}
+
+但个神经元并不能体现出智能的特性,只有大量神经元组合在一起才能体现出智能的特性.
+
+\subsection{Fast CPU Implementations}
+
+精心调试的CPU会有较高的性能,并且有多种策略可供选择,对运行在CPU上的程序进行优化.
+
+\subsection{GPU Implementations}
+
+绝大部分现代神经网络是在GPU上实现的.GPU具有高度并行性和较大内存带宽,但是相比于CPU,它的时钟频率较低,并且分支能力较弱.人工神经网络有同样的特性,因此适合运行在GPU上.基于此,GPU厂商开发出了\textit{通用GPU}(general purpose GPUs)用以处理GPU编程代码,而不仅仅是图形渲染.
+
+但是GPU编程比较困难,大部分工程人员使用现成的代码进行组合以实现自己的模型,尽量避免编写底层代码.
+
+\subsection{Large-Scale Distributed Implementations}
+
+由于单个机器的计算能力有限,因此我们希望可以将训练过程和推断过程转化成分布式计算.
+
+推断过程的分布式计算很简单,因为每个机器可以分别运行模型的不同部分,处理同一个样本,这又被称为\textit{数据并行}(data parallelism).
+
+多个机器在单个数据点上进行协同计算的过程被称为\textit{模型并行}(model parallelism).
+
+\textit{异步SGD}(asynchronous stochastic gradient descent)可以解决数据并行问题.
+
+\subsection{Model Compression}
+
+模型推断时对内存资源的要求更高.通常使用\textit{模型压缩}(model compression)来获取一个对内存需求更少,运行时间更短的小模型来进行存储和执行.
+
+模型压缩可行的前提是原始模型为防止过拟合将不同的模型进行集成,组成了大模型.
