@@ -29,3 +29,31 @@
 模型推断时对内存资源的要求更高.通常使用\textit{模型压缩}(model compression)来获取一个对内存需求更少,运行时间更短的小模型来进行存储和执行.
 
 模型压缩可行的前提是原始模型为防止过拟合将不同的模型进行集成,组成了大模型.
+
+\subsection{Dynamic Structure}
+
+对数据处理系统进行加速的一项通用策略是设计带有在图上具有\textit{动态结构}(dynamic structure)的模型去处理输入数据.在神经网络中根据输入使用不同的子网络进行计算的结构被称为\textit{条件计算}(conditional computation).动态结构是从计算机理论到软件工程领域被广泛使用的一项基本原则.
+
+一种动态结构是层级结构分类器,用以提升计算效率.决策树本身就是典型的动态结构.基于同样的思路,\textit{gater}根据当前输入选择不同的专家网络进行计算.当专家网络数目较少时,使用\textit{hard mixture of experts}进行计算.但是当专家网络数目较多时,组合数目也增多,就需要借助额外的手段去训练专家网络的组合了.
+
+另外一种动态结构是开关形式,隐层神经元根据上下文从不同的输入单元获取输入.
+
+需要注意的是,动态结构大大降低了神经网络的并行化操作,往往很难高效地进行编程实现.
+
+\subsection{Specialized Hardware Implementations of Deep Networks}
+
+神经网络有不同的硬件实现方式:
+\begin{itemize}
+    \item ASICs: application-specific integrated circuit
+    \item digital: based on binary representations of numbers
+    \item analog: based on physical implementations of continuous values as voltages or currents
+    \item hybird implementations: field programmable gated array
+\end{itemize}
+
+深度神经网络专用硬件得以发展的原因有两点:第一,可以在推断时候使用较低的精度;第二,通用处理器(CPU/GPU)计算速率增长放缓,需要通过提升并行特性来提升整体性能.
+
+\section{Computer Vision}
+
+\subsection{Preprocessing}
+
+计算机视觉往往需要很少的预处理步骤.最常见的有像素值归一化和输入图像尺寸归一化.对于训练数据集的预处理有\textit{dataset augmentation}.同时对于训练数据集以及测试数据集进行的预处理主要是为了排除数据扰动对模型的影响.通常需要对于输入数据扰动有明确的描述,并且需要确认去除扰动后对模型训练不会产生影响.
