@@ -57,3 +57,92 @@
 \subsection{Preprocessing}
 
 计算机视觉往往需要很少的预处理步骤.最常见的有像素值归一化和输入图像尺寸归一化.对于训练数据集的预处理有\textit{dataset augmentation}.同时对于训练数据集以及测试数据集进行的预处理主要是为了排除数据扰动对模型的影响.通常需要对于输入数据扰动有明确的描述,并且需要确认去除扰动后对模型训练不会产生影响.
+
+\subsubsection{Contrast Normalization}
+
+通常情况下,绝大多数任务中可以去除的样本间差异就是对比度差异.设图像为$X\in\mathcal R^{r\times c\times 3}$,其中$X_{i,j,1}$代表红色通道中第$i$行第$j$列所对应的像素亮度.整幅图像的对比度为
+\begin{equation}
+\sqrt{\frac{1}{3rc}\sum_{i=1}^{r}\sum_{j=1}^{c}\sum_{k=1}^{3}(X_{i,j,k}-\overline{X})^2}
+\end{equation}
+其中,$\overline X$是整幅图像的亮度均值
+\begin{equation}
+\overline X=\frac{1}{3rc}\sum_{i=1}^{r}\sum_{j=1}^{c}\sum_{k=1}^{3}X_{i,j,k}
+\end{equation}
+
+\textit{全局对比度归一化}(Global contrast normalization, GCN)旨在防止图像间的对比度有较大差异.常将图像的减去均值亮度,并将亮度分布归一化.即
+\begin{equation}
+X'_{i,j,k}=s\frac{X_{i,j,k}-\overline X}{\max\Big\{\epsilon,\sqrt{\lambda+\frac{1}{3rc}\sum_{i=1}^{r}\sum_{j=1}^{c}\sum_{k=1}^{3}(X_{i,j,k}-\overline X)^2}\Big\}}
+\end{equation}
+
+使用$L^2$范数而非标准差归一化的原因在于,神经网络对于方向的响应要比对于准确位置的响应要好.
+
+需要注意的是,\textit{球化}(sphering)与GCN并不相同.球化是指将主成分的方差进行缩放达到一致.球化通常又被称为\textit{白化}(whitening).
+
+全局对比度归一化并不能对图像中局部细节进行突出显示,由此催生出了\textit{局部对比度归一化}(local contrast normalization, LCN).局部对比度归一化可以通过可分离式卷积进行快速实现.此外,LCN也可作为神经网络的非线性单元.
+
+在实际使用中,需要特别注意LCN的正则化策略.
+
+\subsubsection{Dataset Augmentation}
+
+除了之前介绍的augmentation方法,数据集augumentation有更加高级的变换方式.
+
+\section{Speech Recognition}
+
+语音识别的目的是将包含语言信息的声音信号$\mathit X$转换成文字序列$\mathbf y$.\textit{自动语音识别}(automatic speech recognition)的模型可以概括为
+\begin{equation}
+f^\ast_{ASR}(\mathit X)=\arg\max_{\mathbf x}P^\ast(\mathbf y|\mathbf X=\mathit X)
+\end{equation}
+
+传统方法使用HMM与GMM结合的策略进行语音识别.随着深度模型的发展,许多方法借助于深度神经网络提取特征,并用提取出的特征训练HMM和GMM模型.之后深度模型继续发展,并打破了HMM-GMM模型十多年没有提升的僵局.
+
+语音识别领域内的一项突破是使用卷积神经网络进行语音识别.它以二维的视角看待声音信号.
+
+另外一项突破就是端到端的深度神经网络直接摒弃了HMM模型的使用.其中,声音世界的音素级别的对齐也是一个重要环节.
+
+\section{Natural Language Processing}
+
+\textit{自然语言处理}(natural language processing)是使用计算机对人类语言进行处理的技术.除了神经网络领域内的通用技术外,还需要引入专业领域的知识.
+
+\subsection{$n$-grams}
+
+\textit{语言模型}(language model)是指\textit{标记}(token)序列的概率分布.标记序列定长为$n$的模型被称为$n$-gram.
+\begin{equation}
+P(x_1,x_2,\cdots,x_\tau)=P(x_1,\cdots,x_{n-1})\prod_{t=n}^\tau P(x_t|x_{t-n+1},\cdots,x_{t-1})
+\end{equation}
+其中,根据$n$取值不同,$n$-gram可以分为:\textit{unigram}($n=1$),\textit{bigram}($n=2$)和\textit{bigram}($n=3$).
+
+通常使用最大似然度对$n$-gram进行直接训练.并且训练过程中可以对$n-1$-gram一起进行训练.
+
+在句子起始位置的分布通常使用边缘概率分布.
+
+对于条件概率为$0$的情况,需要引入\textit{平滑}(smoothing)策略.一种方法是对所有的概率分布加入非零常量.另一种策略是\textit{back-off}方法,使用低阶$n$-gram模型代替高阶模型.
+
+对于维度灾难问题,使用最近邻查找的方法进行缓解,但不能从根本上克服这一问题.由此引入\textit{基于类别的语言模型}(class-based language model)根据词汇类别共享词汇间的统计信息.但是这种处理方式在信息表示过程中有信息损失.
+
+\subsection{Neural Language Models}
+
+\textit{网络语言模型}(Neural Language Models, NLM)专门用来解决语言模型建模过程中的维度灾难问题.它根据词汇上下文对统计信息进行共享.在相似的句子间建立起关联.
+
+词汇表示又被称为\textit{词汇嵌入}(word embeddings).NLM模型更加注重词汇嵌入这种分布式表示方法.
+
+其他模型也可以使用分布式表示提升模型的性能.
+
+\subsection{High-Dimensional Outputs}
+
+基于词汇的概率分布计算代价很大.最朴素的做法是从隐单元到输入空间建立起放射变换,再用sotmax进行概率估计.
+
+\subsubsection{Use of a Short List}
+
+为减少朴素做法的计算代价,引入有限词汇集,并进一步区分为高频词汇表与低频词汇表.但是泛化能力受到高频词汇的限制.
+
+\subsubsection{Hierarchical Softmax}
+
+另一种减少计算代价的方法是对词汇进行逐级分类,最终形成一棵树.每个单词的概率可以通过到达该词汇所有路径的概率总和得到.
+
+层级结构可以通过机器学习的方法得到.
+
+在训练和测试过程中都会有计算效率高的优势.
+
+同时,这种方法不能解决在给定上下文的时候,相似单词选取的问题.
+
+相比于\textit{基于采样的方法}(sampling-based method),这种方法在实际中的效果并不是很好.
