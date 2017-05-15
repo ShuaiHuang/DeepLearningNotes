@@ -146,3 +146,54 @@ P(x_1,x_2,\cdots,x_\tau)=P(x_1,\cdots,x_{n-1})\prod_{t=n}^\tau P(x_t|x_{t-n+1},\
 同时,这种方法不能解决在给定上下文的时候,相似单词选取的问题.
 
 相比于\textit{基于采样的方法}(sampling-based method),这种方法在实际中的效果并不是很好.
+
+\subsubsection{Importance Sampling}
+
+一种加速NLM训练过程的策略就是避免计算所有词汇出现在下一个位置的概率.但是可以通过对词汇数据集进行采样,计算子集中的每个词汇的概率.
+\begin{equation}\begin{split}
+\frac{\partial\log P(y|C)}{\partial\theta}&=\frac{\partial\log\text{softmax}_y(\mathbf a)}{\partial\theta}\\
+&=\frac{\partial a_y}{\partial\theta}-\sum_{i}P(y=i|C)\frac{\partial a_i}{\partial\theta}
+\end{split}\end{equation}
+上式中后一项需要从模型本身进行采样,仍然需要计算所有单词的概率.因此,一般做法是\textit{importance sampling}从另外一个分布中进行采样,并进行修正.针对上述情形,提出了\textit{biased importance sampling},
+\begin{equation}
+w_i=\frac{p_{n_i}/q_{n_i}}{\sum_{j=1}^Np_{n_j}/q_{n_j}}
+\end{equation}
+因此有
+\begin{equation}
+\sum_{i=1}^{|\mathbb V|}P(i|C)\frac{\partial a_i}{\partial\theta}\approx\frac{1}{m}\sum_{i=1}^mw_i\frac{\partial a_{n_i}}{\partial\theta}
+\end{equation}
+
+更一般地,为了加速训练过程,可以使用稀疏输出层.
+
+\subsubsection{Noise-Contrastive Estimation and Ranking Loss}
+
+\textit{Ranking loss}将NLM的输出看做每个单词作为一个分数,并且正确的分数$a_y$排序比其他的分数$a_i$要靠前,对应的损失函数为
+\begin{equation}
+L=\sum_i\max(0,1-a_y+a_i)
+\end{equation}
+但是它不能提供条件概率的估计.
+
+\subsection{Combining Neural Language Models with $n$-grams}
+
+$n$-gram模型的一大优势是模型capacity比较高,但是计算量比较低.同时NLM的计算量较高.因此考虑将这两者进行结合.
+
+\subsection{Neural Machine Translation}
+
+机器翻译的任务是读入一种语言的句子,并将其翻译成同等含义的另一种语言的句子.从整体上看,机器翻译系统的一个部分是产生候选翻译选项,另外一个部分是对翻译候选项进行评价.
+
+传统的语言模型仅仅输出自然语言句子的概率,为使其能够满足机器翻译任务的需求,需要将其拓展至条件概率的范畴.
+
+基于MLP模型方法的一大缺陷是语句必须是定长.对于这个问题,可以借助于RNN模型,形成encoder-decoder框架.为了产生基于原始句子的条件概率,这个模型必须能够对原始的句子有一个完整的表示策略.
+
+\subsubsection{Using an Attention Mechanism and Aligning Pieces of Data}
+
+机器翻译的一种高效做法是,一次读入整个句子,然后根据相关的上下文,一次输出一个单词.基于这种思想,提出了\textit{attention}模型,主要包含以下几个主要组成部分
+\begin{itemize}
+    \item 读入原始数据并转换成分布式表达方法;
+    \item 前一步输出的特征向量列表;
+    \item 依次对内存中数据进行处理并输出结果的模块.
+\end{itemize}
+
+\subsection{Historical Perspective}
+
+略.
