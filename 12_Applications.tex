@@ -197,3 +197,35 @@ $n$-gram模型的一大优势是模型capacity比较高,但是计算量比较低
 \subsection{Historical Perspective}
 
 略.
+
+\section{Other Applications}
+
+\subsection{Recommender Systems}
+
+推荐系统主要分为两种应用情形:在线广告和商品推荐.推荐系统相关的任务可以归纳为有监督学习:给出用户和商品的相关信息,对用户的兴趣指标进行预测,最终具化为一个回归问题或者分类问题.
+
+常用的一种方法是\textit{协同过滤}(collaborative filtering).可以通过有参数方式和无参数方式分别实现.\textit{双线性预测}(bilinear prediction)实有参数实现方式之一.在具体应用中,双线性预测知识集成学习方法的学习器之一.
+
+除了双线性方法,基于网络实现的协同过滤方法是RBM无向概率模型.
+
+协同过滤方法有一个明显的缺陷就是其冷启动问题.即对于新加入的用户或者商品,算法很容易失效.解决这个问题的方法是引入商品和用户的额外信息.
+
+\subsubsection{Exploration Versus Exploitation}
+
+一方面,推荐系统存在一个问题就是获取到的用户喜好有偏差.对于未给用户进行推荐的商品是无法预测出用户的反应的.另一方面,强化学习可以对任何动作和反馈进行学习,并且强化学习在exploration和exploitation之间取得平衡.决定exploration于exploitation偏好的因素之一是时间尺度.
+
+另外存在一个困难就是如何对比不同的强化学习策略.
+
+\subsection{Knowledge Representation, Reasoning and Question Answering}
+
+\subsubsection{Knowledge, Relations and Question Answering}
+
+在知识表达领域,一个有意思的研究方向就是如何训练出一种表达方式,使得分布式表达能够捕捉到不同实体间的关系.
+
+在数学领域,\textit{二维关系}(binary relation)是描述有序元素对之间关系的集合.
+
+在AI领域,关系指的是由简单句法构成的并且高度结构化语言描述的句子.
+
+为了在神经网络上表示关系并进行推理,首先需要建立训练数据集.通常使用\textit{relational database}和\textit{knowledge base};此外,还需要选择合适的模型族.
+
+知识表达的一种实际应用是\textit{link prediction},但是它的结果很难量化评价.另一种实际应用是\textit{word-sense disambiguation}.
