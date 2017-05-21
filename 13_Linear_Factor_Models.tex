@@ -1,0 +1,73 @@
+\chapter{Linear Factor Models}
+
+许多深度学习学者对输入建立起概率模型$p_{\text{model}}(\mathbf x)$,借助于该模型使用\textit{概率推断}(probabilistic inference)\footnote{Probabilistic inference is the task of deriving the probability of one or more random variables taking a specific value or set of values. For example, a Bernoulli (Boolean) random variable may describe the event that John has cancer. Such a variable could take a value of $1$ (John has cancer) or $0$ (John does not have cancer). DeepDive uses probabilistic inference to estimate the probability that the random variable takes value $1$: a probability of $0.78$ would mean that John is $78\%$ likely to have cancer.}可以利用环境中的变量去预测环境中的其他变量.这其中许多模型包含隐变量$\mathbf h$,即$p_{\text{model}}(\mathbf x)=\mathbb E_{\mathbf h}p_{\text{model}}(\mathbf x|\mathbf h)$.包含隐变量的分布式表达可以囊括深度前向网络和RNN的所有优势.
+
+包含隐变量的最简单模型是\textit{线性因子模型}(linear factor model).它可以用来组成其他更加复杂的模型.它的数学表达式为
+\begin{equation}\label{eq:linear_factor_model}
+\mathbf x=\mathbf {Wh+b}+\text{noise}
+\end{equation}
+其中,$\mathbf h\sim p(\mathbf h)$,并且其各个分量间相互独立,有$p(\mathbf h)=\prod_ip(h_i)$;噪声项通常服从各个分量间相互独立的Gaussian分布.
+
+\section{Probabilistic PCA and Factor Analysis}
+
+各种线性因子模型在本质上都是一样的,都可以用式\ref{eq:linear_factor_model}进行概括.不同之处在于,噪声分布的选择以及在观察$\mathbf x$之前对模型隐变量$\mathbf h$的先验分布的选择.
+
+\paragraph{Factor Analysis}
+
+Factor analysis隐变量服从单位方差Gaussian分布
+\begin{equation}
+\mathbf h\sim\mathcal N(\mathbf{h;0,I})
+\end{equation}
+输入变量在给定$\mathbf h$的情况下条件独立;噪声分布服从对角方差Gaussian分布,$\psi$.
+
+隐变量被用来捕捉不同输入变量间的依赖关系.
+\begin{equation}
+\mathbf x\sim\mathcal N(\mathbf{x;b,WW^T+\psi})
+\end{equation}
+
+\paragraph{Probabilistic PCA}
+
+为了将PCA引入到概率框架中,需要把factor analysis中的条件方差限定为全部相同,因此有
+\begin{equation}
+\mathbf x\sim\mathcal N(\mathbf{x;b,WW^T+\sigma^2I})
+\end{equation}
+大部分数据变量都可以通过隐变量$\mathbf h$进行捕捉,只存在很小的\textit{重构错误}(reconstruction error)残差$\sigma^2$.
+
+\section{Independent Component Analysis (ICA)}
+
+ICA建立线性因子模型将原始信号分解为独立成分.它有许多不同的形式,但都要求使用者预先设定好$p(\mathbf h)$,接着模型就可以利用定式生成$\mathbf{x=Wh}$.
+
+使用者所选择的$p(\mathbf h)$尽可能独立,这样就可以还原出尽可能相互独立的因子.此外还需要注意的是,$p(\mathbf h)$不能服从Gaussian分布,否则$\mathbf W$就不唯一.
+
+ICA仅仅能够获得$\mathbf x$与$\mathbf h$之间的变换关系,它并不清除$p(\mathbf h)$的表示方式,因此也不能获得基于$p(\mathbf x)$的分布.
+
+ICA也有一些拓展形式
+\begin{itemize}
+    \item 非线性生成式模型:使用非线性方程$f$生成观察到的数据;
+    \item nonlinear independent components estimation (NICE)
+    \item 用来学习特征群(feature groups),寻找群内统计独立的特征但是群间不独立的特征.
+\end{itemize}
+
+\section{Slow Feature Analysis}
+
+SFA通过是学信号学习不变特征.相比于单个度量指标,环境中的重要特征变化很缓慢.基于\textit{慢速原则}(slowness principle)可以在损失函数中引入
+\begin{equation}
+\lambda\sum_tL(f(\mathbf x^{(t+1)}),f(\mathbf x^{(t)}))
+\end{equation}
+其中,$lambda$是超参数;$f$是特征提取函数;$L$是损失函数;$t$指示时刻.
+
+SFA算法可以归纳为如下的优化问题
+\begin{equation}\begin{split}
+\min_{\theta}&\mathbb E_t(f(\mathbf x^{(t+1)})_i-f(\mathbf x^{(t)})_i)^2\\
+s.t.&\mathbb E_tf(\mathbf x^{(t)})_i=0\\
+&\mathbb E_t[f(\mathbf x^{(t)})_i^2]=1
+\end{split}\end{equation}
+其中,第一个限制条件确保该优化问题有唯一解;第二个限制条件防止病态问题将所有特征坍缩至$0$.对于多特征的情形,还需要添加限制条件
+\begin{equation}
+\forall i<j,\mathbb E_t[f(\mathbf x^{(t+1)})_i,f(\mathbf x^{(t)})_j]=0
+\end{equation}
+这条限制条件对不同特征进行解耦合.
+
+SFA常被拓展至非线性领域用来学习非线性特征.
+
+SFA的一大优势是可以很容易预测出它所学习到的特征形式,但同时它表现受限的原因也很不清晰,推测可能是因为速度施加了过强的影响.
