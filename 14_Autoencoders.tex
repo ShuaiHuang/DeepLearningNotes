@@ -1,0 +1,67 @@
+\chapter{Autoencoders}
+
+Autoencoder是一个试图将输入复制到输出的神经网络.通常只是将输入和输出限制为大致相似,并且只对输入中有用的部分进行描述.传统上autoencoder是降维和特征学习的方式之一,但是近来它也被视为生成式模型的学习方法.尽管autoencoder与前向神经网络有不同之处,它仍旧可以使用\textit{recirculation}\footnote{TODO: 是什么?}进行训练.
+
+\section{Undercomplete Autoencoders}
+
+\textit{Undercomplete autoencoders}的目的在于获取隐变量$\mathbf h$中有用的特性.因此在模型中对其施加了$\mathbf h$维度要比$\mathbf x$维度低的限制.
+
+学习过程可以被视为最小化损失函数
+\begin{equation}
+L(\mathbf x,g(f(\mathbf)))
+\end{equation}
+的过程.当$f,g$都是线性函数时,autoencoder可以被视为张开一个和PCA相同的子空间.
+
+但是当encoder和decoder的capacity过高时,autoencoder可能提取不到有用的信息.
+
+\section{Regularized Autoencoders}
+
+在隐变量维度和输入变量维度相同,以及过完备的情况下,autoencoder学不到输入数据的分布.但是借助于正则化,encoder和decoder可以根据模型数据分布训练autoencoder.正则化项可以刺激模型训练出直接复制这种形式以外的表示方法.
+
+除了上述的antoencoder,几乎所有的包含隐变量以及推断过程的生成式模型都可以被视为一种特殊形式的autoencoder.
+
+\subsubsection{Sparse Autoencoders}
+
+\textit{Sparse autoencoders}是指将autoencoder的训练准则中加入稀疏补偿项$\Omega(\mathbf h)$
+\begin{equation}
+L(\mathbf x,g(f(\mathbf x)))+\Omega(\mathbf h)
+\end{equation}
+
+sparse autoencoders的目的是学习对其他任务有用的特征.但是这种正则化项并没有直观的贝叶斯表示方法.
+
+稀疏补偿项使模型隐变量的分布,它提供了近似训练生成式模型的方法.
+
+\subsection{Denoising Autoencoders}
+
+\textit{Denoising autoencoders}通过改变重构错误项来训练autoencoder,它最小化
+\begin{equation}
+L(\mathbf x,g(f(\tilde{\mathbf x})))
+\end{equation}
+其中,$\tilde{\mathbf x}$是被噪声干扰的输入$\mathbf x$.
+
+\subsection{Regularizing by Penalizing Derivatives}
+
+这种情况下的补偿项为
+\begin{equation}
+\Omega(\mathbf{h,x})=\lambda\sum_i\|\nabla_{\mathbf x}h_i\|^2
+\end{equation}
+它迫使模型在输入$\mathbf x$有微小变化时,模型输出变动不会太大.
+
+\section{Representation Power, Layer Size and Depth}
+
+Autoencoder还可以有深层结构.它本身就是一种前向网络,继承了前向网络的所有优势.理论上,包含隐层的深度autoencoder可以近似拟合任何一种函数.
+
+\section{Stochastic Encoders and Decoders}
+
+前向网络的损失函数和输出单元同样可以用于autoencoder.
+
+以激进的观点抛开前向神经网络来看,\textit{encoding function}$f(\mathbf x)$可以被一般化为\textit{encoding distribution}$p_{encoder}(\mathbf{h|x})$.
+
+任何一个包含隐变量的模型$p_{encoder}(\mathbf{h|x})=p_{model}(\mathbf{h|x})$可以定义一个stochastic encoder
+\begin{equation}
+p_{encoder}(\mathbf{h|x})=p_{model}(\mathbf{h|x})
+\end{equation}
+和一个stochastic decoder
+\begin{equation}
+p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
+\end{equation}
