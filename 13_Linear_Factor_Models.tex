@@ -71,3 +71,39 @@ s.t.&\mathbb E_tf(\mathbf x^{(t)})_i=0\\
 SFA常被拓展至非线性领域用来学习非线性特征.
 
 SFA的一大优势是可以很容易预测出它所学习到的特征形式,但同时它表现受限的原因也很不清晰,推测可能是因为速度施加了过强的影响.
+
+\section{Sparse Coding}
+
+稀疏编码是一种线性因子模型,在无监督特征学习和特征提取机制中被广泛研究.稀疏编码假设噪声服从精度为$\beta$的各向同性Gaussian分布.
+\begin{equation}
+p(\mathbf{x|h})=\mathbb N(\mathbf{x;Wh+b},\frac{1}{\beta}\mathbf I)
+\end{equation}
+$p(\mathbf h)$通常选定为在$0$附近有尖锐峰值的分布,如Laplace分布和Sutdent-t分布.
+
+由于模型不能通过最大似然度进行训练,通常使用交替训练策略进行decoder和encoder的训练.
+
+并不是所有的稀疏编码方式都显式构建$p(\mathbf h)$和$p(\mathbf{x|h})$.
+
+稀疏编码与非参数encoder紧密结合,相比于其他参数encoder,可以更好地最小化重构误差和对数先验.另一项优势是它没有泛化误差.
+
+稀疏编码的一项劣势是给定$\mathbf x$求取$\mathbf h$的过程是一个迭代过程,因此需要耗费较长训练时间.另一项劣势是非参数encoder进行反向传播操作并不直观.
+
+\section{Manifold Interpretation of PCA}
+
+线性因子模型中的PCA和factor analysis方法可以被视为学习一个流形.
+
+设encoder为
+\begin{equation}
+\mathbf h=f(\mathbf x)=\mathbf{W^T(x-\mu)}
+\end{equation}
+重构过程为
+\begin{equation}
+\hat{\mathbf x}=g(\mathbf x)=\mathbf{b+Vh}
+\end{equation}
+
+线性encoder和decoder的选择可以最小化重构误差
+\begin{equation}
+\mathbb E[\|\mathbf{x-\hat x}\|^2]
+\end{equation}
+
+本章介绍的线性因子模型可以被拓展至autoencoder网络和深度概率模型,在同样的任务中可以有更强大的功能和模型族的自由度.
