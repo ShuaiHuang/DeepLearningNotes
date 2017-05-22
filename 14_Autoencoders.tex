@@ -65,3 +65,27 @@ p_{encoder}(\mathbf{h|x})=p_{model}(\mathbf{h|x})
 \begin{equation}
 p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
 \end{equation}
+
+\section{Denoising Autoencoders}
+
+\textit{Denoising autoencoder} (DAE)是一种将受到噪声干扰的数据还原为原始数据的autoencoder.它可以归结为前向神经网络,使用与前向神经网络相同的方法进行训练.
+
+\subsection{Estimating the Score}
+
+\textit{Score mathcing}是极大似然度的替代方法.它是一种对概率分布的一致性估计.它利用的方法是促使模型与数据分布在每个训练数据点上拥有相同的score.DAE一个重要的特性是其训练准则使得autoencoder可以学习出一个向量场($g(f(\mathbf x))-\mathbf x$)用以估计数据分布的score.
+
+训练过程中使用Gaussian噪声和均方误差的autoencoder等价于训练一个RBM模型,该模型拥有Gaussian可见单元.
+
+\section{Learning Manifolds with Autoencoders}
+
+和其他的机器学习模型一样,autoencoder模型假设数据集中在低维度的流形或者流行子集上.但是autoencoder不仅学习函数来拟合流形,还需要去学习流行的结构.
+
+流形学习有两个因素
+\begin{itemize}
+    \item 学习$\mathbf h$和$\mathbf x$,建立从输入到输出的映射;
+    \item 满足限制条件或者正则化补偿项.
+\end{itemize}
+
+流行还有一个重要特性就是其切平面.结合上述两点因素可以看出,流形只对重要变量进行表示,此时只需要对流形切平面上的变化做出反映即可.
+
+最原始的流行学习方法是基于最近邻的非参数化方法.它的缺点是当流行不是很平滑时,需要大量的数据对新数据点进行插值拟合,很难对未知的数据进行泛化.但是常见的AI问题在流形上都是不平滑的,不能通过插值法进行泛化.
