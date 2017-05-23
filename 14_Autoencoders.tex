@@ -89,3 +89,36 @@ p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
 流行还有一个重要特性就是其切平面.结合上述两点因素可以看出,流形只对重要变量进行表示,此时只需要对流形切平面上的变化做出反映即可.
 
 最原始的流行学习方法是基于最近邻的非参数化方法.它的缺点是当流行不是很平滑时,需要大量的数据对新数据点进行插值拟合,很难对未知的数据进行泛化.但是常见的AI问题在流形上都是不平滑的,不能通过插值法进行泛化.
+
+\section{Contractive Autoencoders}
+
+\textit{Contractive autoencoder}引入正则项
+\begin{equation}
+\Omega(\mathbf h)=\lambda\Big\|\frac{\partial f(\mathbf x)}{\partial\mathbf x}\Big\|^2_F
+\end{equation}
+促使$f$的导数尽可能小.
+
+Contractive autoencoder和denoising autoencoder都能在一定程度上抵抗扰动,但是前者是在特征提取环节实现的,后者是在重构环节实现的.
+
+需要注意的是,contractive autoencoder只是局部收缩,全局来看,可能会存在两个点相互远离的情况.
+
+CAE的目的是为了学习到数据所表示的流行的结构.
+
+深度autoencoder的计算代价较高,并且可能会捕捉到无用的结果.
+
+\section{Predictive Sparse Decomposition}
+
+\textit{Predictive sparse decomposition} (SPD)是稀疏编码和参数autoencoder的结合体.其中,encoder $f(\mathbf x)$和decoder $h(\mathbf x)$都是参数化模型.
+
+训练过程可以归结为最小化
+\begin{equation}
+\|\mathbf x-g(\mathbf x)\|^2+\lambda|\mathbf h|_1+\gamma\|\mathbf h-f(\mathbf x)\|^2
+\end{equation}
+
+\section{Application of Autoencoders}
+
+Autoencoder被广泛用于降维和信息重获取任务中.
+
+低维度特征可以在许多任务上运用,提升性能.同时,降维也可以提升泛化能力.
+
+在信息重获取任务中,autoencoder可以使得信息检索在某些低维度空间上效率更加高效.具体实现可以参考\textit{语义哈希}(semantic hashing).
