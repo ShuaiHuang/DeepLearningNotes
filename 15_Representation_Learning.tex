@@ -1,0 +1,115 @@
+\chapter{Representation Learning}
+
+特征表示的方式直接决定信息处理任务的难易程度.一般情况下,一个好的特征表示方式可以使得后续学习任务更容易完成.
+
+有监督学习方式训练出的前向神经网络是一种特征学习方法.但是它并没有对中间特征显式地施加影响.对于学习出的特征表示方式,也可以供不同的任务使用.
+
+大多数特征学习任务必须要在保持尽可能多的信息与获取更优异的特性这两者之间进行权衡.
+
+特征学习提供了一种实现无监督学习和半监督学习的实现方式,可以帮助解决无监督学习和半监督学习问题.
+
+\section{Greedy Layer-Wise Unsupervised Pretraining}
+
+\textit{贪婪逐层无监督预训练}(Greedy Layer-Wise Unsupervised Pretraining)是基于单层特征学习算法(如RBM)进行实现的.它使用无监督学习方式规避有监督学习任务中深度网络各层联合训练的困难.贪婪逐层训练是第一种成功应用于全连接深度结构的训练方法.贪婪是指它对结果进行分块优化,而不是进行整体优化.预训练是指其仅仅只是训练过程的第一步,之后还要进行参数的精细化调整.因此,在有监督学习的框架下,它仅仅只是一种正则化方法或者是一种参数初始化策略.通常我们使用的预训练不仅仅是指预训练阶段,还包含之后的有监督学习阶段.
+
+贪婪逐层无监督预训练不仅仅用于深度神经网络模型上,还可以用于其他无监督学习算法的初始化.
+
+\subsection{When and Why Does Unsupervised Pretraining Work?}
+
+由于无监督预训练有时会对任务有帮助,但是在大多数情况下反而会恶化学习任务.因此需要搞清楚它为什么会有效,因此就可以针对特定任务运用它.
+
+无监督预训练包含两个核心思想
+\begin{enumerate}
+    \item 深度神经网络的初始参数对算法有较强的正则作用;
+    \item 学习输入的分布有助于建立从输入到输出的映射.
+\end{enumerate}
+其中,核心思想中的第一点并没有被完全理解.我们并没有准确认识到初始化参数所反映的特性在有监督学习阶段被保留多少.第二点的认识稍微深入一些,有些对于无监督学习比较有效果的特征可能同样对有监督学习有效果.但是并不清楚哪种任务可以从无监督学习中取得收益.
+
+从特征学习的角度来看,无监督预训练在原始特征表示比较弱的情况下,无监督预训练会更加有效.从正则化角度来看,无监督预训练在有标记样本数量较少的情况下,对提升模型的效果更有帮助.\footnote{其他无监督预处理对提升模型效果有正向作用的例子可以参见P$532$.}
+
+无监督预训练还可以提升分类任务以外其他任务的结果,还可以用来提升优化环节而不仅仅只是正则化环节.
+
+无监督预训练可以帮助深度神经网络初始参数保持在特定区域中,从而使得结果可以更好地收敛.
+
+一个重要问题是无监督预训练如何能够起到正则化作用.其中一个假设就是,预训练过程可以使得学习算法发现与数据生成过程中的暗含因素相关的特征.
+
+无监督预训练的劣势有
+\begin{itemize}
+    \item 它将显式地将学习过程分为两个阶段;
+    \item 正则化强度不能控制;
+    \item 两个阶段有各自的超参数,超参数过多,事前不能调节.
+\end{itemize}
+
+目前除了自然语言处理领域以外的其他领域很少使用无监督预训练.但是预训练的核心思想已经渗透到有监督预训练中.
+
+\section{Transfer Learning and Domain Adaption}
+
+\textit{迁移学习}(transfer learning)和\textit{领域自适应}(domain adaptation)是指在一种分布$P_1$中学习到的知识被用于提升另外一种分布$P_2$的泛化能力.
+
+在迁移学习中,我们假定分布$P_1$中的部分变量可以被用于学习$P_2$的分布.通常情况下,迁移学习,多任务学习和领域自适应可以通过特征学习的方式进行实现,其中的特征对于不同的分布或者任务均有效,这些特征对应于暗含的因子.然而在某些情况下,不同的任务间共享的不是输入的语义信息而是输出的语义信息.因此需要在较高的逻辑层次进行概念迁移.
+
+领域自适应是指任务相同但是输入的分布有轻微的不同.
+
+另外还有一个相关的问题是\textit{概念漂移}(concept drift),可以将其视为一种随着时间发展对数据分布进行逐渐演进的迁移学习.概念漂移和迁移学习都可以被视为多任务学习的特例.
+
+特征学习的核心思想在于相同的表示方式对于不同的分布均有效.
+
+如果使用更深的模型进行特征表示,那么在新的分布上,其效果会更好.
+
+迁移学习的极端情况是\textit{one-shot learning}和\textit{zero-shot / zero-data learning}.one-shot learning学习有效的原因可能是其在第一阶段就学习到了数据分布中暗含的因素.
+
+zero-shot learning和zero-data learning仅当附加信息在训练过程中被运用时才会生效.zero-shot learning要求任务的描述方式具有一定的泛化能力才会生效.
+
+\section{Semi-Supervised Distangling of Causal Factors}
+
+对于如何评判一种特征表示方式优劣的问题,一个假设是,理想的特征表示方式和底层暗含的数据生成因素相对应,即特征之间不存在耦合关系.除此之外,特征表示还要比较容易进行塑造.对于许多AI任务,上述两项特性是一致的.
+
+如果$\mathbf y$与$\mathbf x$的起因(causal factors)关系密切,那么$p(\mathbf x)$与$p(\mathbf{y|x})$就会有紧密联系.非监督特征表示试图对变量中暗含的因素进行解耦合,这种策略与半监督学习策略很类似.$p(\mathbf x)$与$p(\mathbf{y|x})$就会有紧密联系体现在
+\begin{equation}\begin{split}
+p(\mathbf {h,x})&=p(\mathbf{x|h})p(\mathbf h)\\
+p(\mathbf x)&=\mathbb E_{\mathbf h}p(\mathbf{x|h})
+\end{split}\end{equation}
+最佳的关于$\mathbf x$的分布是$\mathbf h$揭示出了$\mathbf x$的真实分布.
+
+在现实中,输入变量通常是多种因素共同作用的结果.一个直接的方式就是暴力搜索.但是在绝大多数情况下,暴力搜索方式并不可行,替代策略有
+\begin{itemize}
+    \item 同时使用有监督学习与无监督学习去学习特征;
+    \item 如果使用无监督特征学习策略,就是用更大的特征集.
+\end{itemize}
+
+对于无监督学习策略,可以去改变显著性的定义.具体来说,可以使用\textit{生成式对抗网络}(generative adversarial networks)定义显著性.
+
+学习暗含的起因的收益是,如果生成式过程的\textit{果}为$\mathbf x$,\textit{因}为$\mathbf y$,那么$p(\mathbf{x|y})$对$p(\mathbf y)$的变化具有鲁棒性.
+
+\section{Distributed Representation}
+
+\textit{分布式特征表示}(Distributed Representation)的定义为,特征表示的元素间相互可分离.与之相对应的概念为\textit{符号特征表示}(symbolic representation),每一个单个的符号代表一个类别.
+
+对于非分布式特征表示,参数的个数和特征空间中定义的区域的数目是线性关系.
+
+分布式特征表示与符号特征表示的区别在于由于在不同概念间共享属性因而具有泛化能力\footnote{generalization arises due to shared attributes between different concepts.}.分布式特征表示包含有丰富的相似度空间,在这个空间中,语义上相似的概念有较近的距离,这是符号特征表示所不具备的特性.
+
+当使用很复杂的结构可以使用少量参数进行表示时,分布式特征表示具有统计上的优势.传统的符号特征表示泛化能力的前提假设是平滑假设.但是容易受到维度灾难的影响,并且很难根究已有的符号泛化到新的符号.
+
+对于分布式表示,如果有$O(nd)$个参数,那么可以将输入空间划分为$O(n^d)$个区域.分布式表示的capacity仍然受限,因此泛化能力比较强.
+
+\section{Exponential Gains from Depth}
+
+上节提到,深度结构可以提升统计效率.在实际中,深度特征表示可以对低层次特征进行抽象,并进行非线性的加工.
+
+\section{Providing Clues to Discover Underlying Causes}
+
+大多数特征学习的策略是引入有助于发现底层因素的线索.具体有
+\begin{itemize}
+    \item Smoothness
+    \item Linearity
+    \item Multiple explanatory factors
+    \item Causal factors
+    \item Depth, or a hierarchical organization of explanatory factors
+    \item Shared factors across tasks
+    \item Manifolds
+    \item Natural clustering
+    \item Temporal and spatial coherences
+    \item Sparsity
+    \item Simplicity of Factor Dependencies
+\end{itemize}
