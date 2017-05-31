@@ -1,0 +1,36 @@
+\chapter{Structured Probabilistic Models for Deep Learning}
+
+\textit{结构化概率模型}(Structured Probabilistic Models)是一种使用图的形式描述随机变量间交互关系的方法.
+
+\section{The Challenge of Unstructured Modeling}
+
+深度学习的目标是对机器学习算法进行拓展,以应对为了解决人工智能问题所要面对的挑战.
+
+大部分使用结构化概率模型的任务对输入的结构做一个完整地理解和构建,这些任务包括
+\begin{itemize}
+    \item 密度估计
+    \item 去噪
+    \item 缺失值填充
+    \item 采样
+\end{itemize}
+
+直接使用表格法存储各个随机变量间的交互情况并不可行,原因有
+\begin{itemize}
+    \item 内存限制
+    \item 统计效率
+    \item 推断代价
+    \item 采样代价
+\end{itemize}
+但是在实际上,各个变量子集间的影响是间接的.结构化概率模型只关注随机变量间的\textbf{直接关系}.
+
+\section{Using Graphs to Describe Model Structure}
+
+图模型可以分为\textit{有向无环图}与\textit{无向图}两类.
+
+\subsection{Directed Models}
+
+有向图的边是有向的,体现在概率分布上就是条件概率分布.
+
+只要每个变量在图中只有一小部分父节点,那么联合分布就可以使用少量的参数进行表示.
+
+需要注意的是,有向图仅仅对相互间条件独立的变量有简化作用.
