@@ -34,3 +34,38 @@
 只要每个变量在图中只有一小部分父节点,那么联合分布就可以使用少量的参数进行表示.
 
 需要注意的是,有向图仅仅对相互间条件独立的变量有简化作用.
+
+\subsection{Undirected Models}
+
+无向图的边是没有指向的,图模型中的边与条件概率无关.
+
+无向图模型中的\textit{因子}(factor)或者说\textit{团势}(clique potential)$\phi(\mathcal C)$用以度量团\textit{团}(clique)$\mathcal C$中每个变量间的紧密关系.但是因子并不能保证产生一个有效的概率分布.
+
+\subsection{The Partition Function}
+
+为保证得到有效的概率分布,需要使用规范化因子$Z$.$\phi$必须可以让$Z$易于计算.在深度学习中,常对$Z$进行近似估计.
+
+有向图和无向图的一个重要区别是有向图直接基于概率分布构建模型,而无向图使用$\phi$构建模型,进而转化为概率分布.
+
+需要特别注意的是,每个变量对于相应的势函数都会有影响.
+
+\subsection{Energy-Based Models}
+
+许多无向图模型都是基于假设$\forall\mathbf x,\tilde p(\mathbf x)>0$构建的.一种简便的方式是使用\textit{基于能量的模型}(energy-based model)
+\begin{equation}
+\tilde p(\mathbf x)=\exp(-E(\mathbf x))
+\end{equation}
+定义模型.能量函数可以完全自由地选择,没有团势函数的限制.
+
+能量函数中的每一项对应图中的一个团.这也被称为\textit{product of experts}.也就是说,每一个专家仅仅关注低维度内随机变量的映射,但是多个专家相乘则对更加复杂的高维度空间内的变量进行了限制.
+
+一般情况下,更常用的是\textit{自由能量}(free energy)
+\begin{equation}
+\mathcal F(\mathbf x)=-\log\sum_{\mathbf h}\exp(-E(\mathbf{x,h}))
+\end{equation}
+
+\subsection{Separation and D-Separation}
+
+由于图模型中的边对应的是变量间的直接交互,那么研究变量间间接交互(即变量间条件独立)情况就对应于图的分离.其中,有向图的分离被定义为\textit{d-separation}.
+
+但是需要强调的是,\textbf{图并不能展现所有的独立性关系}.图不会展现出不存在的独立性关系,但是可能会无法展现出某些独立性关系.
