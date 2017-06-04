@@ -69,3 +69,66 @@
 由于图模型中的边对应的是变量间的直接交互,那么研究变量间间接交互(即变量间条件独立)情况就对应于图的分离.其中,有向图的分离被定义为\textit{d-separation}.
 
 但是需要强调的是,\textbf{图并不能展现所有的独立性关系}.图不会展现出不存在的独立性关系,但是可能会无法展现出某些独立性关系.
+
+\subsection{Converting between Undirected and Directed Graph}
+
+有向图模型和无向图模型各有优劣,需要根据具体任务选择使用.每一个概率分布既可以使用有向图表示也可以使用无向图表示.
+
+为了使得图模型可以尽可能完整地表示出独立性关系,可以使用有向图模型.有向图模型中有无向图不能进行完美表示的子结构,被称为\textit{immorality}结构(子结点两个父节点间没有直接关联的结构.)有向图转换为无向图的方法为在图中建立起有向图中原有的连接,并且将immorality结构转换为\textit{moralized graph}.
+
+无向图中也有有向图无法完美表示的子结构(最大长度超过4的环,并且不相邻的节点间没有弦).在无向图转换为有向图之前,首先需要进行弦化或者三角化转换.然后给结点进行排序,加上边的指向,避免产生环结构.
+
+\subsection{Factor Graph}
+
+\textit{因子图}(Factor Graph)是另一种构造无向图的方法,它可以避免标准无向图变量在图表示上的二义性.因子图显式规定了势函数的作用范围.圆形结点是随机变量,方形结点是势函数.
+
+\section{Sampling from Graphical Models}
+
+图模型也可用于采样任务.图模型的一项优势是借助于\textit{ancestral sampling}过程从模型所标示的联合分布中进行高效率采样.但是需要按照拓扑顺序进行采样.
+
+但是ancestral sampling的劣势有
+\begin{itemize}
+    \item 它仅仅只针对有向图模型进行采样;
+    \item 它并不能对任意的有向图模型进行采样.
+\end{itemize}
+
+无向图可以使用\textit{Gibbs sampling}方法进行采样.
+
+\section{Advantages of Structured Modeling}
+
+结构化概率模型的首要优势在于它可以减少特征表示的代价以及学习和推断过程的代价.结构化概率模型通过忽略某些变量间的交互节省运行时间也内存消耗.
+
+另外一项优势是它可以显式地分离知识表示的学习过程和推断现有的知识的过程.
+
+\section{Learning about Dependencies}
+
+好的生成式模型必须尽可能准确捕捉\textit{可见变量}(visible variants)的分布情况.在深度学习的情境中,最常见的使用方式是借助于隐变量定义可见变量间的依赖关系.
+
+当模型通过建立直接连接来捕捉所有变量间的独立关系,需要在所有图中变量间建立起两两连接.学习模型结构的过程叫做\textit{structure learning}.如果引入隐变量,学习过程就只需要学习相应的参数,而不用对模型的结构进行变动.
+
+\section{Inference and Approximate Inference}
+
+通过概率模型我们可以获得变量间的相互关联关系.
+
+\begin{equation}
+\log p(\mathbf v)=\mathbb E_{\mathbf h\sim p(\mathbf h|\mathbf v)}[\log p(\mathbf{h,v})-\log p(\mathbf{h|v})]
+\end{equation}
+我们经常需要计算$p(\mathbf{h|v})$以实现上述学习规则.但是对于大部分深度模型,这些推断问题通常不易解决.
+
+可以很直观地看出,一般的图模型计算边缘概率分布是一个#P难问题.这样就需要通过近似推断来避免这一问题.
+
+\section{The Deep Learning Approach to Structured Probabilistic Models}
+
+在深度学习情境中,我们通常使用不同的设计决策来对传统的计算工具进行组合.这样整体的算法和模型相比于传统算法有不同的特点.
+
+深度学习中的隐变量和结构化概率模型的隐变量设计方式不同.
+
+深度学习中的连接方式和结构化概率模型的连接方式不同.
+
+相比于结构化概率模型,深度学习对于未知情况有一定的容忍度.
+
+\subsection{Example: The Restricted Boltzmann Machine}
+
+\textit{有限制Boltzmann机}(Restricted Boltzmann Machine, RBM,又称harmonium)是图模型用于深度学习的精髓部分.
+
+从整体上来说,RBM向概率图模型演示了典型的深度学习方法:使用隐层变量进行特征表示学习,以及不同层的神经元参数之间的高效交互.
