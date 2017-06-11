@@ -1,0 +1,78 @@
+\chapter{Monte Carlo Methods}
+
+随机算法可以分为两类:\textit{Las Vegas算法}和\textit{Monte Carlo算法}.Las Vegas算法返回一个精确结果,但是耗费的时间不确定;Monte Carlo算法返回一个近似正确的结果,但是耗费时间比较固定.
+
+\section{Sampling and Monte Carlo Methods}
+
+在机器学习中,通常会从某个概率分布中采样一定的样本,并且使用这些样本去估计某些变量.
+
+\subsection{Why Sampling?}
+
+采样提供了一种灵活的方法,它可以以较低的代价去估计求和以及积分结果.
+
+\subsection{Basics of Monte Carlo Sampling}
+
+\paragraph{核心思想}Monte Carlo采样的核心是将求和或者积分运算视为在某个分布下的期望值运算,并且通过求取平均值计算期望值.
+\begin{equation}
+s=\sum_{\mathbf x}p(\mathbf x)f(\mathbf x)=E_P[f(\mathbf x)]
+\end{equation}
+或者
+\begin{equation}
+s=\int p(\mathbf x)f(\mathbf x)d\mathbf x=E_P[f(\mathbf x)]
+
+\end{equation}
+
+一般而言,直接求取分布是比较困难的,因此通常采用的方法是从分布中采样来代替直接求取分布.最后问题可以归结为如何对分布进行采样,从而使得通过采样计算出的期望值近似等于目标和或者目标积分值.
+
+\section{Importance Sampling}
+
+将求和过程或者求积分过程进行分解,其中一个重要环节是确定哪一部分为$p(\mathbf x)$,哪一部分为$f(\mathbf x)$.但是这种分解并没有统一标准,因为分解形式并不唯一.
+\begin{equation}
+p(\mathbf x)f(\mathbf x)=q(\mathbf x)\frac{p(\mathbf x)f(\mathbf x)}{q(\mathbf x)}
+\end{equation}
+
+\paragraph{optimal importance sampling}$p(\mathbf x)f(\mathbf x)$并不一定是最优的分解方式.最优选择$q^\ast$被称为\textit{optimal importance sampling}.
+
+\paragraph{biased importance sampling}另外一种重要的分解方式是\textit{biased importance sampling},它不要求$p$和$q$必须进行归一化.
+
+$q$的选择直接对Monte Carlo估计的效率产生影响,因此进行选择时必须加以注意\footnote{见P$594$页中间部分.}.
+
+尽管importance sampling有许多危险之处,但是它包括深度学习在内的机器学习算法中起到了重要作用.
+
+\section{Markov Chain Monte Carlo Methods}
+
+在许多情况下,我们希望使用Monte Carlo方法,但是很难获取到可用的方法去从$p_{model}$中采样或者从一个足够好的分布$q$中进行importance sampling.在无向图中,通常使用无向图表示分布$p_{model}$,因此就可以借助于\textit{Markov Chain}去近似采样.这种方法被称为\textit{Markov Chain Monte Carlo方法}(MCMC方法).
+
+MCMC方法的限制是模型的每一个状态都没有$0$概率.因此该方法适用于基于能量的方法(energy-based method, EBM).
+
+在EBM中进行\textit{ancestral sampling}会遇到先有鸡还是先有蛋的问题,为避免这一问题需要采用Markov链方法.核心思想是状态$\mathbf x$以任意值作为起始状态,不断迭代更新,最终逼近真实的分布\footnote{TODO: 再看一遍参数化的过程.}.这一过程最终收敛到\textit{stationary distribution}或者\textit{equilibrium distribution}.如果状态转移$T$选取正确,那么稳态分布$q$将会与分布$p$相同.
+
+\paragraph{难点} 所有的Markov Chain都包含随机更新过程直至收敛到equilibrium distribution的过程,并从中采样.这一过程被称为\textit{burning in}.这一过程产生的相邻两个样本相互间是耦合的,为了产生不耦合的样本,需要间隔一定的次数进行采样,时间代价会很高.可以使用并行化进行操作.
+
+另外一个难点是事先并不知道经过多少步可以达到稳定状态.其中迭代的步数被称为\textit{mixing time}.$\mathbf A$中比$1$小的特征值决定了mixing time,但是实际中Markov Chain并不能使用矩阵进行标示,因此只能通过估测判定是否mix.
+
+\section{Gibbs Sampling}
+
+确保$q(\mathbf x)$成为可用分布的方法有两种:
+\begin{itemize}
+    \item 从学习得到的$p_{model}$中获取到$T$;
+    \item 直接参数化$T$并对其进行学习.
+\end{itemize}
+
+一个从$p_{model}$中进行采样并建立起Markov Chain的方法是使用Gibbs sampling\footnote{具体算法过程可见周志华<机器学习>中7.5节相关内容.}.
+
+\section{The Challenge of Mixing between Separated Modes}
+
+MCMC方法的一个难点是其很有可能mix不充分.这样会导致在高维空间中,MCMC采样会非常耦合.耦合的原因是其在低能量内进行转移,不能顺利逃离低能量区域.这个问题在一定条件下可以通过找到独立成分并进行同步更新加以解决,但是当独立关系很复杂时,这个方法就失效了.
+
+\subsection{Tempering to Mix between Modes}
+
+当一个分布有明显尖峰并且其周围相对平坦时,它很难与其他mode进行mix.基于能量的模型可以通过引入参数$\beta$控制尖峰的分布
+\begin{equation}
+p_\beta\propto\exp(-\beta E(\mathbf x))
+\end{equation}
+其中$\beta$常被称为\textit{temperature}的倒数,反映员是基于能量模型的统计物理量.Tempering是一种常用的mixing策略.但是其仍有局限性\footnote{TODO: 再读一遍本节.}.
+
+\subsection{Depth May Help Mixing}
+
+当从包含隐变量的模型$p(\mathbf{h,x})$中进行采样时,如果$p(\mathbf{h|x})$对$\mathbf x$编码过于完善的话,那么$p(\mathbf{x|h})$并不会使$\mathbf x$变化太大,进而使得mixing效果欠佳.一种解决方案是使$\mathbf h$称为深度特征表示.
