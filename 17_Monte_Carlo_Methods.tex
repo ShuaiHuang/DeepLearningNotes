@@ -14,12 +14,11 @@
 
 \paragraph{核心思想}Monte Carlo采样的核心是将求和或者积分运算视为在某个分布下的期望值运算,并且通过求取平均值计算期望值.
 \begin{equation}
-s=\sum_{\mathbf x}p(\mathbf x)f(\mathbf x)=E_P[f(\mathbf x)]
+s=\sum_{\mathbf x}p(\mathbf x)f(\mathbf x)=E_P\left[f(\mathbf x)\right]
 \end{equation}
 或者
 \begin{equation}
-s=\int p(\mathbf x)f(\mathbf x)d\mathbf x=E_P[f(\mathbf x)]
-
+s=\int p(\mathbf x)f(\mathbf x)d\mathbf x=E_P\left[f(\mathbf x)\right]
 \end{equation}
 
 一般而言,直接求取分布是比较困难的,因此通常采用的方法是从分布中采样来代替直接求取分布.最后问题可以归结为如何对分布进行采样,从而使得通过采样计算出的期望值近似等于目标和或者目标积分值.
