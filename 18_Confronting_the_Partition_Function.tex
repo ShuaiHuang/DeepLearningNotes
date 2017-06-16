@@ -1,0 +1,26 @@
+\chapter{Confronting the Partition Function}
+
+在一些情况下,我们需要将$\tilde p$除以\textit{partition function} $Z(\theta)$进行归一化,以获得有效概率分布
+\begin{equation}
+p(\mathbf x;\theta)=\frac{1}{Z(\theta)}\tilde p(\mathbf x;\theta)
+\end{equation}
+其中partition function是一个对所有未归一化概率的积分(连续变量)或者求和(离散变量)操作.
+\begin{equation}\begin{split}
+&\int\tilde p(\mathbf x)d\mathbf x\\
+&\sum_{\mathbf x}\tilde p(\mathbf x)
+\end{split}\end{equation}
+
+\section{The Log-Likelihood Gradient}
+
+无向图模型学习在最大化对数似然特别困难是因为它的partition function依赖于参数.
+\begin{equation}
+\nabla_\theta\log p(\mathbf x;\theta)=\nabla_\theta\tilde p(\mathbf x;\theta)-\nabla\log Z(\theta)
+\end{equation}
+这就是我们所熟知的\textit{positive phase}和\textit{negative phase}分解\footnote{The term positive and negative do not refer to the sign of each term in equation, but rather reflect to their effect on the probability density defined by the model.\href{http://deeplearning.net/tutorial/rbm.html\#rbm}{http://deeplearning.net}}.
+
+\begin{equation}
+\nabla_\theta\log Z=\mathbb E_{\mathbf x\sim p(\mathbf x)}\nabla_\theta\log\tilde p(\mathbf x)
+\end{equation}
+上述等式是Monte Carolo方法估计极大似然的基础.
+
+在positive phase项中,我们增大从\textbf{数据}中采样的$\mathbf x$所对应的$\log\tilde p(\mathbf x)$的值.在negative phase项中,我们通过降低从\textbf{模型}中采样的$\log\tilde p(\mathbf x)$的值而降低partition function的值\footnote{There are many ways that a learner can capture knowledge about the data generating distribution $p_{data}$ from which training examples were obtained. Some of this encapsulate a model $p_{model}$ of that distribution (or of a derived distribution such as a distribution of output variables given input variables).}.

@@ -40,7 +40,7 @@ $q$的选择直接对Monte Carlo估计的效率产生影响,因此进行选择�
 
 \section{Markov Chain Monte Carlo Methods}
 
-在许多情况下,我们希望使用Monte Carlo方法,但是很难获取到可用的方法去从$p_{model}$中采样或者从一个足够好的分布$q$中进行importance sampling.在无向图中,通常使用无向图表示分布$p_{model}$,因此就可以借助于\textit{Markov Chain}去近似采样.这种方法被称为\textit{Markov Chain Monte Carlo方法}(MCMC方法).
+在许多情况下,我们希望使用Monte Carlo方法,但是很难获取到可用的方法去从$p_{model}$中精确采样或者从一个足够好的分布$q$中进行importance sampling.在无向图中,通常使用无向图表示分布$p_{model}$,因此就可以借助于\textit{Markov Chain}去近似采样.这种方法被称为\textit{Markov Chain Monte Carlo方法}(MCMC方法).
 
 MCMC方法的限制是模型的每一个状态都没有$0$概率.因此该方法适用于基于能量的方法(energy-based method, EBM).
 
