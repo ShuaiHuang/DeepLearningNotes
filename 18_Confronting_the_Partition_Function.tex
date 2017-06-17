@@ -16,11 +16,83 @@ p(\mathbf x;\theta)=\frac{1}{Z(\theta)}\tilde p(\mathbf x;\theta)
 \begin{equation}
 \nabla_\theta\log p(\mathbf x;\theta)=\nabla_\theta\tilde p(\mathbf x;\theta)-\nabla\log Z(\theta)
 \end{equation}
-这就是我们所熟知的\textit{positive phase}和\textit{negative phase}分解\footnote{The term positive and negative do not refer to the sign of each term in equation, but rather reflect to their effect on the probability density defined by the model.\href{http://deeplearning.net/tutorial/rbm.html\#rbm}{http://deeplearning.net}}.
+这就是我们所熟知的\textit{positive phase}和\textit{negative phase}分解\footnote{The term positive and negative do not refer to the sign of each term in equation, but rather reflect to their effect on the probability density defined by the model.(\href{http://deeplearning.net/tutorial/rbm.html\#rbm}{http://deeplearning.net})}.
 
-\begin{equation}
+\begin{equation}\label{eq:gradient_of_log_partition_function}
 \nabla_\theta\log Z=\mathbb E_{\mathbf x\sim p(\mathbf x)}\nabla_\theta\log\tilde p(\mathbf x)
 \end{equation}
 上述等式是Monte Carolo方法估计极大似然的基础.
 
 在positive phase项中,我们增大从\textbf{数据}中采样的$\mathbf x$所对应的$\log\tilde p(\mathbf x)$的值.在negative phase项中,我们通过降低从\textbf{模型}中采样的$\log\tilde p(\mathbf x)$的值而降低partition function的值\footnote{There are many ways that a learner can capture knowledge about the data generating distribution $p_{data}$ from which training examples were obtained. Some of this encapsulate a model $p_{model}$ of that distribution (or of a derived distribution such as a distribution of output variables given input variables).}.
+
+\section{Stochastic Maximum Likelihood and Contrastive Divergence}
+
+\paragraph{naive approach}式\ref{eq:gradient_of_log_partition_function}的一种直观计算方法为,每次需要计算梯度时都从随机状态burning in一个Markov链.可以看出,这样的方法计算代价较高并且非常低效.
+
+MCMC方法最大化似然度可视为在两种力量间进行平衡:一种力量是提升数据所在的模型分布位置的概率;另外一种力量是压低模型样本出现位置的模型分布概率.
+
+\paragraph{contrastive divergence}contrastive divergence(CD, 或者CD-$K$用以指示$k$步Gibbs的CD算法)在初始化Markov链的每一步都使用从数据分布中采样到的样本.
+
+CD算法容易在supurious modes的情况下失效.并且对于直接训练深度模型没有太大的帮助.
+
+CD算法可以视为对模型进行补偿,当Markov链的输入是从数据分布中采样得到时,其结果变化剧烈.
+
+\paragraph{stochastic maximum likelihood(SML)}另外一种方法是在计算梯度而初始化Markov链的时候,都将前一步的梯度方向考虑进来,用以初始化Markov链.由于可以储存观测变量和隐变量,所以SML可以同时初始化观测变量和隐变量.SML可以高效训练深度模型.
+
+相比于精确采样,CD算法的方差较低,但是SML的方差偏高.
+
+基于MCMC采样的方法适用于几乎所有的MCMC变体.
+
+\paragraph{Fast PCD}一种加速学习过程mixing的方法不是改变Monte Carlo方法,而是改变模型和代价函数的参数化过程.即将参数$\theta$替换为
+\begin{equation}
+\theta=\theta^{(slow)}+\theta^{(fast)}
+\end{equation}
+尽管当快速权重可以自由改变时效果才会体现,但是这样就可以使得Markov链进行快速mix.
+
+\section{Pseudolikelihood}
+
+Monte Carlo直接面对partition function的计算过程,与之对应的其他方法则绕考计算partition function的过程,也就是本节所提到的\textit{pseudolikelihood}方法.
+
+Pseudolikelihood方法通过概率的比例部分消除掉partition function的影响.假设将变量$\mathbf x$分割为$\mathbf a, \mathbf b, \mathbf c$,那么有
+\begin{equation}
+p(\mathbf a|\mathbf b)=\frac{p(\mathbf{a,b})}{p(\mathbf b)}=\frac{p(\mathbf{a,b})}{\sum_{\mathbf{a,c}}p(\mathbf {a,b,c})}=\frac{\tilde p(\mathbf{a,b})}{\sum_{\mathbf{a,c}}\tilde p(\mathbf {a,b,c})}
+\end{equation}
+在实际中,$\mathbf c$的数目会很多,如果将$\mathbf c$并入$\mathbf b$会减少计算量,这样就产生了pseudolikelihood目标函数
+\begin{equation}
+\sum_{i=1}^n\log p(x_i|\mathbf x_{-i})
+\end{equation}
+将计算复杂度向偏差让渡,可得\textit{generalized pseudolikelihood}估计
+\begin{equation}
+\sum_{i=1}^m\log p(x_{\mathbb S^{(i)}}|\mathbf x_{-{\mathbb S^{(i)}}})
+\end{equation}
+
+基于pseudolikelihood的方法表现很大程度上取决于模型如何使用.generalized pseudolikelihood适用的情形为$\mathbb S$捕捉到了变量间的重要耦合关系.但是它的缺点为,当与其他近似估计方法一起使用时,仅能提供$\tilde p(\mathbf x)$的下限.
+
+它也不能用于深度模型.但是它可以用于深度网络的单层神经元训练以及不基于下限的近似推断方法.
+
+同时需要注意的是它的计算代价比较大.
+
+\section{Score Matching and Ratio Matching}
+
+\paragraph{Score Matching}在训练模型时可以不用对$Z$及其导数进行估计.$\nabla_{\mathbf x}\log p(\mathbf x)$被称为\textit{score}.\textit{score matching}是指
+\begin{equation}\begin{split}
+L(\mathbf x,\theta)&=\frac{1}{2}\|\nabla_{\mathbf x}\log p_{model}(\mathbf x;\theta)-\nabla_{\mathbf x}\log p_{data}(\mathbf x;\theta)\|_2^2\\
+J(\theta)&=\frac{1}{2}\mathbb E_{p_{data}(\mathbf x)}L(\mathbf x,\theta)\\
+\theta^\ast&=\min_\theta J(\theta)
+\end{split}\end{equation}
+同时可以看出,score matching需要知道真实的数据分布$p_{data}$.但是在一定条件下\footnote{见P618},$L(\mathbf x,\theta)$等价于
+\begin{equation}
+\tilde L(\mathbf x,\theta)=\sum_{j=1}^n\Big(\frac{\partial^2}{\partial x_j^2}\log p_{model}(\mathbf x;\theta)+\frac{1}{2}(\frac{\partial}{\partial x_j}\log p_{model}(\mathbf x;\theta))^2\Big)
+\end{equation}
+上式不适用于离散观察变量,但是可以用于离散隐变量.
+
+\paragraph{Generalized Score Matching(GSM)}GSM适用于观察变量是离散的情形,但是不适用于高维离散空间中某些事件概率为$0$的情形.
+
+\paragraph{Ratio Matching} Ratio Matching是特别针对二值数据提出的.
+\begin{equation}
+L^{(RM)}(\mathbf x;\theta)=\sum_{j=1}^n\Big(\frac{1}{1+\frac{p_{model}(\mathbf x;\theta)}{p_{model}(f(\mathbf x), j;\theta)}}\Big)
+\end{equation}
+
+但是ratio matching的计算代价较高.
+
+Ratio Matching适用于高维离散的情形.
