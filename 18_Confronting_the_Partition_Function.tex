@@ -96,3 +96,75 @@ L^{(RM)}(\mathbf x;\theta)=\sum_{j=1}^n\Big(\frac{1}{1+\frac{p_{model}(\mathbf x
 但是ratio matching的计算代价较高.
 
 Ratio Matching适用于高维离散的情形.
+
+\section{Denoising Score Matching}
+
+在一些情况下,我们希望正则化score matching,就需要将真实数据分布$p_{data}$替换为
+\begin{equation}
+p_{smoothed}(\mathbf x)=\int p_{data}(\mathbf y)q(\mathbf x|\mathbf y)d\mathbf y
+\end{equation}
+
+如果给定足够的capacity,任何一致性估计都会使得$p_{model}$在训练集上样本上形成Dirac分布.对$q$进行平滑有助于减轻这个问题,但同时也损失了一部分渐进一致性.
+
+\section{Noise-Contrastive Estimation}
+
+\paragraph{Noise-contrastive estimation(NCE)}在NCE方法中,概率分布估计被显式定义为
+\begin{equation}\label{eq:noise-contrastive-estimation}
+\log p_{model}(\mathbf x)=\log\tilde p_{model}(\mathbf x;\theta)+c
+\end{equation}
+其中,引入的$c$是$-\log Z(\theta)$的近似估计.
+
+如果采用最大似然度对式\ref{eq:noise-contrastive-estimation}进行估计,那么$c$将会被置为一个非常高的值,而不是产生一个有效分布.
+
+\paragraph{Noise Distribution}因此引入噪声分布$p_{model}(\mathbf x)$,
+\begin{equation}\begin{split}
+p_{joint}(y=1)&=\frac{1}{2}\\
+p_{joint}(\mathbf x|y=1)&=p_{model}(\mathbf x)\\
+p_{joint}(\mathbf x|y=0)&=p_{noise}(\mathbf x)
+\end{split}\end{equation}
+其中$y$是一个开关变量,决定是从模型分布还是噪声分布中产生$\mathbf x$.这样就可以使用最大似然度解决上述问题
+\begin{equation}
+\theta,c={\arg\max}_{\theta,c}\mathbb E_{\mathbf{x,y}\sim p_{train}}\log p_{joint}(y|\mathbf x)
+\end{equation}
+
+NCE使用最为成功的是没有太多随机变量的情形,但是这些随机变量可以有很数目的数值.同时它的缺陷是$p_{noise}$必须容易估计,并且很容易从过度限制中进行采样.
+
+NCE的核心思想是一个好的生成式模型应该可以区分开数据和噪声.
+
+\section{Estimating the Partition Function}
+
+在模型评估,监控训练效果,以及对比模型的过程中,必须计算partition function.
+
+如果我们需要计算$\mathcal M_A$或者$\mathcal M_B$的真实分布,并且知道两个分布的partition function的比值,那么只需要计算其中一个partition function就可以了.
+\begin{equation}
+Z(\theta_B)=rZ(\theta)=\frac{Z(\theta_B)}{Z(\theta_A)}Z(\theta_A)
+\end{equation}
+一个简单的办法就是使用Monte Carlo方法估计partition function.
+\begin{equation}\begin{split}
+Z_1&=\int\tilde p(\mathbf x)d\mathbf x\\
+&=\int\frac{p_0(\mathbf x)}{p_0(\mathbf x)}\tilde p_1(\mathbf x)d\mathbf x\\
+&=Z_0\int p_0(\mathbf x)\frac{\tilde p_1(\mathbf x)}{\tilde p_0(\mathbf x)}d\mathbf x\\
+\hat Z_1&=\frac{Z_0}{K}\sum_{k=1}^K\frac{\tilde p_1(\mathbf x^{(k)})}{\tilde p_0(\mathbf x^{(k)})}\quad\text{s.t.}\,\mathbf x^{(k)}\sim p_0
+\end{split}\end{equation}
+如果$p_0$和$p_1$的分布情况比较接近,那么上式是一种比较有效的partition function的估计方式.但是在大部分情况下,$p_1$分布很复杂并且维度很高.那么这就需要借助于一定的方法去弥补$p_0$和$p_1$之间的差异.
+
+\subsection{Annealed Importance Sampling}
+
+在$DL(p_0\|p_1)$很大时,考虑使用\textit{annealed importance sampling}(AIS).考虑分布序列$p_{\eta_0},p_{\eta_1},\cdots,p_{\eta_n}$,其中,$0=\eta_0<\eta_1<\cdots<\eta_{n-1}<\eta_n=1$.
+
+中间分布需要针对具体问题进行特别设计,通常的做法是使用权重几何平均
+\begin{equation}
+p_{\eta_j}\propto p_1^{n_j}p_0^{1-n_j}
+\end{equation}
+
+\subsection{Bridge Sampling}
+
+\textit{Bridge sampling}的原理是,借助于单个分布$p_\ast$,去对一个partition function的分布和一个未知partition function的分布做桥接.
+\begin{equation}\label{eq:bridge_sampling}
+\frac{Z_1}{Z_0}\approx\sum_{k=1}^K\frac{\tilde p_\ast(\mathbf x_0^{(k)})}{\tilde p_0(\mathbf x_0^{(k)})}\Big/\frac{\tilde p_\ast(\mathbf x_0^{(k)})}{\tilde p_1(\mathbf x_0^{(k)})}
+\end{equation}
+$p_\ast$选择策略是尽可能覆盖$p_0$和$p_1$.式\ref{eq:bridge_sampling}通常采用迭代方法最终获取精确值$r$.
+
+\paragraph{Linked importance sampling}当$p_0$和$p_1$的差距过大时考虑使用AIS.
+
+\paragraph{Estimating the partition function while training}另外一种策略是在训练过程中对partition function进行估计.
