@@ -10,6 +10,7 @@
 \begin{equation}
 \mathcal L(\mathbf v,\theta,q)=\log\,p(\mathbf v;\theta)-D_{KL}\Big(q(\mathbf{h|v})\big\|p(\mathbf{h|v;\theta})\Big)
 \end{equation}
+其中$q$是关于$h$的任意分布.
 
 因此我们可以通过最大化$\mathcal L$逼近真实分布进行推断.也可以通过控制$\mathcal L$的松紧程度灵活控制计算量.
 
@@ -19,8 +20,20 @@
 
 EM算法可以分两步,第一步通过选择分布$q$来最大化$\mathcal L$;第二步通过选择$\theta$来最大化$\mathcal L$\footnote{具体算法步骤可见原书P$634$页下方.}.
 
-EM算法有两点本质
+EM算法有两点本质:
 \begin{enumerate}
     \item 学习过程有一个基本的结构,那就是通过更新模型参数来提升完备数据集的似然度,其中所有的缺失变量可以通过后验概率进行估计填充;
     \item 在EM算法中,我们在更新了$\theta$值之后,仍然可以沿用同一个$q$的值进行训练.
 \end{enumerate}
+
+\section{MAP Inference and Sparse Coding}
+
+推断也可以指计算条件概率的过程.另外一种推断是计算出缺失变量的一个最可能的取值,而不是推断出在所有可能取值上的概率分布,即
+\begin{equation}
+\mathbf h^\ast={\arg\max}_{\mathbf h}p(\mathbf{h|v})
+\end{equation}
+这又被称为\textit{最大后验概率推断}(maximum a posteriori inference, MAP inference).
+
+通常我们并不将MAP推断视为一种近似推断,因为它并不能准确地计算$\mathbf h^\ast$.如果基于最大化$\mathbf L$的策略进行学习,那么可以视为MAP提出了一个$q$值.从这种程度上来看,MAP推断是一种近似推断,因为它并不能提供最优分布$q$.
+
+MAP推断在深度学习领域既被视为一种特征提取器,又被视为一种学习机制.它主要被用于稀疏编码模型中.
