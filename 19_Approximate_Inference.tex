@@ -1,0 +1,26 @@
+\chapter{Approximate Inference}
+
+概率模型训练的难点在于推断.推断的目的是为了求得\textbf{目标变量的边际分布}或者\textbf{以某些可观测变量为条件的条件分布}.深度学习中推断问题比较困难是由于隐变量间存在交互关系.
+
+\section{Inference as Optimization}
+
+精确推断可以归结为一个优化问题,而近似推断则是精确推断的估计.
+
+假设概率模型包含可观测变量$\mathbf v$和隐变量$\mathbf h$,我们的目的是计算可观测变量的对数概率$\log\,p(\mathbf v;\theta)$.在有些情况下边际化$\mathbf h$很困难,可以计算$\log\,p(\mathbf v;\theta)$的下限$\mathcal L(\mathbf v,\theta,q)$,即\textit{evidence lower bound}(ELBO).ELBO的另一个更常见的名称是\textit{negative variation free energy}.
+\begin{equation}
+\mathcal L(\mathbf v,\theta,q)=\log\,p(\mathbf v;\theta)-D_{KL}\Big(q(\mathbf{h|v})\big\|p(\mathbf{h|v;\theta})\Big)
+\end{equation}
+
+因此我们可以通过最大化$\mathcal L$逼近真实分布进行推断.也可以通过控制$\mathcal L$的松紧程度灵活控制计算量.
+
+\section{Expectation Maximization}
+
+\textit{Expectation maximization}(EM)算法是一种基于最大化$\mathcal L$的推断算法.它适用于训练包含隐变量的模型.但它并不是近似推断的方法,而是学习近似后验概率的方法.
+
+EM算法可以分两步,第一步通过选择分布$q$来最大化$\mathcal L$;第二步通过选择$\theta$来最大化$\mathcal L$\footnote{具体算法步骤可见原书P$634$页下方.}.
+
+EM算法有两点本质
+\begin{enumerate}
+    \item 学习过程有一个基本的结构,那就是通过更新模型参数来提升完备数据集的似然度,其中所有的缺失变量可以通过后验概率进行估计填充;
+    \item 在EM算法中,我们在更新了$\theta$值之后,仍然可以沿用同一个$q$的值进行训练.
+\end{enumerate}
