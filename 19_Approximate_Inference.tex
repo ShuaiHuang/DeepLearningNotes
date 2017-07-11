@@ -37,3 +37,21 @@ EM算法有两点本质:
 通常我们并不将MAP推断视为一种近似推断,因为它并不能准确地计算$\mathbf h^\ast$.如果基于最大化$\mathbf L$的策略进行学习,那么可以视为MAP提出了一个$q$值.从这种程度上来看,MAP推断是一种近似推断,因为它并不能提供最优分布$q$.
 
 MAP推断在深度学习领域既被视为一种特征提取器,又被视为一种学习机制.它主要被用于稀疏编码模型中.
+
+\section{Variational Inference and Learning}
+
+\textit{变分学习}(variational learning)的核心思想是通过限制$q$的分布族来最大化$\mathcal L$.通常$q$分布相对简单或者具有良好的结构.
+
+最常见的$q$的限制是
+\begin{equation}
+q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
+\end{equation}
+即$q$为乘积分布.这也就是常说的\textit{平均场}(mean field)方法.更一般的,可以使用任何图模型结构来代表$q$,这种通用图模型方法被称为\textit{结构化变分推断}(structured variational inference)\footnote{什么是结构化变分推断?怎样从学习到推断?}
+
+变分方法的一大优势是我们不需要特别指定$q$的参数化形式.即使当隐变量是离散情形时,并不需要变量微积分,但是变量微积分仍然是变分学习或者变分推断的名称来源.
+
+\subsection{Discrete Latent Variables}
+
+隐变量是离散情形的变分推断方法相对直观.基于平均场的方法定义分布$q$,建立查找表,通过查表法确定$q(\mathbf{h|v})$分布.
+
+在确定$q$的行使后就需要优化其参数.要求优化算法的收敛速度要快.\footnote{变分推断具体可见周志华所著的机器学习相关章节,这里略过.}
