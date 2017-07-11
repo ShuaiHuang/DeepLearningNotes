@@ -48,10 +48,31 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 \end{equation}
 即$q$为乘积分布.这也就是常说的\textit{平均场}(mean field)方法.更一般的,可以使用任何图模型结构来代表$q$,这种通用图模型方法被称为\textit{结构化变分推断}(structured variational inference)\footnote{什么是结构化变分推断?怎样从学习到推断?}
 
-变分方法的一大优势是我们不需要特别指定$q$的参数化形式.即使当隐变量是离散情形时,并不需要变量微积分,但是变量微积分仍然是变分学习或者变分推断的名称来源.
+变分方法的一大优势是我们不需要特别指定$q$的参数化形式.即使当隐变量是离散情形时,并不需要变分法,但是变分法仍然是变分学习或者变分推断的名称来源.
 
 \subsection{Discrete Latent Variables}
 
 隐变量是离散情形的变分推断方法相对直观.基于平均场的方法定义分布$q$,建立查找表,通过查表法确定$q(\mathbf{h|v})$分布.
 
-在确定$q$的行使后就需要优化其参数.要求优化算法的收敛速度要快.\footnote{变分推断具体可见周志华所著的机器学习相关章节,这里略过.}
+在确定$q$的形式后就需要优化其参数.由于优化过程出现在学习过程的内循环中,所以要求优化算法的收敛速度要快.\footnote{变分推断具体可见周志华所著的机器学习相关章节,这里略过.}
+
+\subsection{Calculus of Variations}
+
+\textit{变分法}(calculus of variations)寻求极值函数,使泛函取得极值,是处理函数的领域.
+
+在机器学习领域中,我们通常会求取使得$J(\theta)$取得极小值的$\theta$.同样的,在某些情况下,我们的目标是求取使得$J(f(\mathbf x))$取得极小值的函数$f(\mathbf f)$,这就是变分法的应用场景.
+
+一个方程的方程被称为\textit{泛函}(functional)$J[f]$.泛函对应于任意一个取值$\mathbf x$的$f(\mathbf x)$的导数被称为\textit{泛函导数}(functional derivatives)或者\textit{变分导数}(variational derivatives),记为$\frac{\delta}{\delta\,f(x)}J$.
+
+对于可微函数$f(\mathbf x)$和具有连续导数的可微函数$g(y,\mathbf x)$,有
+\begin{equation}
+\frac{\delta}{\delta\,f(x)}\int g(f(\mathbf x),\mathbf x)d\mathbf x=\frac{\delta}{\delta\,y}g(f(\mathbf x),\mathbf x)
+\end{equation}
+
+我们可以在泛函导数为$0$的点的集合内取得泛函优化问题的最优值\footnote{优化过程举例见原书P$646$-$648$.}.
+
+\subsection{Continuous Latent Variables}
+
+当图模型中包含有连续隐变量时,我们希望仍然可以使用变分推断以及变分学习的方式来最大化$\mathcal L$.但是,由于隐变量是连续的,所以不能像离散情形那样对每个离散值分别进行求导.
+
+\subsection{Interactions between Learning and Inference}
