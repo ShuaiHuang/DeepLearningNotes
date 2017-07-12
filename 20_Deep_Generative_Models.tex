@@ -1,0 +1,22 @@
+\chapter{Deep Generative Models}
+
+\section{Boltzmann Machines}
+
+\textit{Boltzmann机}是一种基于能量的模型,这也就意味着我们需要使用能量函数来定义联合概率分布
+\begin{equation}
+P(\mathbf x)=\frac{\exp(-E(\mathbf x))}{Z}
+\end{equation}
+其中$Z$是partition函数,$E$是能量函数
+\begin{equation}
+E(\mathbf x)=\mathbf{-x^TUx-b^Tx}
+\end{equation}
+其中,$\mathbf U$是模型参数的权重矩阵,$\mathbf b$是偏置参数的向量.
+
+从上式可以看出,某个单元的概率可能由其它单元的概率线性组合而成,这一个局限性.而引入隐变量可以打破这种局限性.如果引入隐变量,可以实现对离散变量的概率分布进行全估计.
+
+引入了隐变量之后,能量函数定义为
+\begin{equation}
+E(\mathbf x)=\mathbf{-v^TRv-v^TWh-h^TSh-b^Tv-c^Th}
+\end{equation}
+
+\paragraph{Boltamann Machine Learning} Boltamann机学习算法通常基于最大似然度,需要对partition函数进行估计.在学习过程中,连接两个单元的权重更新仅仅与这两个单元的统计量(如$P_{model}(\mathbf v)$,$\hat P_{data}(\mathbf v)P_{model}(\mathbf{h|v})$)有关联.也就是说,学习时局部性的,这在生物学上也是可以接受的.
