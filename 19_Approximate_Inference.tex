@@ -75,4 +75,16 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 
 当图模型中包含有连续隐变量时,我们希望仍然可以使用变分推断以及变分学习的方式来最大化$\mathcal L$.但是,由于隐变量是连续的,所以不能像离散情形那样对每个离散值分别进行求导.
 
+在大部分情形下,我们并不需要解任何变分法.设平均场近似估计为
+\begin{equation}
+q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
+\end{equation}
+对于所有$j\ne i$的$q(h_j|\mathbf v)$视为定值,那么$q(h_i|\mathbf v)$的最优值可通过归一化如下分布得到
+\begin{equation}
+\tilde q(h_i|\mathbf v)=\exp(\mathbb E_{\mathbf h_{-i\sim q(\mathbf{h_{-1}|v})}}\log\tilde p(\mathbf{v,h}))
+\end{equation}
+需要注意的是,$p$在任何变量的联合分布中取值都不能为$0$.
+
+只有在使用新形式的变分学习时,才会使用变分法.
+
 \subsection{Interactions between Learning and Inference}
