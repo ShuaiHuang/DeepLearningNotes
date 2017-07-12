@@ -88,3 +88,21 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 只有在使用新形式的变分学习时,才会使用变分法.
 
 \subsection{Interactions between Learning and Inference}
+
+在学习算法中引入近似推断(使用$q$去计算$\mathcal L$)将会影响学习过程,然后学习过程又会影响推断算法的精度(影响近似推断$q$的精度).
+
+特别地,学习算法倾向于将模型进行调整,以使得近似推断算法暗含的近似假设更加贴近于现实分布.
+
+泛函近似对于模型的真实影响很难量化.
+
+\section{Learned Approximate Inference}
+
+在之前的章节我们可以看到,推断可以被视为增大$\mathcal L$数值的优化过程.这一过程的计算代价会很大而且会很耗时.许多推断方法则会避免进行近似推断.特别地,我们可以将优化过程视为一个函数$f$,它将输入$\mathbf v$映射到一个近似分布$q^\ast={\arg\max}_q\mathcal L(\mathbf v,q)$.
+
+\subsection{Wake-Sleep}
+
+训练一个模型从$\mathbf v$到$\mathbf h$进行推断的主要困难在于,没有一个有监督训练集去训练这个模型.\textit{wake-sleep}算法则解决了这一难题.同时它的缺点也很明显,它只能对那些已很高概率出现的样本进行训练.
+
+\subsection{Other Forms of Learned Inference}
+
+上述使用学习策略进行的近似推断还被应用于许多其他的模型中.见原书P$652$.
