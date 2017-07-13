@@ -4,19 +4,50 @@
 
 \textit{Boltzmann机}是一种基于能量的模型,这也就意味着我们需要使用能量函数来定义联合概率分布
 \begin{equation}
-P(\mathbf x)=\frac{\exp(-E(\mathbf x))}{Z}
+P(\bm x)=\frac{\exp(-E(\bm x))}{Z}
 \end{equation}
 其中$Z$是partition函数,$E$是能量函数
 \begin{equation}
-E(\mathbf x)=\mathbf{-x^TUx-b^Tx}
+E(\bm x)=\bm{-x^TUx-b^Tx}
 \end{equation}
-其中,$\mathbf U$是模型参数的权重矩阵,$\mathbf b$是偏置参数的向量.
+其中,$\bm U$是模型参数的权重矩阵,$\bm b$是偏置参数的向量.
 
 从上式可以看出,某个单元的概率可能由其它单元的概率线性组合而成,这一个局限性.而引入隐变量可以打破这种局限性.如果引入隐变量,可以实现对离散变量的概率分布进行全估计.
 
 引入了隐变量之后,能量函数定义为
 \begin{equation}
-E(\mathbf x)=\mathbf{-v^TRv-v^TWh-h^TSh-b^Tv-c^Th}
+E(\bm x)=\bm{-v^TRv-v^TWh-h^TSh-b^Tv-c^Th}
 \end{equation}
 
-\paragraph{Boltamann Machine Learning} Boltamann机学习算法通常基于最大似然度,需要对partition函数进行估计.在学习过程中,连接两个单元的权重更新仅仅与这两个单元的统计量(如$P_{model}(\mathbf v)$,$\hat P_{data}(\mathbf v)P_{model}(\mathbf{h|v})$)有关联.也就是说,学习时局部性的,这在生物学上也是可以接受的.
+\paragraph{Boltamann Machine Learning} Boltamann机学习算法通常基于最大似然度,需要对partition函数进行估计.在学习过程中,连接两个单元的权重更新仅仅与这两个单元的统计量(如$P_{model}(\bm v)$,$\hat P_{data}(\bm v)P_{model}(\bm{h|v})$)有关联.也就是说,学习时局部性的,这在生物学上也是可以接受的.
+
+\section{Restricted Boltzmann Machines}
+
+与Boltzmann机一样,RBM也是基于能量的模型
+\begin{equation}
+P(\mathbf v=\bm v,\mathbf h=\bm h)=\frac{1}{Z}\exp(-E(\bm{v,h}))
+\end{equation}
+其中能量$E$定义为
+\begin{equation}
+E(\bm{v,h})=\bm{-b^Tv-c^Th-v^TWh}
+\end{equation}
+没有了$\bm v$与$\bm v$,$\bm h$与$\bm h$的交互项;$Z$是partition函数
+\begin{equation}
+Z=\sum_{\bm v}\sum_{\bm h}\exp\{-E(\bm{v,h})\}
+\end{equation}
+
+\subsection{Conditional Distributions}
+
+虽然$P(\bm v)$很难计算,但是RBM的二部图结构特点使得$P(\mathbf{h|v})$与$P(\mathbf{v|h})$可以相对容易地进行计算以及采样.
+
+原书P$658$推理过程可得,
+\begin{equation}
+P(\bm{h|v})=\prod_{j=1}^{n_h}\sigma\Big((2\bm h-1)\odot(\bm c+\bm W^T\bm v)\Big)_j
+\end{equation}
+\begin{equation}
+P(\bm{v|h})=\prod_{i=1}^{n_v}\sigma\Big((2\bm h-1)\odot(\bm b+\bm W^T\bm h)\Big)_i
+\end{equation}
+
+\subsection{Training Restricted Boltzmann Machines}
+
+RBM可以使用第\ref{ch:partition_function}章中任意一种具有难以计算的partition函数的训练方式(如CD,SML,PCD,ratio matching等)进行训练.
