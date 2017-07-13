@@ -6,9 +6,9 @@
 
 精确推断可以归结为一个优化问题,而近似推断则是精确推断的估计.
 
-假设概率模型包含可观测变量$\mathbf v$和隐变量$\mathbf h$,我们的目的是计算可观测变量的对数概率$\log\,p(\mathbf v;\theta)$.在有些情况下边际化$\mathbf h$很困难,可以计算$\log\,p(\mathbf v;\theta)$的下限$\mathcal L(\mathbf v,\theta,q)$,即\textit{evidence lower bound}(ELBO).ELBO的另一个更常见的名称是\textit{negative variation free energy}.
+假设概率模型包含可观测变量$\bm v$和隐变量$\bm h$,我们的目的是计算可观测变量的对数概率$\log\,p(\bm v;\bm\theta)$.在有些情况下边际化$\bm h$很困难,可以计算$\log\,p(\bm v;\bm\theta)$的下限$\mathcal L(\bm v,\bm\theta,q)$,即\textit{evidence lower bound}(ELBO).ELBO的另一个更常见的名称是\textit{negative variation free energy}.
 \begin{equation}
-\mathcal L(\mathbf v,\theta,q)=\log\,p(\mathbf v;\theta)-D_{KL}\Big(q(\mathbf{h|v})\big\|p(\mathbf{h|v;\theta})\Big)
+\mathcal L(\bm v,\bm\theta,q)=\log\,p(\bm v;\bm\theta)-D_{KL}\Big(q(\bm{h|v})\big\|p(\bm{h|v;\theta})\Big)
 \end{equation}
 其中$q$是关于$h$的任意分布.
 
@@ -18,23 +18,23 @@
 
 \textit{Expectation maximization}(EM)算法是一种基于最大化$\mathcal L$的推断算法.它适用于训练包含隐变量的模型.但它并不是近似推断的方法,而是学习近似后验概率的方法.
 
-EM算法可以分两步,第一步通过选择分布$q$来最大化$\mathcal L$;第二步通过选择$\theta$来最大化$\mathcal L$\footnote{具体算法步骤可见原书P$634$页下方.}.
+EM算法可以分两步,第一步通过选择分布$q$来最大化$\mathcal L$;第二步通过选择$\bm\theta$来最大化$\mathcal L$\footnote{具体算法步骤可见原书P$634$页下方.}.
 
 EM算法有两点本质:
 \begin{enumerate}
     \item 学习过程有一个基本的结构,那就是通过更新模型参数来提升完备数据集的似然度,其中所有的缺失变量可以通过后验概率进行估计填充;
-    \item 在EM算法中,我们在更新了$\theta$值之后,仍然可以沿用同一个$q$的值进行训练.
+    \item 在EM算法中,我们在更新了$\bm\theta$值之后,仍然可以沿用同一个$q$的值进行训练.
 \end{enumerate}
 
 \section{MAP Inference and Sparse Coding}
 
 推断也可以指计算条件概率的过程.另外一种推断是计算出缺失变量的一个最可能的取值,而不是推断出在所有可能取值上的概率分布,即
 \begin{equation}
-\mathbf h^\ast={\arg\max}_{\mathbf h}p(\mathbf{h|v})
+\bm h^\ast={\arg\max}_{\bm h}p(\bm{h|v})
 \end{equation}
 这又被称为\textit{最大后验概率推断}(maximum a posteriori inference, MAP inference).
 
-通常我们并不将MAP推断视为一种近似推断,因为它并不能准确地计算$\mathbf h^\ast$.如果基于最大化$\mathbf L$的策略进行学习,那么可以视为MAP提出了一个$q$值.从这种程度上来看,MAP推断是一种近似推断,因为它并不能提供最优分布$q$.
+通常我们并不将MAP推断视为一种近似推断,因为它并不能准确地计算$\bm h^\ast$.如果基于最大化$\mathcal L$的策略进行学习,那么可以视为MAP提出了一个$q$值.从这种程度上来看,MAP推断是一种近似推断,因为它并不能提供最优分布$q$.
 
 MAP推断在深度学习领域既被视为一种特征提取器,又被视为一种学习机制.它主要被用于稀疏编码模型中.
 
@@ -44,7 +44,7 @@ MAP推断在深度学习领域既被视为一种特征提取器,又被视为一�
 
 最常见的$q$的限制是
 \begin{equation}
-q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
+q(\bm{h|v})=\prod_iq(h_i|\bm v)
 \end{equation}
 即$q$为乘积分布.这也就是常说的\textit{平均场}(mean field)方法.更一般的,可以使用任何图模型结构来代表$q$,这种通用图模型方法被称为\textit{结构化变分推断}(structured variational inference)\footnote{什么是结构化变分推断?怎样从学习到推断?}
 
@@ -52,7 +52,7 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 
 \subsection{Discrete Latent Variables}
 
-隐变量是离散情形的变分推断方法相对直观.基于平均场的方法定义分布$q$,建立查找表,通过查表法确定$q(\mathbf{h|v})$分布.
+隐变量是离散情形的变分推断方法相对直观.基于平均场的方法定义分布$q$,建立查找表,通过查表法确定$q(\bm{h|v})$分布.
 
 在确定$q$的形式后就需要优化其参数.由于优化过程出现在学习过程的内循环中,所以要求优化算法的收敛速度要快.\footnote{变分推断具体可见周志华所著的机器学习相关章节,这里略过.}
 
@@ -60,13 +60,13 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 
 \textit{变分法}(calculus of variations)寻求极值函数,使泛函取得极值,是处理函数的领域.
 
-在机器学习领域中,我们通常会求取使得$J(\theta)$取得极小值的$\theta$.同样的,在某些情况下,我们的目标是求取使得$J(f(\mathbf x))$取得极小值的函数$f(\mathbf f)$,这就是变分法的应用场景.
+在机器学习领域中,我们通常会求取使得$J(\bm\theta)$取得极小值的$\bm\theta$.同样的,在某些情况下,我们的目标是求取使得$J(f(\bm x))$取得极小值的函数$f(\bm f)$,这就是变分法的应用场景.
 
-一个方程的方程被称为\textit{泛函}(functional)$J[f]$.泛函对应于任意一个取值$\mathbf x$的$f(\mathbf x)$的导数被称为\textit{泛函导数}(functional derivatives)或者\textit{变分导数}(variational derivatives),记为$\frac{\delta}{\delta\,f(x)}J$.
+一个方程的方程被称为\textit{泛函}(functional)$J[f]$.泛函对应于任意一个取值$\bm x$的$f(\bm x)$的导数被称为\textit{泛函导数}(functional derivatives)或者\textit{变分导数}(variational derivatives),记为$\frac{\delta}{\delta\,f(x)}J$.
 
-对于可微函数$f(\mathbf x)$和具有连续导数的可微函数$g(y,\mathbf x)$,有
+对于可微函数$f(\bm x)$和具有连续导数的可微函数$g(y,\bm x)$,有
 \begin{equation}
-\frac{\delta}{\delta\,f(x)}\int g(f(\mathbf x),\mathbf x)d\mathbf x=\frac{\delta}{\delta\,y}g(f(\mathbf x),\mathbf x)
+\frac{\delta}{\delta\,f(x)}\int g(f(\bm x),\bm x)d\bm x=\frac{\delta}{\delta\,y}g(f(\bm x),\bm x)
 \end{equation}
 
 我们可以在泛函导数为$0$的点的集合内取得泛函优化问题的最优值\footnote{优化过程举例见原书P$646$-$648$.}.
@@ -77,11 +77,11 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 
 在大部分情形下,我们并不需要解任何变分法.设平均场近似估计为
 \begin{equation}
-q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
+q(\bm{h|v})=\prod_iq(h_i|\bm v)
 \end{equation}
-对于所有$j\ne i$的$q(h_j|\mathbf v)$视为定值,那么$q(h_i|\mathbf v)$的最优值可通过归一化如下分布得到
+对于所有$j\ne i$的$q(h_j|\bm v)$视为定值,那么$q(h_i|\bm v)$的最优值可通过归一化如下分布得到
 \begin{equation}
-\tilde q(h_i|\mathbf v)=\exp(\mathbb E_{\mathbf h_{-i\sim q(\mathbf{h_{-1}|v})}}\log\tilde p(\mathbf{v,h}))
+\tilde q(h_i|\bm v)=\exp(\mathbb E_{\bm h_{-i\sim q(\bm{h_{-1}|v})}}\log\tilde p(\bm{v,h}))
 \end{equation}
 需要注意的是,$p$在任何变量的联合分布中取值都不能为$0$.
 
@@ -97,11 +97,11 @@ q(\mathbf{h|v})=\prod_iq(h_i|\mathbf v)
 
 \section{Learned Approximate Inference}
 
-在之前的章节我们可以看到,推断可以被视为增大$\mathcal L$数值的优化过程.这一过程的计算代价会很大而且会很耗时.许多推断方法则会避免进行近似推断.特别地,我们可以将优化过程视为一个函数$f$,它将输入$\mathbf v$映射到一个近似分布$q^\ast={\arg\max}_q\mathcal L(\mathbf v,q)$.
+在之前的章节我们可以看到,推断可以被视为增大$\mathcal L$数值的优化过程.这一过程的计算代价会很大而且会很耗时.许多推断方法则会避免进行近似推断.特别地,我们可以将优化过程视为一个函数$f$,它将输入$\bm v$映射到一个近似分布$q^\ast={\arg\max}_q\mathcal L(\bm v,q)$.
 
 \subsection{Wake-Sleep}
 
-训练一个模型从$\mathbf v$到$\mathbf h$进行推断的主要困难在于,没有一个有监督训练集去训练这个模型.\textit{wake-sleep}算法则解决了这一难题.同时它的缺点也很明显,它只能对那些已很高概率出现的样本进行训练.
+训练一个模型从$\bm v$到$\bm h$进行推断的主要困难在于,没有一个有监督训练集去训练这个模型.\textit{wake-sleep}算法则解决了这一难题.同时它的缺点也很明显,它只能对那些已很高概率出现的样本进行训练.
 
 \subsection{Other Forms of Learned Inference}
 
