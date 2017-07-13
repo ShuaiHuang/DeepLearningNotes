@@ -51,3 +51,30 @@ P(\bm{v|h})=\prod_{i=1}^{n_v}\sigma\Big((2\bm h-1)\odot(\bm b+\bm W^T\bm h)\Big)
 \subsection{Training Restricted Boltzmann Machines}
 
 RBM可以使用第\ref{ch:partition_function}章中任意一种具有难以计算的partition函数的训练方式(如CD,SML,PCD,ratio matching等)进行训练.
+
+\section{Deep Belief Networks}
+
+\textit{深度信念网络}(deep belief network, DBN)是具有多层隐变量的生成式模型.隐变量是二值离散的,可见单元既可以是离散的,也可以是连续的.图的最上两层是无向的,其余各层是有向的,箭头均指向离数据最近的层.因此DBN的图模型是有向图和无向图的混合.特别地,仅由一层隐层的模型是RBM.
+
+深度信念网络的采样方法是,最上两层隐层使用Gibbs采样,后续层上使用ancestral采样.
+
+深度信念网络使用逐层训练的方法进行训练
+\begin{enumerate}
+    \item 使用constractive divergence或者stochastic maximum likelihood方法最大化$\mathbb E_{\mathbf v\sim p_{data}}\log p(\bm v)$来训练一个RBM
+    \item 第二个RBM使用近似地最大化
+    \begin{equation}
+    \mathbb E_{\mathbf v\sim p_{data}}\mathbb E_{\mathbf h^{(1)}\sim p^{(1)}(\bm h^{(1)}|\bm v)}\log p^{(2)}(\bm h^(1))
+    \end{equation}
+    其中$p^{(1)}$是第一个RBM所代表的概率分布,$p^{(2)}$是第二个RBM所代表的概率分布.
+    \item 重复以上过程,直到深度信念网络达到预期的层数.
+\end{enumerate}
+在大多数应用中,不对深度信念网络进行整体训练,但可以通过wake-sleep算法进行参数的精细调节.
+
+虽然深度信念网络是生成式模型,但可以用来提升分类模型的效果.我们可以使用深度信念网络的权重定义一个多层感知器网络(MLP)
+\begin{equation}\begin{split}
+\bm h^{(1)}&=\sigma(b^{(1)}+\bm v^T\bm W^{(1)})\\
+\bm h^{(l)}&=\sigma(b_i^{(l)}+\bm h^{(l-1)T}\bm W^{(l)})
+\end{split}\end{equation}
+但是这样定义的多层感知器网络忽略了许多深度信念网络中的重要交互.
+
+深度信念网络特制在最深层使用无向连接而在其它层使用指向数据的有向连接的模型.需要特别注意与信念网络进行区分,因为信念网络有时特指有向图模型.
