@@ -117,4 +117,30 @@ DBM学习过程面临两大挑战:partition函数难以计算;后验概率难以
 
 \subsection{Layer-Wise Pretraining}
 
+从一个随机初始值开始,使用随机最大似然方法训练DBM通常会以失败告终.最朴素同时也是最流行的方法是使用贪心逐层预训练方法.贪心逐层训练方法不仅仅是坐标上升法\footnote{一种优化问题求解方法.},它与坐标上升法有不同之处.
+
+DBM中间每一层都会有自顶向下和自底向上的输入,因此需要对权重做相应的调整.
+
 \subsection{Jointly Training Deep Boltzmann Machines}
+
+DBM在训练过程中的训练效果不容易追踪,因为完整的DBM特性难以评估.Boltzmann机顶部的MLP会让概率模型损失许多优势.
+
+解决DBM训练难题有两种途径:\textit{centered deep Boltzmann machine}和\textit{multi-prediction deep Boltzmann machine}.
+
+\paragraph{Centered Deep Boltzmann Machine}这种方法会产生一个不使用贪心逐层训练策略的模型,但是它并不能像MLP那样经过正则化形成一个分类器.
+
+Centered deep Boltzmann machine引入向量$\bm\mu$减去所有的状态
+\begin{equation}
+E'(\bm{x;U,b})=\bm{-(x-\mu)^TU(x-\mu)-(x-\mu)^Tb}
+\end{equation}
+其中,$\bm\mu$是一个超参数,在训练开始时就固定下来.
+
+\paragraph{Multi-Prediction Deep Boltzmann Machine}这种方法使用一种替代训练策略,引入逆传播算法,从而避免对梯度的MCMC估计.
+
+MP-DBM将平均场等式视为recurrent网络族用以近似解决所有可能的推断问题.
+
+图推断引入逆传播算法有两项优势
+\begin{itemize}
+    \item 训练过程和近似推断过程统一;
+    \item 逆传播计算损失函数的精确梯度.
+\end{itemize}
