@@ -9,28 +9,28 @@
 
 根据特征值的性质，有
 \begin{equation}
-\mathbf A = \mathbf V\text{diag}(\mathbf\lambda)\mathbf V^{-1}
+\bm A = \bm V\text{diag}(\bm\lambda)\bm V^{-1}
 \end{equation}
-其中$\mathbf V$是$\mathbf A$所有特征向量组成的矩阵；$\text{diag}(\mathbf\lambda)$是$\mathbf V$中与特征向对应的特征值组成的对角矩阵。
+其中$\bm V$是$\bm A$所有特征向量组成的矩阵；$\text{diag}(\bm\lambda)$是$\bm V$中与特征向对应的特征值组成的对角矩阵。
 
 同样的，有奇异值分解
 \begin{equation}\label{eq:svd}
-\mathbf A=\mathbf{UDV}^{T}
+\bm A=\bm{UDV}^{T}
 \end{equation}
-其中$\mathbf A$是一个$m\times n$矩阵；$\mathbf U$是一个$m\times m$矩阵；$\mathbf V$是一个$n\times n$矩阵；$\mathbf D$是一个$m\times n$矩阵。$\mathbf U$和$\mathbf V$是正交矩阵，$\mathbf D$是对角矩阵。$\mathbf D$对角线上元素被称为奇异值；$\mathbf U$中的每一列被称为\textit{左奇异值向量}；$\mathbf V$中的每一列被称为\textit{右奇异值向量}。
+其中$\bm A$是一个$m\times n$矩阵；$\bm U$是一个$m\times m$矩阵；$\bm V$是一个$n\times n$矩阵；$\bm D$是一个$m\times n$矩阵。$\bm U$和$\bm V$是正交矩阵，$\bm D$是对角矩阵。$\bm D$对角线上元素被称为奇异值；$\bm U$中的每一列被称为\textit{左奇异值向量}；$\bm V$中的每一列被称为\textit{右奇异值向量}。
 
-$\mathbf A$的左奇异值向量是$\mathbf {AA}^T$对应的特征向量；$\mathbf A$的右奇异值向量是$\mathbf{A}^T\mathbf A$对应的特征向量；非零奇异值是$\mathbf {AA}^T$或$\mathbf{A}^T\mathbf A$特征值的平方根。
+$\bm A$的左奇异值向量是$\bm {AA}^T$对应的特征向量；$\bm A$的右奇异值向量是$\bm{A}^T\bm A$对应的特征向量；非零奇异值是$\bm {AA}^T$或$\bm{A}^T\bm A$特征值的平方根。
 
 \section{The Moore-Penrose Pesudoinverse}
 
-$\mathbf A$的\textit{Moore-Penrose广义逆}被定义为
+$\bm A$的\textit{Moore-Penrose广义逆}被定义为
 \begin{equation}
-\mathbf A^+=\lim_{\alpha\to 0}(\mathbf{A}^T\mathbf A+\alpha\mathbf I)^{-1}\mathbf A^T
+\bm A^+=\lim_{\alpha\to 0}(\bm{A}^T\bm A+\alpha\bm I)^{-1}\bm A^T
 \end{equation}
 但是通常情况下采用如下的方法进行计算
 \begin{equation}
-\mathbf A^+=\mathbf{VD}^+\mathbf U^T
+\bm A^+=\bm{VD}^+\bm U^T
 \end{equation}
-其中，$\mathbf{U}$，$\mathbf{D}$，$\mathbf{V}$的含义同式\ref{eq:svd}中的定义。$\mathbf D$的广义逆$\mathbf D^+$求取方法为对$\mathbf D$中非零元素取倒数再转置。
+其中，$\bm{U}$，$\bm{D}$，$\bm{V}$的含义同式\ref{eq:svd}中的定义。$\bm D$的广义逆$\bm D^+$求取方法为对$\bm D$中非零元素取倒数再转置。
 
-使用广义逆求解$\mathbf {Ax=y}$即$\mathbf{x=A^+y}$。如果$\mathbf A$的列数大于行数，则$\|\mathbf x\|_2$在所有可能解中最小；如果$\mathbf A$的行数大于列数，则$\mathbf{Ax}$非常近似于$\mathbf y$即$\|\mathbf{Ax-y}\|_2$最小。
+使用广义逆求解$\bm {Ax=y}$即$\bm{x=A^+y}$。如果$\bm A$的列数大于行数，则$\|\bm x\|_2$在所有可能解中最小；如果$\bm A$的行数大于列数，则$\bm{Ax}$非常近似于$\bm y$即$\|\bm{Ax-y}\|_2$最小。
