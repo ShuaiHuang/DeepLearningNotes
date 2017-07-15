@@ -28,7 +28,7 @@ E(\bm x)=\bm{-v^TRv-v^TWh-h^TSh-b^Tv-c^Th}
 P(\mathbf v=\bm v,\mathbf h=\bm h)=\frac{1}{Z}\exp(-E(\bm{v,h}))
 \end{equation}
 其中能量$E$定义为
-\begin{equation}
+\begin{equation}\label{eq:rbm_energy}
 E(\bm{v,h})=\bm{-b^Tv-c^Th-v^TWh}
 \end{equation}
 没有了$\bm v$与$\bm v$,$\bm h$与$\bm h$的交互项;$Z$是partition函数
@@ -78,3 +78,43 @@ RBM可以使用第\ref{ch:partition_function}章中任意一种具有难以计�
 但是这样定义的多层感知器网络忽略了许多深度信念网络中的重要交互.
 
 深度信念网络特制在最深层使用无向连接而在其它层使用指向数据的有向连接的模型.需要特别注意与信念网络进行区分,因为信念网络有时特指有向图模型.
+
+\section{Deep Boltzmann Machines}
+
+\textit{深度Boltzmann机}(deep Boltzmann machine, DBM)是一种多隐层全无向图.
+
+DBM是一种基于能量的模型,假设一个Boltzmann有一个可视层$\bm v$,三个隐层$\bm h^{(1)}$,$\bm h^{(2)}$和$\bm h^{(3)}$,那么联合概率为
+\begin{equation}
+P(\bm{v,h^{(1)},h^{(2)},h^{(3)}})=\frac{1}{Z(\bm\theta)}\exp\Big(-E(\bm{v,h^{(1)},h^{(2)},h^{(3)};\theta})\Big)
+\end{equation}
+其中能量定义为
+\begin{equation}
+E(\bm{v,h^{(1)},h^{(2)},h^{(3)};\theta})=\bm{-v^TW^{(1)}h^{(1)}-h^{(1)T}W^{(2)}h^{(2)}-h^{(2)}W^{(3)}h^{(3)}}
+\end{equation}
+与RBM的能量定义式\ref{eq:rbm_energy}相比,DBM的能量包含了隐层之间的交互.在后续章节我们可以看到,这些交互一方面会影响模型所表现出的行为,另外一方面也会影响模型的推断.另外,DBM奇偶层之间具有条件独立性.这种二部图结构意味着我们可以使用与RBM相同的条件分布去决定DBM的条件分布.同样由于其条件独立性,Gibbs采样可以在$2$轮迭代内完成.高效率的采样对训练中的随机量最大似然优化算法尤为重要.
+
+\subsection{Interesting Properties}
+
+与DBN相比,DBM的后验概率更为简单,但是DBM的后验概率有更为丰富的估计形式.DBN下估计的下限不一定准确.
+
+DBM的一项缺点是其采样相对困难.
+
+\subsection{DBM Mean Field Inference}
+
+DBM的后验概率使用变分推断很容易实现,尤其是平均场近似.
+
+在变分近似推断中,我们使用一些简单的分布族去逼近一个特定的目标分布.
+
+假设$Q(\bm{h^{(1)},h^{(2)}|v})$是$P(\bm{h^{(1)},h^{(2)}|v})$的近似估计,根据平均场假设有
+\begin{equation}
+Q(\bm{h^{(1)},h^{(2)}|v})=\prod_jQ(h_j^{(1)}|\bm v)\prod_kQ(h_k^{(2)}|\bm v)
+\end{equation}
+但是其缺点也很明显,每次使用一个新的$\bm v$的数值都要重新进行推断以确定$Q$的分布.
+
+\subsection{DBM Parameter Learning}
+
+DBM学习过程面临两大挑战:partition函数难以计算;后验概率难以计算.由于DBM包含RBM,所以DBM所遇到的困难同样是RBM所面临的困难.
+
+\subsection{Layer-Wise Pretraining}
+
+\subsection{Jointly Training Deep Boltzmann Machines}
