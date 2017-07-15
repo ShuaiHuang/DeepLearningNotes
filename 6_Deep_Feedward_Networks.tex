@@ -1,6 +1,6 @@
 \chapter{Deep Feedforward Networks}
 
-\textit{深度前向神经网络}(Deep Feedforward Network)是深度神经网络的经典模型,它通过学习参数$\theta$来估计映射函数$y=f(\mathbf x)$.在前向神经网络中,信息向前流动没有反馈,有反馈的网络被称为\textit{recurrent neural network}(RNN).从工程角度看,前向神经网络是许多工业用途的神经网络的基础,因而它十分重要.前向深度神经网络通过有向无环图直观表示如何将不同的函数进行嵌套组合,进而形成网络.
+\textit{深度前向神经网络}(Deep Feedforward Network)是深度神经网络的经典模型,它通过学习参数${\bm\theta}$来估计映射函数$y=f(\bm x)$.在前向神经网络中,信息向前流动没有反馈,有反馈的网络被称为\textit{recurrent neural network}(RNN).从工程角度看,前向神经网络是许多工业用途的神经网络的基础,因而它十分重要.前向深度神经网络通过有向无环图直观表示如何将不同的函数进行嵌套组合,进而形成网络.
 
 在发展之初,神经网络是一个神经科学模型,但如今它在数学和工程领域内得以发展,也就脱离了原始的神经科学的范畴.
 
@@ -30,34 +30,34 @@ g(z)=\max\{0,z\}
 
 \subsection{Cost Function}
 
-如果模型定义了分布$p(\mathbf y|\mathbf x;\theta)$,则使用交叉熵作为损失函数(\ref{sec:cost_func_distribution}).如果模型是为了估计$\mathbf y$的某些统计量,则使用针对任务特别设计的损失函数.上述损失函数的基本型还需要加上正则化项形成完整的损失函数(\ref{sec:cost_func_statistics}).
+如果模型定义了分布$p(\bm y|\bm x;{\bm\theta})$,则使用交叉熵作为损失函数(\ref{sec:cost_func_distribution}).如果模型是为了估计$\bm y$的某些统计量,则使用针对任务特别设计的损失函数.上述损失函数的基本型还需要加上正则化项形成完整的损失函数(\ref{sec:cost_func_statistics}).
 
 \subsubsection{Learning Conditional Distributions with Maximum Likelihood}\label{sec:cost_func_distribution}
 
 交叉熵损失函数定义为
 \begin{equation}
-J(\theta)=-\mathbb E_{\mathbf{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}}(\mathbf y|\mathbf x)
+J({\bm\theta})=-\mathbb E_{\bm{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm y|\bm x)
 \end{equation}
 其中$\log p_{\text{model}}(\cdot)$的具体形式与模型本身有关.
 
-交叉熵损失函数的优点是,不用设计损失函数,根据模型分布$p(\mathbf y|\mathbf x)$就可以确定损失函数的具体形式.负对数似然项满足损失函数梯度值域区间大的要求.缺点是损失函数不一定存在最小值点,但是可以通过添加正则项来规避这一问题.
+交叉熵损失函数的优点是,不用设计损失函数,根据模型分布$p(\bm y|\bm x)$就可以确定损失函数的具体形式.负对数似然项满足损失函数梯度值域区间大的要求.缺点是损失函数不一定存在最小值点,但是可以通过添加正则项来规避这一问题.
 
 \subsubsection{Learning Conditional Statistics}\label{sec:cost_func_statistics}
 
 如果模型的目的是为了学习全分布相关的统计量而非全分布本身,那么可以使用根据实际任务设计损失函数.深度学习模型本身可以看做一个函数族,并且函数族中每一个函数的参数取值都不是固定值.那么就可以把损失函数视为\textit{functional}.解决上述问题的工具被称为\textit{calculus of variations}.
 
-如果通过最小化均方误差的方法求取$\mathbf y$的均值$\mathbf x$,则可以解下面的问题
+如果通过最小化均方误差的方法求取$\bm y$的均值$\bm x$,则可以解下面的问题
 \begin{equation}
-f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(\mathbf x)\|^2
+f^\ast={\arg \min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|^2
 \end{equation}
 等价于
 \begin{equation}
-f^\ast(\mathbf x)=\mathbb E_{\mathbf y\sim p_{\text{data}}(\mathbf y|\mathbf x)}[\mathbf y]
+f^\ast(\bm x)=\mathbb E_{\bm y\sim p_{\text{data}}(\bm y|\bm x)}[\bm y]
 \end{equation}
 
-通过最小化\textit{绝对均值误差}(mean absolute error)求取$\mathbf y$的中值$\mathbf x$,可以使用下面的优化问题
+通过最小化\textit{绝对均值误差}(mean absolute error)求取$\bm y$的中值$\bm x$,可以使用下面的优化问题
 \begin{equation}
-f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(\mathbf x)\|_1
+f^\ast={\arg \min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|_1
 \end{equation}
 
 上述上述两种问题的缺点是,MSE和MAE使用梯度优化的表现并不好.
@@ -70,7 +70,7 @@ f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(
 
 线性单元只对输入做放射变换
 \begin{equation}
-\mathbf{\hat y=W^Th+b}
+\bm{\hat y=W^Th+b}
 \end{equation}
 常用来估计条件正态分布的均值.并且由于在正态分布条件下,MSE等价于极大对数似然,损失函数为MSE.如果要估计条件正态分布的协方差,就需要添加限制条件.
 
@@ -80,7 +80,7 @@ f^\ast={\arg \min}_{f}\mathbb E_{\mathbf{x,y}\sim p_{\text{data}}}\|\mathbf y-f(
 
 使用Sigmoid函数替代原始Bernoulli分布以便使用梯度优化.Sigmoid单元定义为
 \begin{equation}
-\hat y=\sigma(\mathbf w^T\mathbf h+b)
+\hat y=\sigma(\bm w^T\bm h+b)
 \end{equation}
 则有分布
 \begin{equation}
@@ -88,7 +88,7 @@ P(y)=\frac{\exp{(yz)}}{\sum_{y'=0}^1\exp(y'z)}
 \end{equation}
 相应的损失函数为
 \begin{equation}
-J(\theta)=-\log P(y|\mathbf x)=\zeta((1-2y)z)
+J({\bm\theta})=-\log P(y|\bm x)=\zeta((1-2y)z)
 \end{equation}
 
 如果使用其他的损失函数,Sigmoid可能会saturate.定量来看,Sigmoid的对数完备且有限.
@@ -99,11 +99,11 @@ J(\theta)=-\log P(y|\mathbf x)=\zeta((1-2y)z)
 \begin{equation}
 \text{softmax}(z)_i=\frac{\exp(z_i)}{\sum_j\exp(z_j)}
 \end{equation}
-其中$z_i$为向量$\mathbf{z=W^Th+b}$第$i$个元素.
+其中$z_i$为向量$\bm{z=W^Th+b}$第$i$个元素.
 
 Softmax单元使用对数最大似然进行训练.如果不使用对数似然作为损失函数的话,很难处理softmax函数.softmax函数也可能saturate.
 
-Softmax函数中参数$\mathbf z$的产生方法有两种.第一种是由前一层神经元产生$n$个参数,第二种是通过添加限制产生$n-1$个参数.这两种方法并没有太大的差别.
+Softmax函数中参数$\bm z$的产生方法有两种.第一种是由前一层神经元产生$n$个参数,第二种是通过添加限制产生$n-1$个参数.这两种方法并没有太大的差别.
 
 从神经科学角度看softmax单元,可以将其视为竞争关系.极端情况下就是$\textit{winner-take-all}$形式.
 
@@ -111,7 +111,7 @@ Softmax名称可以解释为\textit{"softened" version of the} $\arg \max$.
 
 \subsubsection{Other Output Types}
 
-本节主要介绍的是估计$\mathbf y$相关统计量是用到的输出层单元类型.其核心思想是,线性,sigmoid和softmax可以作为任何神经网络的输出层,最大似然度准则提供了设计损失函数的方法.最大似然度准则使用对数似然作为损失函数的具体实现形式.一般的,\textbf{神经网络表示函数$f(\mathbf x;\theta)$,与预测值并无直接关系.但它为$\mathbf y$的分布提供参数.}假设有$f(\mathbf x;\theta)=\mathbf w$,则损失函数可以被写成$-\log p(\mathbf y;\mathbf{w(x)})$.
+本节主要介绍的是估计$\bm y$相关统计量是用到的输出层单元类型.其核心思想是,线性,sigmoid和softmax可以作为任何神经网络的输出层,最大似然度准则提供了设计损失函数的方法.最大似然度准则使用对数似然作为损失函数的具体实现形式.一般的,\textbf{神经网络表示函数$f(\bm x;{\bm\theta})$,与预测值并无直接关系.但它为$\bm y$的分布提供参数.}假设有$f(\bm x;{\bm\theta})=\bm w$,则损失函数可以被写成$-\log p(\bm y;\bm{w(x)})$.
 
 \section{Hidden Units}
 
@@ -127,15 +127,15 @@ g(z)=\max\{0,z\}
 \end{equation}
 它与线性单元很像,但是非常便于求梯度.Rectified单元通常用在仿射变换上
 \begin{equation}
-\mathbf h=g(\mathbf{W^Tx+b})
+\bm h=g(\bm{W^Tx+b})
 \end{equation}
-从经验上来说,通常把$\mathbf b$中每个元素的初始值都设置的非常小,可以取得较好的效果.
+从经验上来说,通常把$\bm b$中每个元素的初始值都设置的非常小,可以取得较好的效果.
 
 Rectified单元的缺点很明显,当样本映射变换后的值为$0$时,函数不可导,不可进行梯度优化.
 
 为了避免上述缺陷,当$z_i<0$时,使用非$0$斜率$\alpha_i$
 \begin{equation}
-h_i=g(z,\mathbf\alpha)_i=\max(0,z_i)+\alpha_i\min(0,z_i)
+h_i=g(z,\alpha)_i=\max(0,z_i)+\alpha_i\min(0,z_i)
 \end{equation}
 并在此基础上有三种变体:
 \begin{itemize}
@@ -176,7 +176,7 @@ Hyperbolic tangent单元在前向神经网络的隐层中表现稍微好一些.
 \begin{itemize}
     \item 没有激活函数的隐层单元
     \item softmax隐层单元
-    \item 径向基函数隐层单元$h_i=\exp\Big(-\frac{1}{\delta^2}\|\mathbf{W_{:,i}-x}\|^2\Big)$
+    \item 径向基函数隐层单元$h_i=\exp\Big(-\frac{1}{\delta^2}\|\bm{W_{:,i}-x}\|^2\Big)$
     \item Softplus隐层单元$g(a)=\zeta(a)=\log(1+e^a)$(a smooth version of the rectifier)
     \item Hard tanh$g(a)=\max(-1,\min(1,a))$
 \end{itemize}
@@ -270,9 +270,9 @@ O\Big(\big(^n_d\big)^{d(l-1)n^d}\Big)
 
 深度学习中常用到Hessian矩阵,但是当参数很多时,计算代价很高.常用\textit{Krylov方法}(Krylov methods)简化Hessian矩阵的计算.可以通过直接计算
 \begin{equation}
-\mathbf{Hv}=\nabla_{\mathbf x}\Big[\big(\nabla_{\mathbf x}f(x)\big)^T\mathbf v\Big]
+\bm{Hv}=\nabla_{\bm x}\Big[\big(\nabla_{\bm x}f(x)\big)^T\bm v\Big]
 \end{equation}
-其中$\mathbf v$是一个任意向量.为了能够计算任意Hessian与任意向量的乘积,可以计算$\mathbf{He}^{(i)}$,其中$i=1,\cdots,n$;$e^{(i)}$是一个one-hot向量.
+其中$\bm v$是一个任意向量.为了能够计算任意Hessian与任意向量的乘积,可以计算$\bm{He}^{(i)}$,其中$i=1,\cdots,n$;$e^{(i)}$是一个one-hot向量.
 
 \section{Historical Notes}
 
