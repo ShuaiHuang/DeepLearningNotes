@@ -88,9 +88,9 @@ X'_{i,j,k}=s\frac{X_{i,j,k}-\overline X}{\max\Big\{\epsilon,\sqrt{\lambda+\frac{
 
 \section{Speech Recognition}
 
-语音识别的目的是将包含语言信息的声音信号$\mathit X$转换成文字序列$\mathbf y$.\textit{自动语音识别}(automatic speech recognition)的模型可以概括为
+语音识别的目的是将包含语言信息的声音信号$\bm X$转换成文字序列$\bm y$.\textit{自动语音识别}(automatic speech recognition)的模型可以概括为
 \begin{equation}
-f^\ast_{ASR}(\mathit X)=\arg\max_{\mathbf x}P^\ast(\mathbf y|\mathbf X=\mathit X)
+f^\ast_{ASR}(\bm X)={\arg\max}_{\bm x}P^\ast(\bm y|\mathbf X=\bm X)
 \end{equation}
 
 传统方法使用HMM与GMM结合的策略进行语音识别.随着深度模型的发展,许多方法借助于深度神经网络提取特征,并用提取出的特征训练HMM和GMM模型.之后深度模型继续发展,并打破了HMM-GMM模型十多年没有提升的僵局.
@@ -151,8 +151,8 @@ P(x_1,x_2,\cdots,x_\tau)=P(x_1,\cdots,x_{n-1})\prod_{t=n}^\tau P(x_t|x_{t-n+1},\
 
 一种加速NLM训练过程的策略就是避免计算所有词汇出现在下一个位置的概率.但是可以通过对词汇数据集进行采样,计算子集中的每个词汇的概率.
 \begin{equation}\begin{split}
-\frac{\partial\log P(y|C)}{\partial\theta}&=\frac{\partial\log\text{softmax}_y(\mathbf a)}{\partial\theta}\\
-&=\frac{\partial a_y}{\partial\theta}-\sum_{i}P(y=i|C)\frac{\partial a_i}{\partial\theta}
+\frac{\partial\log P(y|C)}{\partial\bm\theta}&=\frac{\partial\log\text{softmax}_y(\bm a)}{\partial\bm\theta}\\
+&=\frac{\partial a_y}{\partial\bm\theta}-\sum_{i}P(y=i|C)\frac{\partial a_i}{\partial\bm\theta}
 \end{split}\end{equation}
 上式中后一项需要从模型本身进行采样,仍然需要计算所有单词的概率.因此,一般做法是\textit{importance sampling}从另外一个分布中进行采样,并进行修正.针对上述情形,提出了\textit{biased importance sampling},
 \begin{equation}
@@ -160,7 +160,7 @@ w_i=\frac{p_{n_i}/q_{n_i}}{\sum_{j=1}^Np_{n_j}/q_{n_j}}
 \end{equation}
 因此有
 \begin{equation}
-\sum_{i=1}^{|\mathbb V|}P(i|C)\frac{\partial a_i}{\partial\theta}\approx\frac{1}{m}\sum_{i=1}^mw_i\frac{\partial a_{n_i}}{\partial\theta}
+\sum_{i=1}^{|\mathbb V|}P(i|C)\frac{\partial a_i}{\partial\bm\theta}\approx\frac{1}{m}\sum_{i=1}^mw_i\frac{\partial a_{n_i}}{\partial\bm\theta}
 \end{equation}
 
 更一般地,为了加速训练过程,可以使用稀疏输出层.
