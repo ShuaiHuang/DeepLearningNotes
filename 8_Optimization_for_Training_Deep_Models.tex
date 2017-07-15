@@ -12,18 +12,18 @@
 
 对于机器学习算法中的损失函数$J$,其目的是用来提升机器学习效果$P$的,但是对于传统优化问题来说,$J$仅仅只是一个优化目标.通常情况下,损失函数是在所有训练样本上取平均
 \begin{equation}
-J(\theta)=\mathbb E_{(\mathbf x,y)\sim\hat p_{data}}L(f(\mathbf x;\theta),y)
+J(\bm\theta)=\mathbb E_{(\bm x,y)\sim\hat p_{data}}L(f(\bm x;\bm\theta),y)
 \end{equation}
 但是我们希望得到的是在数据生成模型分布上的期望泛化误差
 \begin{equation}\label{eq:expected_generalization_error}
-J^\ast(\theta)=\mathbb E_{(\mathbf x,y)\sim p_{data}}L(f(\mathbf x;\theta),y)
+J^\ast(\bm\theta)=\mathbb E_{(\bm x,y)\sim p_{data}}L(f(\bm x;\bm\theta),y)
 \end{equation}
 
 \subsection{Empirical Risk Minimization}
 
 机器学习的目标是降低期望泛化误差,又被称为\textit{风险}(risk),但是通过观察式\ref{eq:expected_generalization_error}可以看出,真实数据分布$p_{data}$未知,因此期望泛化误差不能通过计算直接得到.因此一个替代方案就是最小化\textit{经验风险}(empirical risk)
 \begin{equation}
-\mathbb E_{(\mathbf x,y)\sim\hat p_{data}}\left[L(f(\mathbf x;\theta),y)\right]=\frac{1}{m}\sum_{i=1}^mL(f(\mathbf x^{(i)};\theta),y^{(i)})
+\mathbb E_{(\bm x,y)\sim\hat p_{data}}\left[L(f(\bm x;\bm\theta),y)\right]=\frac{1}{m}\sum_{i=1}^mL(f(\bm x^{(i)};\bm\theta),y^{(i)})
 \end{equation}
 其中$m$是训练样本的数目.
 
@@ -60,9 +60,9 @@ minibatch尺寸的选择因素有
 
 在优化问题是凸优化的条件下,也会存在挑战.Hessian矩阵病态条件就是其中之一.如式\ref{eq:second_order_taylor_expansion}中的
 \begin{equation}
--\epsilon\mathbf g^T\mathbf g+\frac{1}{2}\epsilon^2\mathbf g^T\mathbf{Hg}
+-\epsilon\bm g^T\bm g+\frac{1}{2}\epsilon^2\bm g^T\bm{Hg}
 \end{equation}
-就有可能存在$\frac{1}{2}\epsilon^2\mathbf g^T\mathbf{Hg}>\epsilon\mathbf g^T\mathbf g$的病态情况.
+就有可能存在$\frac{1}{2}\epsilon^2\bm g^T\bm{Hg}>\epsilon\bm g^T\bm g$的病态情况.
 
 其他领域内解决病态的问题的方法不能直接用来解决深度学习中的病态问题,需要做一些调整.
 
@@ -136,35 +136,35 @@ minibatch尺寸的选择因素有
 
 SGD的计算时间不会随着样本数量的增加而增加,同时还可以保证算法的收敛性.为了研究优化算法的收敛性,引入度量指标\textit{excess error}
 \begin{equation}
-J(\mathbf\theta)-\min_{\mathbf\theta}J(\mathbf\theta)
+J(\bm\theta)-\min_{\bm\theta}J(\bm\theta)
 \end{equation}
 对于SGD算法,在第$k$轮迭代后,其excess error为$O(\frac{1}{\sqrt{k}})$,当优化问题是凸优化时,excess error为$O(\frac{1}{k})$.除非引入新的前提假设,这个上限是不会被提升的.但是如果收敛速度超过$O(\frac{1}{k})$时,就会导致过拟合.
 
 \subsection{Momentum}
 
-SGD算法的学习速率较慢,\textit{动量算法}(Momentum Algorithm)是用来加速学习速率的.在动量算法中,引入了速度$\mathbf v$的概念,用来指示在参数空间中搜索最优参数的速率和方向.为了简便,在这里将动量定义为速度和单位质量质点的乘机.因此有迭代更新公式
+SGD算法的学习速率较慢,\textit{动量算法}(Momentum Algorithm)是用来加速学习速率的.在动量算法中,引入了速度$\bm v$的概念,用来指示在参数空间中搜索最优参数的速率和方向.为了简便,在这里将动量定义为速度和单位质量质点的乘机.因此有迭代更新公式
 \begin{equation}\begin{split}
-\mathbf v&\leftarrow\alpha\mathbf v-\epsilon\nabla_\theta\Big(\frac{1}{m}\sum_{i=1}^mL(\mathbf f(\mathbf x^{(i)};\theta),\mathbf y^{(i)})\Big)\\
-\theta&\leftarrow\theta+\mathbf v
+\bm v&\leftarrow\alpha\bm v-\epsilon\nabla_{\bm\theta}\Big(\frac{1}{m}\sum_{i=1}^mL(\bm f(\bm x^{(i)};\bm\theta),\bm y^{(i)})\Big)\\
+\bm\theta&\leftarrow\bm\theta+\bm v
 \end{split}\end{equation}
 其中,$\alpha\in\left[0,1\right)$用来指示历史梯度均值对当前的影响程度.$\alpha$也可以通过学习算法进行自适应调整.
 
-与物理领域内的动量定义一样,这里的动量也与力$\mathbf f(t)$和速度$\mathbf v(t)$有关联.
+与物理领域内的动量定义一样,这里的动量也与力$\bm f(t)$和速度$\bm v(t)$有关联.
 \begin{equation}\begin{split}
-\mathbf f(t)&=\frac{\partial^2}{\partial t^2}\theta(t)\\
-\mathbf v(t)&=\frac{\partial}{\partial t}\theta(t)\\
-\mathbf f(t)&=\frac{\partial}{\partial t}\mathbf v(t)
+\bm f(t)&=\frac{\partial^2}{\partial t^2}\bm\theta(t)\\
+\bm v(t)&=\frac{\partial}{\partial t}\bm\theta(t)\\
+\bm f(t)&=\frac{\partial}{\partial t}\bm v(t)
 \end{split}\end{equation}
 从上式可以看出,动量算法需要解微分方程,可以借助\textit{Euler方法}(Euler's method)\footnote{TODO: 查一下}实现.
 
-动量算法中的力可以视为两个力的合力,一个力正比于损失函数负梯度方向$-\nabla_\theta J(\theta)$;另一个力(粘滞阻力)正比于$-\mathbf v(t)$.当然还有其他形式的阻力,但是最好还是用粘滞阻力的形式.
+动量算法中的力可以视为两个力的合力,一个力正比于损失函数负梯度方向$-\nabla_{\bm\theta} J(\bm\theta)$;另一个力(粘滞阻力)正比于$-\bm v(t)$.当然还有其他形式的阻力,但是最好还是用粘滞阻力的形式.
 
 \subsection{Nesterov Momentum}
 
 \textit{Nesterov Momentum}与标准动量不同之处在于梯度的计算方式.
 \begin{equation}\begin{split}
-\mathbf v&\leftarrow\alpha\mathbf v-\epsilon\nabla_\theta\Big(\frac{1}{m}\sum_{i=1}^mL(\mathbf f(\mathbf x^{(i)};\theta+\alpha\mathbf v),\mathbf y^{(i)})\Big)\\
-\theta&\leftarrow\theta+\mathbf v
+\bm v&\leftarrow\alpha\bm v-\epsilon\nabla_{\bm\theta}\Big(\frac{1}{m}\sum_{i=1}^mL(\bm f(\bm x^{(i)};\bm\theta+\alpha\bm v),\bm y^{(i)})\Big)\\
+\bm\theta&\leftarrow\bm\theta+\bm v
 \end{split}\end{equation}
 
 Nesterov Momentum将凸优化的exxcess error从$O(\frac{1}{k})$提升至$O(\frac{1}{k^2})$.但是对于非凸问题,则没有提升.
@@ -245,19 +245,19 @@ Adam算法可以视为RMSProp算法和动量算法的结合.最简单的结合�
 
 \subsection{Newton's Method}
 
-二阶方法使用二阶导数改善优化效果\footnote{TODO: 建立起优化方法的简单知识体系.},最广泛使用的是牛顿法.对$J(\theta)$在$\theta_0$附近进行二阶展开,有
+二阶方法使用二阶导数改善优化效果\footnote{TODO: 建立起优化方法的简单知识体系.},最广泛使用的是牛顿法.对$J(\bm\theta)$在$\bm\theta_0$附近进行二阶展开,有
 \begin{equation}
-J(\theta)\approx J(\theta_0)+(\theta-\theta_0)^T\nabla_\theta J(\theta_0)+\frac{1}{2}(\theta-\theta_0)^T\mathbf H(\theta-\theta_0)
+J(\bm\theta)\approx J(\bm\theta_0)+(\bm\theta-\bm\theta_0)^T\nabla_{\bm\theta} J(\bm\theta_0)+\frac{1}{2}(\bm\theta-\bm\theta_0)^T\bm H(\bm\theta-\bm\theta_0)
 \end{equation}
-其中$\mathbf H$是$J$对$\theta$在$\theta_0$点附近的Hessian矩阵.如果求取critical point,有
+其中$\bm H$是$J$对$\bm\theta$在$\bm\theta_0$点附近的Hessian矩阵.如果求取critical point,有
 \begin{equation}\label{eq:newtown_cirtical_point}
-\theta^\ast=\theta_0-\mathbf H^{-1}\nabla_\theta J(\theta_0)
+\bm\theta^\ast=\bm\theta_0-\bm H^{-1}\nabla_{\bm\theta} J(\bm\theta_0)
 \end{equation}
-因此对于二次函数,通过缩放$\mathbf H^{-1}$可以直接到达最小值点.对于凸优化非二次问题,在Hessian矩阵正定的情况下,需要通过迭代算法获取最优解.
+因此对于二次函数,通过缩放$\bm H^{-1}$可以直接到达最小值点.对于凸优化非二次问题,在Hessian矩阵正定的情况下,需要通过迭代算法获取最优解.
 
 深度学习中的Hessian矩阵并不保证正定,牛顿法的优化方向可能会产生错误,因此需要添加正则化项
 \begin{equation}
-\theta^\ast=\theta_0-\left[H(f(\theta_0))+\alpha\mathbf I\right]^{-1}\nabla_\theta f(\theta_0)
+\bm\theta^\ast=\bm\theta_0-\left[H(f(\bm\theta_0))+\alpha\bm I\right]^{-1}\nabla_{\bm\theta} f(\bm\theta_0)
 \end{equation}
 正则化后的牛顿法有两个缺陷:
 \begin{itemize}
@@ -267,28 +267,28 @@ J(\theta)\approx J(\theta_0)+(\theta-\theta_0)^T\nabla_\theta J(\theta_0)+\frac{
 
 \subsection{Conjugate Gradients}
 
-\textit{共轭梯度}(conjugate gradient)通过迭代选取共轭梯度方向来避免对Hessian矩阵求逆.在共轭梯度算法中,我们每一次选取的搜索方向都是与上一次搜索方向共轭的方向.搜索方向$\mathbf d_t$的迭代形式为
+\textit{共轭梯度}(conjugate gradient)通过迭代选取共轭梯度方向来避免对Hessian矩阵求逆.在共轭梯度算法中,我们每一次选取的搜索方向都是与上一次搜索方向共轭的方向.搜索方向$\bm d_t$的迭代形式为
 \begin{equation}
-\mathbf d_t=\nabla_\theta J(\theta)+\beta_{t-1}\mathbf d_{t-1}
+\bm d_t=\nabla_{\bm\theta} J(\bm\theta)+\beta_{t-1}\bm d_{t-1}
 \end{equation}
 $\beta_{t}$的选取方法有
 \begin{description}
-    \item [Fletcher-Reeves] \begin{equation}\beta_t=\frac{\nabla_\theta J(\theta_t)^T\nabla_\theta J(\theta_t)}{\nabla_\theta J(\theta_{t-1})^T\nabla_\theta J(\theta_{t-1})}\end{equation}
-    \item [Polak-Ribiere] \begin{equation}\beta_t=\frac{(\nabla_\theta J(\theta_t)-\nabla_\theta J(\theta_{t-1}))^T\nabla_\theta J(\theta_t)}{\nabla_\theta J(\theta_{t-1})^T\nabla_\theta J(\theta_{t-1})}\end{equation}
+    \item [Fletcher-Reeves] \begin{equation}\beta_t=\frac{\nabla_{\bm\theta} J(\bm\theta_t)^T\nabla_{\bm\theta} J(\bm\theta_t)}{\nabla_{\bm\theta} J(\bm\theta_{t-1})^T\nabla_{\bm\theta} J(\bm\theta_{t-1})}\end{equation}
+    \item [Polak-Ribiere] \begin{equation}\beta_t=\frac{(\nabla_{\bm\theta} J(\bm\theta_t)-\nabla_{\bm\theta} J(\bm\theta_{t-1}))^T\nabla_{\bm\theta} J(\bm\theta_t)}{\nabla_{\bm\theta} J(\bm\theta_{t-1})^T\nabla_{\bm\theta} J(\bm\theta_{t-1})}\end{equation}
 \end{description}
 
 共轭梯度法经过修改可用于非线性的情形.\textit{nonlinear conjugate gradients}算法就是应用于非线性情形的算法.
 
 \subsection{BFGS}
 
-\textit{Broyden-Fletcher-Goldfarb-Shanno (BGFS)}算法的目的是为了减少牛顿法中的计算负担.它通过迭代法估计式\ref{eq:newtown_cirtical_point}中的$\mathbf H^{-1}$,得到估计量$\mathbf M_t$.并且通过$\mathbf M_t$决定优化方向$\mathbf\rho_t=\mathbf M_t\mathbf g_t$
+\textit{Broyden-Fletcher-Goldfarb-Shanno (BGFS)}算法的目的是为了减少牛顿法中的计算负担.它通过迭代法估计式\ref{eq:newtown_cirtical_point}中的$\bm H^{-1}$,得到估计量$\bm M_t$.并且通过$\bm M_t$决定优化方向$\bm\rho_t=\bm M_t\bm g_t$
 \begin{equation}
-\theta_{t+1}=\theta_t+\epsilon^\ast\mathbf\rho_t
+\bm\theta_{t+1}=\bm\theta_t+\epsilon^\ast\bm\rho_t
 \end{equation}
 
 BFGS算法的优势在于通过线性搜索减少线性搜索的时间.缺点在于Hessian逆矩阵的存储,需要$O(n^2)$的存储空间.
 
-\textit{Limited Memory BFGS}或L-BFGS改进了BFGS的存储限制.它添加了一个假设为$\mathbf M^{(t-1)}$初始值为单位矩阵,并且在迭代过程中仅存储用来更新$\mathbf M$的向量.
+\textit{Limited Memory BFGS}或L-BFGS改进了BFGS的存储限制.它添加了一个假设为$\bm M^{(t-1)}$初始值为单位矩阵,并且在迭代过程中仅存储用来更新$\bm M$的向量.
 
 \section{Optimization Strategies and Meta-Algorithms}
 
@@ -298,15 +298,15 @@ BFGS算法的优势在于通过线性搜索减少线性搜索的时间.缺点在
 
 梯度算法有一个前提就是除了当前层,其他所有层的参数都不会改变.但是实际上,所有层的参数都是同步更新的.某一层参数的更新会影响其它所有层的更新.二阶优化将二阶交互考虑进优化算法中,但是计算代价太大.批归一化提供了一种再参数化深度神经网络的方法.
 
-假设$\mathbf H$是将要被归一化的网络层的最小批激活函数(以设计矩阵形式排列),为了归一化$\mathbf H$,将其替换为
+假设$\bm H$是将要被归一化的网络层的最小批激活函数(以设计矩阵形式排列),为了归一化$\bm H$,将其替换为
 \begin{equation}
-\mathbf H'=\frac{\mathbf{H-\mu}}{\mathbf\sigma}
+\bm H'=\frac{\bm{H-\mu}}{\bm\sigma}
 \end{equation}
-其中,$\mathbf\mu$是神经元的均值向量;$\mathbf\sigma$是每一个神经元对应的标准差.训练过程中,当进行逆向传播时,进行归一化,避免梯度增大标准差或者均值.在测试时,使用训练得到的参数$\mathbf\mu$,$\mathbf\sigma$.
+其中,$\bm\mu$是神经元的均值向量;$\bm\sigma$是每一个神经元对应的标准差.训练过程中,当进行逆向传播时,进行归一化,避免梯度增大标准差或者均值.在测试时,使用训练得到的参数$\bm\mu$,$\bm\sigma$.
 
 归一化去除了一阶和二阶统计量的影响,但是允许神经元间和非线性统计量的更新.
 
-归一化会降低神经网络的表示能力,因此通常将$\mathbf H'$替换为$\gamma\mathbf H'+\beta$.其中$\gamma$和$\beta$通过学习得到.与原始的$\mathbf H$表示不同,新的表示形势下,均值仅由参数$\beta$决定.
+归一化会降低神经网络的表示能力,因此通常将$\bm H'$替换为$\gamma\bm H'+\beta$.其中$\gamma$和$\beta$通过学习得到.与原始的$\bm H$表示不同,新的表示形势下,均值仅由参数$\beta$决定.
 
 \subsection{Coordinate Descent}
 
@@ -316,7 +316,7 @@ BFGS算法的优势在于通过线性搜索减少线性搜索的时间.缺点在
 
 \textit{Polyak Averaging}是指对优化路径上的点取平均保证算法的收敛性.非凸问题的优化路径很复杂,Polyak平均的形式为
 \begin{equation}
-\hat\theta^{(t)}=\alpha\hat\theta^{(t-1)}+(1-\alpha)\theta^{(t)}
+\hat{\bm\theta}^{(t)}=\alpha\hat{\bm\theta}^{(t-1)}+(1-\alpha)\bm\theta^{(t)}
 \end{equation}
 
 \subsection{Supervised Pretraining}
