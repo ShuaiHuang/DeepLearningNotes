@@ -51,9 +51,9 @@
 
 \subsection{Energy-Based Models}
 
-许多无向图模型都是基于假设$\forall\mathbf x,\tilde p(\mathbf x)>0$构建的.一种简便的方式是使用\textit{基于能量的模型}(energy-based model)
+许多无向图模型都是基于假设$\forall\bm x,\tilde p(\bm x)>0$构建的.一种简便的方式是使用\textit{基于能量的模型}(energy-based model)
 \begin{equation}
-\tilde p(\mathbf x)=\exp(-E(\mathbf x))
+\tilde p(\bm x)=\exp(-E(\bm x))
 \end{equation}
 定义模型.能量函数可以完全自由地选择,没有团势函数的限制.
 
@@ -61,7 +61,7 @@
 
 一般情况下,更常用的是\textit{自由能量}(free energy)
 \begin{equation}
-\mathcal F(\mathbf x)=-\log\sum_{\mathbf h}\exp(-E(\mathbf{x,h}))
+\mathcal F(\bm x)=-\log\sum_{\bm h}\exp(-E(\bm{x,h}))
 \end{equation}
 
 \subsection{Separation and D-Separation}
@@ -111,9 +111,9 @@
 通过概率模型我们可以获得变量间的相互关联关系.
 
 \begin{equation}
-\log p(\mathbf v)=\mathbb E_{\mathbf h\sim p(\mathbf h|\mathbf v)}[\log p(\mathbf{h,v})-\log p(\mathbf{h|v})]
+\log p(\bm v)=\mathbb E_{\bm h\sim p(\bm h|\bm v)}[\log p(\bm{h,v})-\log p(\bm{h|v})]
 \end{equation}
-我们经常需要计算$p(\mathbf{h|v})$以实现上述学习规则.但是对于大部分深度模型,这些推断问题通常不易解决.
+我们经常需要计算$p(\bm{h|v})$以实现上述学习规则.但是对于大部分深度模型,这些推断问题通常不易解决.
 
 可以很直观地看出,一般的图模型计算边缘概率分布是一个\#P难问题.这样就需要通过近似推断来避免这一问题.
 
