@@ -4,11 +4,11 @@ Autoencoder是一个试图将输入复制到输出的神经网络.通常只是�
 
 \section{Undercomplete Autoencoders}
 
-\textit{Undercomplete autoencoders}的目的在于获取隐变量$\mathbf h$中有用的特性.因此在模型中对其施加了$\mathbf h$维度要比$\mathbf x$维度低的限制.
+\textit{Undercomplete autoencoders}的目的在于获取隐变量$\bm h$中有用的特性.因此在模型中对其施加了$\bm h$维度要比$\bm x$维度低的限制.
 
 学习过程可以被视为最小化损失函数
 \begin{equation}
-L(\mathbf x,g(f(\mathbf)))
+L(\bm x,g(f(\bm x)))
 \end{equation}
 的过程.当$f,g$都是线性函数时,autoencoder可以被视为张开一个和PCA相同的子空间.
 
@@ -22,9 +22,9 @@ L(\mathbf x,g(f(\mathbf)))
 
 \subsubsection{Sparse Autoencoders}
 
-\textit{Sparse autoencoders}是指将autoencoder的训练准则中加入稀疏补偿项$\Omega(\mathbf h)$
+\textit{Sparse autoencoders}是指将autoencoder的训练准则中加入稀疏补偿项$\Omega(\bm h)$
 \begin{equation}
-L(\mathbf x,g(f(\mathbf x)))+\Omega(\mathbf h)
+L(\bm x,g(f(\bm x)))+\Omega(\bm h)
 \end{equation}
 
 sparse autoencoders的目的是学习对其他任务有用的特征.但是这种正则化项并没有直观的贝叶斯表示方法.
@@ -35,17 +35,17 @@ sparse autoencoders的目的是学习对其他任务有用的特征.但是这种
 
 \textit{Denoising autoencoders}通过改变重构错误项来训练autoencoder,它最小化
 \begin{equation}
-L(\mathbf x,g(f(\tilde{\mathbf x})))
+L(\bm x,g(f(\tilde{\bm x})))
 \end{equation}
-其中,$\tilde{\mathbf x}$是被噪声干扰的输入$\mathbf x$.
+其中,$\tilde{\bm x}$是被噪声干扰的输入$\bm x$.
 
 \subsection{Regularizing by Penalizing Derivatives}
 
 这种情况下的补偿项为
 \begin{equation}
-\Omega(\mathbf{h,x})=\lambda\sum_i\|\nabla_{\mathbf x}h_i\|^2
+\Omega(\bm{h,x})=\lambda\sum_i\|\nabla_{\bm x}h_i\|^2
 \end{equation}
-它迫使模型在输入$\mathbf x$有微小变化时,模型输出变动不会太大.
+它迫使模型在输入$\bm x$有微小变化时,模型输出变动不会太大.
 
 \section{Representation Power, Layer Size and Depth}
 
@@ -55,15 +55,15 @@ Autoencoder还可以有深层结构.它本身就是一种前向网络,继承了�
 
 前向网络的损失函数和输出单元同样可以用于autoencoder.
 
-以激进的观点抛开前向神经网络来看,\textit{encoding function}$f(\mathbf x)$可以被一般化为\textit{encoding distribution}$p_{encoder}(\mathbf{h|x})$.
+以激进的观点抛开前向神经网络来看,\textit{encoding function}$f(\bm x)$可以被一般化为\textit{encoding distribution} $p_{encoder}(\bm{h|x})$.
 
-任何一个包含隐变量的模型$p_{encoder}(\mathbf{h|x})=p_{model}(\mathbf{h|x})$可以定义一个stochastic encoder
+任何一个包含隐变量的模型$p_{encoder}(\bm{h|x})=p_{model}(\bm{h|x})$可以定义一个stochastic encoder
 \begin{equation}
-p_{encoder}(\mathbf{h|x})=p_{model}(\mathbf{h|x})
+p_{encoder}(\bm{h|x})=p_{model}(\bm{h|x})
 \end{equation}
 和一个stochastic decoder
 \begin{equation}
-p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
+p_{decoder}(\bm{x|h})=p_{model}(\bm{x|h})
 \end{equation}
 
 \section{Denoising Autoencoders}
@@ -72,7 +72,7 @@ p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
 
 \subsection{Estimating the Score}
 
-\textit{Score mathcing}是极大似然度的替代方法.它是一种对概率分布的一致性估计.它利用的方法是促使模型与数据分布在每个训练数据点上拥有相同的score.DAE一个重要的特性是其训练准则使得autoencoder可以学习出一个向量场($g(f(\mathbf x))-\mathbf x$)用以估计数据分布的score.
+\textit{Score mathcing}是极大似然度的替代方法.它是一种对概率分布的一致性估计.它利用的方法是促使模型与数据分布在每个训练数据点上拥有相同的score.DAE一个重要的特性是其训练准则使得autoencoder可以学习出一个向量场($g(f(\bm x))-\bm x$)用以估计数据分布的score.
 
 训练过程中使用Gaussian噪声和均方误差的autoencoder等价于训练一个RBM模型,该模型拥有Gaussian可见单元.
 
@@ -82,7 +82,7 @@ p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
 
 流形学习有两个因素
 \begin{itemize}
-    \item 学习$\mathbf h$和$\mathbf x$,建立从输入到输出的映射;
+    \item 学习$\bm h$和$\bm x$,建立从输入到输出的映射;
     \item 满足限制条件或者正则化补偿项.
 \end{itemize}
 
@@ -94,7 +94,7 @@ p_{decoder}(\mathbf{x|h})=p_{model}(\mathbf{x|h})
 
 \textit{Contractive autoencoder}引入正则项
 \begin{equation}
-\Omega(\mathbf h)=\lambda\Big\|\frac{\partial f(\mathbf x)}{\partial\mathbf x}\Big\|^2_F
+\Omega(\bm h)=\lambda\Big\|\frac{\partial f(\bm x)}{\partial\bm x}\Big\|^2_F
 \end{equation}
 促使$f$的导数尽可能小.
 
@@ -108,11 +108,11 @@ CAE的目的是为了学习到数据所表示的流行的结构.
 
 \section{Predictive Sparse Decomposition}
 
-\textit{Predictive sparse decomposition} (SPD)是稀疏编码和参数autoencoder的结合体.其中,encoder $f(\mathbf x)$和decoder $h(\mathbf x)$都是参数化模型.
+\textit{Predictive sparse decomposition} (SPD)是稀疏编码和参数autoencoder的结合体.其中,encoder $f(\bm x)$和decoder $h(\bm x)$都是参数化模型.
 
 训练过程可以归结为最小化
 \begin{equation}
-\|\mathbf x-g(\mathbf x)\|^2+\lambda|\mathbf h|_1+\gamma\|\mathbf h-f(\mathbf x)\|^2
+\|\bm x-g(\bm x)\|^2+\lambda|\bm h|_1+\gamma\|\bm h-f(\bm x)\|^2
 \end{equation}
 
 \section{Application of Autoencoders}
