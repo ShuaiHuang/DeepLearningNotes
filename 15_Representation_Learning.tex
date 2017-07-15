@@ -64,12 +64,12 @@ zero-shot learning和zero-data learning仅当附加信息在训练过程中被�
 
 对于如何评判一种特征表示方式优劣的问题,一个假设是,理想的特征表示方式和底层暗含的数据生成因素相对应,即特征之间不存在耦合关系.除此之外,特征表示还要比较容易进行塑造.对于许多AI任务,上述两项特性是一致的.
 
-如果$\mathbf y$与$\mathbf x$的起因(causal factors)关系密切,那么$p(\mathbf x)$与$p(\mathbf{y|x})$就会有紧密联系.非监督特征表示试图对变量中暗含的因素进行解耦合,这种策略与半监督学习策略很类似.$p(\mathbf x)$与$p(\mathbf{y|x})$就会有紧密联系体现在
+如果$\bm y$与$\bm x$的起因(causal factors)关系密切,那么$p(\bm x)$与$p(\bm{y|x})$就会有紧密联系.非监督特征表示试图对变量中暗含的因素进行解耦合,这种策略与半监督学习策略很类似.$p(\bm x)$与$p(\bm{y|x})$就会有紧密联系体现在
 \begin{equation}\begin{split}
-p(\mathbf {h,x})&=p(\mathbf{x|h})p(\mathbf h)\\
-p(\mathbf x)&=\mathbb E_{\mathbf h}p(\mathbf{x|h})
+p(\bm {h,x})&=p(\bm{x|h})p(\bm h)\\
+p(\bm x)&=\mathbb E_{\bm h}p(\bm{x|h})
 \end{split}\end{equation}
-最佳的关于$\mathbf x$的分布是$\mathbf h$揭示出了$\mathbf x$的真实分布.
+最佳的关于$\bm x$的分布是$\bm h$揭示出了$\bm x$的真实分布.
 
 在现实中,输入变量通常是多种因素共同作用的结果.一个直接的方式就是暴力搜索.但是在绝大多数情况下,暴力搜索方式并不可行,替代策略有
 \begin{itemize}
@@ -79,7 +79,7 @@ p(\mathbf x)&=\mathbb E_{\mathbf h}p(\mathbf{x|h})
 
 对于无监督学习策略,可以去改变显著性的定义.具体来说,可以使用\textit{生成式对抗网络}(generative adversarial networks)定义显著性.
 
-学习暗含的起因的收益是,如果生成式过程的\textit{果}为$\mathbf x$,\textit{因}为$\mathbf y$,那么$p(\mathbf{x|y})$对$p(\mathbf y)$的变化具有鲁棒性.
+学习暗含的起因的收益是,如果生成式过程的\textit{果}为$\bm x$,\textit{因}为$\bm y$,那么$p(\bm{x|y})$对$p(\bm y)$的变化具有鲁棒性.
 
 \section{Distributed Representation}
 
