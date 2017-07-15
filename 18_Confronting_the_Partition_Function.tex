@@ -2,28 +2,28 @@
 
 在一些情况下,我们需要将$\tilde p$除以\textit{partition function} $Z(\theta)$进行归一化,以获得有效概率分布
 \begin{equation}
-p(\mathbf x;\theta)=\frac{1}{Z(\theta)}\tilde p(\mathbf x;\theta)
+p(\bm x;\bm\theta)=\frac{1}{Z(\bm\theta)}\tilde p(\bm x;\bm\theta)
 \end{equation}
 其中partition function是一个对所有未归一化概率的积分(连续变量)或者求和(离散变量)操作.
 \begin{equation}\begin{split}
-&\int\tilde p(\mathbf x)d\mathbf x\\
-&\sum_{\mathbf x}\tilde p(\mathbf x)
+&\int\tilde p(\bm x)d\bm x\\
+&\sum_{\bm x}\tilde p(\bm x)
 \end{split}\end{equation}
 
 \section{The Log-Likelihood Gradient}
 
 无向图模型学习在最大化对数似然特别困难是因为它的partition function依赖于参数.
 \begin{equation}
-\nabla_\theta\log p(\mathbf x;\theta)=\nabla_\theta\tilde p(\mathbf x;\theta)-\nabla\log Z(\theta)
+\nabla_{\bm\theta}\log p(\bm x;\bm\theta)=\nabla_{\bm\theta}\tilde p(\bm x;\bm\theta)-\nabla_{\bm\theta}\log Z(\bm\theta)
 \end{equation}
 这就是我们所熟知的\textit{positive phase}和\textit{negative phase}分解\footnote{The term positive and negative do not refer to the sign of each term in equation, but rather reflect to their effect on the probability density defined by the model.(\href{http://deeplearning.net/tutorial/rbm.html\#rbm}{http://deeplearning.net})}.
 
 \begin{equation}\label{eq:gradient_of_log_partition_function}
-\nabla_\theta\log Z=\mathbb E_{\mathbf x\sim p(\mathbf x)}\nabla_\theta\log\tilde p(\mathbf x)
+\nabla_{\bm\theta}\log Z=\mathbb E_{\bm x\sim p(\bm x)}\nabla_{\bm\theta}\log\tilde p(\bm x)
 \end{equation}
 上述等式是Monte Carolo方法估计极大似然的基础.
 
-在positive phase项中,我们增大从\textbf{数据}中采样的$\mathbf x$所对应的$\log\tilde p(\mathbf x)$的值.在negative phase项中,我们通过降低从\textbf{模型}中采样的$\log\tilde p(\mathbf x)$的值而降低partition function的值\footnote{There are many ways that a learner can capture knowledge about the data generating distribution $p_{data}$ from which training examples were obtained. Some of this encapsulate a model $p_{model}$ of that distribution (or of a derived distribution such as a distribution of output variables given input variables).}.
+在positive phase项中,我们增大从\textbf{数据}中采样的$\bm x$所对应的$\log\tilde p(\bm x)$的值.在negative phase项中,我们通过降低从\textbf{模型}中采样的$\log\tilde p(\bm x)$的值而降低partition function的值\footnote{There are many ways that a learner can capture knowledge about the data generating distribution $p_{data}$ from which training examples were obtained. Some of this encapsulate a model $p_{model}$ of that distribution (or of a derived distribution such as a distribution of output variables given input variables).}.
 
 \section{Stochastic Maximum Likelihood and Contrastive Divergence}
 
@@ -45,7 +45,7 @@ CD算法可以视为对模型进行补偿,当Markov链的输入是从数据分�
 
 \paragraph{Fast PCD}一种加速学习过程mixing的方法不是改变Monte Carlo方法,而是改变模型和代价函数的参数化过程.即将参数$\theta$替换为
 \begin{equation}
-\theta=\theta^{(slow)}+\theta^{(fast)}
+\bm\theta=\bm\theta^{(slow)}+\bm\theta^{(fast)}
 \end{equation}
 尽管当快速权重可以自由改变时效果才会体现,但是这样就可以使得Markov链进行快速mix.
 
@@ -53,20 +53,20 @@ CD算法可以视为对模型进行补偿,当Markov链的输入是从数据分�
 
 Monte Carlo直接面对partition function的计算过程,与之对应的其他方法则绕考计算partition function的过程,也就是本节所提到的\textit{pseudolikelihood}方法.
 
-Pseudolikelihood方法通过概率的比例部分消除掉partition function的影响.假设将变量$\mathbf x$分割为$\mathbf a, \mathbf b, \mathbf c$,那么有
+Pseudolikelihood方法通过概率的比例部分消除掉partition function的影响.假设将变量$\bm x$分割为$\bm a, \bm b, \bm c$,那么有
 \begin{equation}
-p(\mathbf a|\mathbf b)=\frac{p(\mathbf{a,b})}{p(\mathbf b)}=\frac{p(\mathbf{a,b})}{\sum_{\mathbf{a,c}}p(\mathbf {a,b,c})}=\frac{\tilde p(\mathbf{a,b})}{\sum_{\mathbf{a,c}}\tilde p(\mathbf {a,b,c})}
+p(\bm a|\bm b)=\frac{p(\bm{a,b})}{p(\bm b)}=\frac{p(\bm{a,b})}{\sum_{\bm{a,c}}p(\bm {a,b,c})}=\frac{\tilde p(\bm{a,b})}{\sum_{\bm{a,c}}\tilde p(\bm {a,b,c})}
 \end{equation}
-在实际中,$\mathbf c$的数目会很多,如果将$\mathbf c$并入$\mathbf b$会减少计算量,这样就产生了pseudolikelihood目标函数
+在实际中,$\bm c$的数目会很多,如果将$\bm c$并入$\bm b$会减少计算量,这样就产生了pseudolikelihood目标函数
 \begin{equation}
-\sum_{i=1}^n\log p(x_i|\mathbf x_{-i})
+\sum_{i=1}^n\log p(x_i|\bm x_{-i})
 \end{equation}
 将计算复杂度向偏差让渡,可得\textit{generalized pseudolikelihood}估计
 \begin{equation}
-\sum_{i=1}^m\log p(x_{\mathbb S^{(i)}}|\mathbf x_{-{\mathbb S^{(i)}}})
+\sum_{i=1}^m\log p(x_{\mathbb S^{(i)}}|\bm x_{-{\mathbb S^{(i)}}})
 \end{equation}
 
-基于pseudolikelihood的方法表现很大程度上取决于模型如何使用.generalized pseudolikelihood适用的情形为$\mathbb S$捕捉到了变量间的重要耦合关系.但是它的缺点为,当与其他近似估计方法一起使用时,仅能提供$\tilde p(\mathbf x)$的下限.
+基于pseudolikelihood的方法表现很大程度上取决于模型如何使用.generalized pseudolikelihood适用的情形为$\mathbb S$捕捉到了变量间的重要耦合关系.但是它的缺点为,当与其他近似估计方法一起使用时,仅能提供$\tilde p(\bm x)$的下限.
 
 它也不能用于深度模型.但是它可以用于深度网络的单层神经元训练以及不基于下限的近似推断方法.
 
@@ -74,15 +74,15 @@ p(\mathbf a|\mathbf b)=\frac{p(\mathbf{a,b})}{p(\mathbf b)}=\frac{p(\mathbf{a,b}
 
 \section{Score Matching and Ratio Matching}
 
-\paragraph{Score Matching}在训练模型时可以不用对$Z$及其导数进行估计.$\nabla_{\mathbf x}\log p(\mathbf x)$被称为\textit{score}.\textit{score matching}是指
+\paragraph{Score Matching}在训练模型时可以不用对$Z$及其导数进行估计.$\nabla_{\bm x}\log p(\bm x)$被称为\textit{score}.\textit{score matching}是指
 \begin{equation}\begin{split}
-L(\mathbf x,\theta)&=\frac{1}{2}\|\nabla_{\mathbf x}\log p_{model}(\mathbf x;\theta)-\nabla_{\mathbf x}\log p_{data}(\mathbf x;\theta)\|_2^2\\
-J(\theta)&=\frac{1}{2}\mathbb E_{p_{data}(\mathbf x)}L(\mathbf x,\theta)\\
-\theta^\ast&=\min_\theta J(\theta)
+L(\bm x,\bm\theta)&=\frac{1}{2}\|\nabla_{\bm x}\log p_{model}(\bm x;\bm\theta)-\nabla_{\bm x}\log p_{data}(\bm x;\bm\theta)\|_2^2\\
+J(\bm\theta)&=\frac{1}{2}\mathbb E_{p_{data}(\bm x)}L(\bm x,\bm\theta)\\
+{\bm\theta}^\ast&=\min_{\bm\theta} J(\bm\theta)
 \end{split}\end{equation}
-同时可以看出,score matching需要知道真实的数据分布$p_{data}$.但是在一定条件下\footnote{见P618},$L(\mathbf x,\theta)$等价于
+同时可以看出,score matching需要知道真实的数据分布$p_{data}$.但是在一定条件下\footnote{见P618},$L(\bm x,\theta)$等价于
 \begin{equation}
-\tilde L(\mathbf x,\theta)=\sum_{j=1}^n\Big(\frac{\partial^2}{\partial x_j^2}\log p_{model}(\mathbf x;\theta)+\frac{1}{2}(\frac{\partial}{\partial x_j}\log p_{model}(\mathbf x;\theta))^2\Big)
+\tilde L(\bm x,\bm\theta)=\sum_{j=1}^n\Big(\frac{\partial^2}{\partial x_j^2}\log p_{model}(\bm x;\bm\theta)+\frac{1}{2}(\frac{\partial}{\partial x_j}\log p_{model}(\bm x;\bm\theta))^2\Big)
 \end{equation}
 上式不适用于离散观察变量,但是可以用于离散隐变量.
 
@@ -90,7 +90,7 @@ J(\theta)&=\frac{1}{2}\mathbb E_{p_{data}(\mathbf x)}L(\mathbf x,\theta)\\
 
 \paragraph{Ratio Matching} Ratio Matching是特别针对二值数据提出的.
 \begin{equation}
-L^{(RM)}(\mathbf x;\theta)=\sum_{j=1}^n\Big(\frac{1}{1+\frac{p_{model}(\mathbf x;\theta)}{p_{model}(f(\mathbf x), j;\theta)}}\Big)
+L^{(RM)}(\bm x;\bm\theta)=\sum_{j=1}^n\Big(\frac{1}{1+\frac{p_{model}(\bm x;\bm\theta)}{p_{model}(f(\bm x), j;\bm\theta)}}\Big)
 \end{equation}
 
 但是ratio matching的计算代价较高.
@@ -101,7 +101,7 @@ Ratio Matching适用于高维离散的情形.
 
 在一些情况下,我们希望正则化score matching,就需要将真实数据分布$p_{data}$替换为
 \begin{equation}
-p_{smoothed}(\mathbf x)=\int p_{data}(\mathbf y)q(\mathbf x|\mathbf y)d\mathbf y
+p_{smoothed}(\bm x)=\int p_{data}(\bm y)q(\bm x|\bm y)d\bm y
 \end{equation}
 
 如果给定足够的capacity,任何一致性估计都会使得$p_{model}$在训练集上样本上形成Dirac分布.对$q$进行平滑有助于减轻这个问题,但同时也损失了一部分渐进一致性.
@@ -110,21 +110,21 @@ p_{smoothed}(\mathbf x)=\int p_{data}(\mathbf y)q(\mathbf x|\mathbf y)d\mathbf y
 
 \paragraph{Noise-contrastive estimation(NCE)}在NCE方法中,概率分布估计被显式定义为
 \begin{equation}\label{eq:noise-contrastive-estimation}
-\log p_{model}(\mathbf x)=\log\tilde p_{model}(\mathbf x;\theta)+c
+\log p_{model}(\bm x)=\log\tilde p_{model}(\bm x;\bm\theta)+c
 \end{equation}
-其中,引入的$c$是$-\log Z(\theta)$的近似估计.
+其中,引入的$c$是$-\log Z(\bm\theta)$的近似估计.
 
 如果采用最大似然度对式\ref{eq:noise-contrastive-estimation}进行估计,那么$c$将会被置为一个非常高的值,而不是产生一个有效分布.
 
-\paragraph{Noise Distribution}因此引入噪声分布$p_{model}(\mathbf x)$,
+\paragraph{Noise Distribution}因此引入噪声分布$p_{model}(\bm x)$,
 \begin{equation}\begin{split}
 p_{joint}(y=1)&=\frac{1}{2}\\
-p_{joint}(\mathbf x|y=1)&=p_{model}(\mathbf x)\\
-p_{joint}(\mathbf x|y=0)&=p_{noise}(\mathbf x)
+p_{joint}(\bm x|y=1)&=p_{model}(\bm x)\\
+p_{joint}(\bm x|y=0)&=p_{noise}(\bm x)
 \end{split}\end{equation}
-其中$y$是一个开关变量,决定是从模型分布还是噪声分布中产生$\mathbf x$.这样就可以使用最大似然度解决上述问题
+其中$y$是一个开关变量,决定是从模型分布还是噪声分布中产生$\bm x$.这样就可以使用最大似然度解决上述问题
 \begin{equation}
-\theta,c={\arg\max}_{\theta,c}\mathbb E_{\mathbf{x,y}\sim p_{train}}\log p_{joint}(y|\mathbf x)
+\bm\theta,c={\arg\max}_{\bm\theta,c}\mathbb E_{\bm{x,y}\sim p_{train}}\log p_{joint}(y|\bm x)
 \end{equation}
 
 NCE使用最为成功的是没有太多随机变量的情形,但是这些随机变量可以有很数目的数值.同时它的缺陷是$p_{noise}$必须容易估计,并且很容易从过度限制中进行采样.
@@ -137,14 +137,14 @@ NCE的核心思想是一个好的生成式模型应该可以区分开数据和�
 
 如果我们需要计算$\mathcal M_A$或者$\mathcal M_B$的真实分布,并且知道两个分布的partition function的比值,那么只需要计算其中一个partition function就可以了.
 \begin{equation}
-Z(\theta_B)=rZ(\theta)=\frac{Z(\theta_B)}{Z(\theta_A)}Z(\theta_A)
+Z(\bm\theta_B)=rZ(\bm\theta)=\frac{Z(\bm\theta_B)}{Z(\bm\theta_A)}Z(\bm\theta_A)
 \end{equation}
 一个简单的办法就是使用Monte Carlo方法估计partition function.
 \begin{equation}\begin{split}
-Z_1&=\int\tilde p(\mathbf x)d\mathbf x\\
-&=\int\frac{p_0(\mathbf x)}{p_0(\mathbf x)}\tilde p_1(\mathbf x)d\mathbf x\\
-&=Z_0\int p_0(\mathbf x)\frac{\tilde p_1(\mathbf x)}{\tilde p_0(\mathbf x)}d\mathbf x\\
-\hat Z_1&=\frac{Z_0}{K}\sum_{k=1}^K\frac{\tilde p_1(\mathbf x^{(k)})}{\tilde p_0(\mathbf x^{(k)})}\quad\text{s.t.}\,\mathbf x^{(k)}\sim p_0
+Z_1&=\int\tilde p(\bm x)d\bm x\\
+&=\int\frac{p_0(\bm x)}{p_0(\bm x)}\tilde p_1(\bm x)d\bm x\\
+&=Z_0\int p_0(\bm x)\frac{\tilde p_1(\bm x)}{\tilde p_0(\bm x)}d\bm x\\
+\hat Z_1&=\frac{Z_0}{K}\sum_{k=1}^K\frac{\tilde p_1(\bm x^{(k)})}{\tilde p_0(\bm x^{(k)})}\quad\text{s.t.}\,\bm x^{(k)}\sim p_0
 \end{split}\end{equation}
 如果$p_0$和$p_1$的分布情况比较接近,那么上式是一种比较有效的partition function的估计方式.但是在大部分情况下,$p_1$分布很复杂并且维度很高.那么这就需要借助于一定的方法去弥补$p_0$和$p_1$之间的差异.
 
@@ -161,7 +161,7 @@ p_{\eta_j}\propto p_1^{n_j}p_0^{1-n_j}
 
 \textit{Bridge sampling}的原理是,借助于单个分布$p_\ast$,去对一个partition function的分布和一个未知partition function的分布做桥接.
 \begin{equation}\label{eq:bridge_sampling}
-\frac{Z_1}{Z_0}\approx\sum_{k=1}^K\frac{\tilde p_\ast(\mathbf x_0^{(k)})}{\tilde p_0(\mathbf x_0^{(k)})}\Big/\frac{\tilde p_\ast(\mathbf x_0^{(k)})}{\tilde p_1(\mathbf x_0^{(k)})}
+\frac{Z_1}{Z_0}\approx\sum_{k=1}^K\frac{\tilde p_\ast(\bm x_0^{(k)})}{\tilde p_0(\bm x_0^{(k)})}\Big/\frac{\tilde p_\ast(\bm x_0^{(k)})}{\tilde p_1(\bm x_0^{(k)})}
 \end{equation}
 $p_\ast$选择策略是尽可能覆盖$p_0$和$p_1$.式\ref{eq:bridge_sampling}通常采用迭代方法最终获取精确值$r$.
 
