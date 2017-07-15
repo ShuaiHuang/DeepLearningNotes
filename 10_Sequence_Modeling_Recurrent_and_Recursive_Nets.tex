@@ -6,9 +6,9 @@
 
 计算图中的unfolding操作是将迭代操作转换为重复结构非递归操作的过程.RNN有多种形式,任意一种包含递归的函数均可使用RNN来表示.RNN的典型形式为
 \begin{equation}
-\mathbf h^{(t)}=f(\mathbf h^{(t-1)}, \mathbf x^{(t)};\theta)
+\bm h^{(t)}=f(\bm h^{(t-1)}, \bm x^{(t)};\bm\theta)
 \end{equation}
-其中$\mathbf h$是状态变量.由此可见,RNN将$t$时刻任务相关的历史信息经过有损压缩整合成$\mathbf h^{(t)}$.
+其中$\bm h$是状态变量.由此可见,RNN将$t$时刻任务相关的历史信息经过有损压缩整合成$\bm h^{(t)}$.
 
 RNN模型有两种图的表现形式:第一种是使用一个包含所有成分的结点;第二种是将前一种形式的结点进行展开.
 
@@ -65,15 +65,15 @@ RNN中的参数共享意味着$t$与$t+1$时刻的条件分布的参数是固定
 
 \subsection{Modeling Sequences Conditioned on Context with RNNs}
 
-RNN对于条件概率分布有着不同的实现方式.当随机变量$\mathbf x$是一个固定长度的向量时,有以下方式将其作为附加信息加入RNN模型用以产生$\mathbf y$序列:
+RNN对于条件概率分布有着不同的实现方式.当随机变量$\bm x$是一个固定长度的向量时,有以下方式将其作为附加信息加入RNN模型用以产生$\bm y$序列:
 \begin{itemize}
     \item 作为每一个时间步骤的额外输入;
-    \item 作为一个初始状态$\mathbf h^{(0)}$;
+    \item 作为一个初始状态$\bm h^{(0)}$;
     \item 以上两种方法的结合.
 \end{itemize}
-添加的额外信息$\mathbf x$可以视为前向神经网络中的bias.
+添加的额外信息$\bm x$可以视为前向神经网络中的bias.
 
-当有多个输入$\mathbf x^{(t)}$时,可以将$t$时刻的输出作为$t+1$时刻的隐层单元的输入.但是限制条件是,这些序列的长度必须相同.
+当有多个输入$\bm x^{(t)}$时,可以将$t$时刻的输出作为$t+1$时刻的隐层单元的输入.但是限制条件是,这些序列的长度必须相同.
 
 \section{Bidirectional RNNs}
 
@@ -168,7 +168,7 @@ LSTM模型的核心在于
     q_i^{(t)}=\sigma\Big(b_i^o+\sum_jU_{i,j}^ox_j^{(t)}+\sum)_jW_{i,j}^oh_j^{(t-1)}\Big)
     \end{equation}
 \end{itemize}
-其中,$\mathbf x^{(t)}$是当前输入向量;$\mathbf h^{(t)}$是当前隐层神经元向量;$\mathbf{b,U,W}$分别是偏置,输入权重,门限的循环权重.
+其中,$\bm x^{(t)}$是当前输入向量;$\bm h^{(t)}$是当前隐层神经元向量;$\bm{b,U,W}$分别是偏置,输入权重,门限的循环权重.
 
 LSTM更容易捕捉到长期依赖.
 
@@ -202,15 +202,15 @@ LSTM更容易捕捉到长期依赖.
 
 通常我们希望,
 \begin{equation}
-(\nabla_{\mathbf h^{(t)}}L)\frac{\partial\mathbf h^{(t)}}{\partial\mathbf h^{(t-1)}}
+(\nabla_{\bm h^{(t)}}L)\frac{\partial\bm h^{(t)}}{\partial\bm h^{(t-1)}}
 \end{equation}
 与
 \begin{equation}
-\nabla_{\mathbf h^{(t)}}L
+\nabla_{\bm h^{(t)}}L
 \end{equation}
 的大小相同.因此,引入正则化项
 \begin{equation}
-\Omega=\sum_t\Big(\frac{\|(\nabla_{\mathbf h^{(t)}}L)\frac{\partial\mathbf h^{(t)}}{\partial\mathbf h^{(t-1)}}\|}{\|\nabla_{\mathbf h^{(t)}}L\|}-1\Big)^2
+\Omega=\sum_t\Big(\frac{\|(\nabla_{\bm h^{(t)}}L)\frac{\partial\bm h^{(t)}}{\partial\bm h^{(t-1)}}\|}{\|\nabla_{\bm h^{(t)}}L\|}-1\Big)^2
 \end{equation}
 上式中的正则化项比较复杂,还有近似的估计形式.
 
