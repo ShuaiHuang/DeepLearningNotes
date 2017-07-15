@@ -14,23 +14,23 @@
 
 \paragraph{核心思想}Monte Carlo采样的核心是将求和或者积分运算视为在某个分布下的期望值运算,并且通过求取平均值计算期望值.
 \begin{equation}
-s=\sum_{\mathbf x}p(\mathbf x)f(\mathbf x)=E_P\left[f(\mathbf x)\right]
+s=\sum_{\bm x}p(\bm x)f(\bm x)=E_P\left[f(\bm x)\right]
 \end{equation}
 或者
 \begin{equation}
-s=\int p(\mathbf x)f(\mathbf x)d\mathbf x=E_P\left[f(\mathbf x)\right]
+s=\int p(\bm x)f(\bm x)d\bm x=E_P\left[f(\bm x)\right]
 \end{equation}
 
 一般而言,直接求取分布是比较困难的,因此通常采用的方法是从分布中采样来代替直接求取分布.最后问题可以归结为如何对分布进行采样,从而使得通过采样计算出的期望值近似等于目标和或者目标积分值.
 
 \section{Importance Sampling}
 
-将求和过程或者求积分过程进行分解,其中一个重要环节是确定哪一部分为$p(\mathbf x)$,哪一部分为$f(\mathbf x)$.但是这种分解并没有统一标准,因为分解形式并不唯一.
+将求和过程或者求积分过程进行分解,其中一个重要环节是确定哪一部分为$p(\bm x)$,哪一部分为$f(\bm x)$.但是这种分解并没有统一标准,因为分解形式并不唯一.
 \begin{equation}
-p(\mathbf x)f(\mathbf x)=q(\mathbf x)\frac{p(\mathbf x)f(\mathbf x)}{q(\mathbf x)}
+p(\bm x)f(\bm x)=q(\bm x)\frac{p(\bm x)f(\bm x)}{q(\bm x)}
 \end{equation}
 
-\paragraph{optimal importance sampling}$p(\mathbf x)f(\mathbf x)$并不一定是最优的分解方式.最优选择$q^\ast$被称为\textit{optimal importance sampling}.
+\paragraph{optimal importance sampling}$p(\bm x)f(\bm x)$并不一定是最优的分解方式.最优选择$q^\ast$被称为\textit{optimal importance sampling}.
 
 \paragraph{biased importance sampling}另外一种重要的分解方式是\textit{biased importance sampling},它不要求$p$和$q$必须进行归一化.
 
@@ -44,15 +44,15 @@ $q$的选择直接对Monte Carlo估计的效率产生影响,因此进行选择�
 
 MCMC方法的限制是模型的每一个状态都没有$0$概率.因此该方法适用于基于能量的方法(energy-based method, EBM).
 
-在EBM中进行\textit{ancestral sampling}会遇到先有鸡还是先有蛋的问题,为避免这一问题需要采用Markov链方法.核心思想是状态$\mathbf x$以任意值作为起始状态,不断迭代更新,最终逼近真实的分布\footnote{TODO: 再看一遍参数化的过程.}.这一过程最终收敛到\textit{stationary distribution}或者\textit{equilibrium distribution}.如果状态转移$T$选取正确,那么稳态分布$q$将会与分布$p$相同.
+在EBM中进行\textit{ancestral sampling}会遇到先有鸡还是先有蛋的问题,为避免这一问题需要采用Markov链方法.核心思想是状态$\bm x$以任意值作为起始状态,不断迭代更新,最终逼近真实的分布\footnote{TODO: 再看一遍参数化的过程.}.这一过程最终收敛到\textit{stationary distribution}或者\textit{equilibrium distribution}.如果状态转移$T$选取正确,那么稳态分布$q$将会与分布$p$相同.
 
 \paragraph{难点} 所有的Markov Chain都包含随机更新过程直至收敛到equilibrium distribution的过程,并从中采样.这一过程被称为\textit{burning in}.这一过程产生的相邻两个样本相互间是耦合的,为了产生不耦合的样本,需要间隔一定的次数进行采样,时间代价会很高.可以使用并行化进行操作.
 
-另外一个难点是事先并不知道经过多少步可以达到稳定状态.其中迭代的步数被称为\textit{mixing time}.$\mathbf A$中比$1$小的特征值决定了mixing time,但是实际中Markov Chain并不能使用矩阵进行标示,因此只能通过估测判定是否mix.
+另外一个难点是事先并不知道经过多少步可以达到稳定状态.其中迭代的步数被称为\textit{mixing time}.$\bm A$中比$1$小的特征值决定了mixing time,但是实际中Markov Chain并不能使用矩阵进行标示,因此只能通过估测判定是否mix.
 
 \section{Gibbs Sampling}
 
-确保$q(\mathbf x)$成为可用分布的方法有两种:
+确保$q(\bm x)$成为可用分布的方法有两种:
 \begin{itemize}
     \item 从学习得到的$p_{model}$中获取到$T$;
     \item 直接参数化$T$并对其进行学习.
@@ -68,10 +68,10 @@ MCMC方法的一个难点是其很有可能mix不充分.这样会导致在高维
 
 当一个分布有明显尖峰并且其周围相对平坦时,它很难与其他mode进行mix.基于能量的模型可以通过引入参数$\beta$控制尖峰的分布
 \begin{equation}
-p_\beta\propto\exp(-\beta E(\mathbf x))
+p_\beta\propto\exp(-\beta E(\bm x))
 \end{equation}
 其中$\beta$常被称为\textit{temperature}的倒数,反映员是基于能量模型的统计物理量.Tempering是一种常用的mixing策略.但是其仍有局限性\footnote{TODO: 再读一遍本节.}.
 
 \subsection{Depth May Help Mixing}
 
-当从包含隐变量的模型$p(\mathbf{h,x})$中进行采样时,如果$p(\mathbf{h|x})$对$\mathbf x$编码过于完善的话,那么$p(\mathbf{x|h})$并不会使$\mathbf x$变化太大,进而使得mixing效果欠佳.一种解决方案是使$\mathbf h$称为深度特征表示.
+当从包含隐变量的模型$p(\bm{h,x})$中进行采样时,如果$p(\bm{h|x})$对$\bm x$编码过于完善的话,那么$p(\bm{x|h})$并不会使$\bm x$变化太大,进而使得mixing效果欠佳.一种解决方案是使$\bm h$称为深度特征表示.
