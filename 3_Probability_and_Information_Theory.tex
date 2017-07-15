@@ -16,17 +16,17 @@ Bernoulli分布的扩展，假设离散变量有$k$种不同状态。Bernoulli�
 \subsection{Gaussian Distribution}
 
 \begin{equation}
-\mathcal N(\mathbf x;\mathbf{\mu,\beta^{-1}})=\sqrt{\frac{\text{det}(\mathbf\beta)}{(2\pi)^n}}\exp\Big(-\frac{1}{2}(\mathbf{x-\mu})^T\mathbf\beta(\mathbf{x-\mu})\Big)
+\mathcal N(\bm x;\bm{\mu,\beta^{-1}})=\sqrt{\frac{\text{det}(\bm\beta)}{(2\pi)^n}}\exp\Big(-\frac{1}{2}(\bm{x-\mu})^T\bm\beta(\bm{x-\mu})\Big)
 \end{equation}
-其中$\mathbf\beta$是精度矩阵，即协方差矩阵的逆矩阵。
+其中$\bm\beta$是精度矩阵，即协方差矩阵的逆矩阵。
 
 \subsection{Exponential and Laplace Distribution}
 
 指数分布：
 \begin{equation}
-p(x;\lambda)=\lambda\mathbf{1}_{x\ge 0}\exp(-\lambda x)
+p(x;\lambda)=\lambda\bm{1}_{x\ge 0}\exp(-\lambda x)
 \end{equation}
-其中$\mathbf{1}_{x\ge 0}$是指示函数。
+其中$\bm{1}_{x\ge 0}$是指示函数。
 
 拉普拉斯分布
 \begin{equation}
@@ -42,9 +42,9 @@ p(x)=\delta(x-\mu)
 
 经验分布：
 \begin{equation}
-\hat p(x)=\frac{1}{m}\sum_{i=1}^m\delta(\mathbf{x-x^{(i)}})
+\hat p(x)=\frac{1}{m}\sum_{i=1}^m\delta(\bm{x-x^{(i)}})
 \end{equation}
-其中，$\mathbf x^{(i)}$是从数据集中采样得到的样本集。
+其中，$\bm x^{(i)}$是从数据集中采样得到的样本集。
 
 \subsection{Mixtures of Distributions}
 
@@ -67,21 +67,21 @@ softplus:
 \setcounter{section}{12}
 \section{Information Theory}
 
-事件$\mathbf x =x$的\textit{自信息}定义为
+事件$\mathbf x =\bm x$的\textit{自信息}定义为
 \begin{equation}
-I(x)=-\log P(x)
+I(\bm x)=-\log P(\bm x)
 \end{equation}
 
 我们通常使用\textit{Shannon entropy}定义一个概率分布的不确定性
 \begin{equation}
-H(\mathbf x)=\mathbb E_{\mathbf x\sim P}[\log P(x)]
+H(\bm x)=\mathbb E_{\bm x\sim P}[\log P(\bm x)]
 \end{equation}
-使用\textit{Kullback-Leibler divergence}度量两个分布$P(\mathbf x)$和$Q(\mathbf x)$的差异程度
+使用\textit{Kullback-Leibler divergence}度量两个分布$P(\bm x)$和$Q(\bm x)$的差异程度
 \begin{equation}
-D_{\text{KL}}(P\|Q)=\mathbb E_{\mathbf x\sim P}\Big[\log\frac{P(x)}{Q(x)}\Big]=
-\mathbb E_{\mathbf x\sim P}[\log P(x)-\log Q(x)]\end{equation}
+D_{\text{KL}}(P\|Q)=\mathbb E_{\bm x\sim P}\Big[\log\frac{P(\bm x)}{Q(\bm x)}\Big]=
+\mathbb E_{\bm x\sim P}[\log P(\bm x)-\log Q(\bm x)]\end{equation}
 
 与\textit{Kullback-Leibler divergence}类似的还有\textit{cross-entropy}
 \begin{equation}
-H(P,Q)=H(P)+D_{\text{KL}}(P\|Q)=-\mathbb E_{\mathbf x\sim P}\log Q(x)
+H(P,Q)=H(P)+D_{\text{KL}}(P\|Q)=-\mathbb E_{\bm x\sim P}\log Q(\bm x)
 \end{equation}
