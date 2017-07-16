@@ -10,4 +10,4 @@ The note is written in the formation of LaTex, and pdfLaTex is recommended for c
 
 ## License
 
-MIT3.0
+GPL-3.0
