@@ -124,7 +124,7 @@ p_{joint}(\bm x|y=0)&=p_{noise}(\bm x)
 \end{split}\end{equation}
 其中$y$是一个开关变量,决定是从模型分布还是噪声分布中产生$\bm x$.这样就可以使用最大似然度解决上述问题
 \begin{equation}
-\bm\theta,c={\arg\max}_{\bm\theta,c}\mathbb E_{\bm{x,y}\sim p_{train}}\log p_{joint}(y|\bm x)
+\bm\theta,c=\mathop{\arg\max}_{\bm\theta,c}\mathbb E_{\bm{x,y}\sim p_{train}}\log p_{joint}(y|\bm x)
 \end{equation}
 
 NCE使用最为成功的是没有太多随机变量的情形,但是这些随机变量可以有很数目的数值.同时它的缺陷是$p_{noise}$必须容易估计,并且很容易从过度限制中进行采样.

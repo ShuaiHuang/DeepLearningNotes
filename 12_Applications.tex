@@ -90,7 +90,7 @@ X'_{i,j,k}=s\frac{X_{i,j,k}-\overline X}{\max\Big\{\epsilon,\sqrt{\lambda+\frac{
 
 语音识别的目的是将包含语言信息的声音信号$\bm X$转换成文字序列$\bm y$.\textit{自动语音识别}(automatic speech recognition)的模型可以概括为
 \begin{equation}
-f^\ast_{ASR}(\bm X)={\arg\max}_{\bm x}P^\ast(\bm y|\mathbf X=\bm X)
+f^\ast_{ASR}(\bm X)=\mathop{\arg\max}_{\bm x}P^\ast(\bm y|\mathbf X=\bm X)
 \end{equation}
 
 传统方法使用HMM与GMM结合的策略进行语音识别.随着深度模型的发展,许多方法借助于深度神经网络提取特征,并用提取出的特征训练HMM和GMM模型.之后深度模型继续发展,并打破了HMM-GMM模型十多年没有提升的僵局.

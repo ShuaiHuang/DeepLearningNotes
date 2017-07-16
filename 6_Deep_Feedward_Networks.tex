@@ -48,7 +48,7 @@ J({\bm\theta})=-\mathbb E_{\bm{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}
 
 如果通过最小化均方误差的方法求取$\bm y$的均值$\bm x$,则可以解下面的问题
 \begin{equation}
-f^\ast={\arg \min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|^2
+f^\ast=\mathop{\arg\min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|^2
 \end{equation}
 等价于
 \begin{equation}
@@ -57,7 +57,7 @@ f^\ast(\bm x)=\mathbb E_{\bm y\sim p_{\text{data}}(\bm y|\bm x)}[\bm y]
 
 通过最小化\textit{绝对均值误差}(mean absolute error)求取$\bm y$的中值$\bm x$,可以使用下面的优化问题
 \begin{equation}
-f^\ast={\arg \min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|_1
+f^\ast=\mathop{\arg\min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|_1
 \end{equation}
 
 上述上述两种问题的缺点是,MSE和MAE使用梯度优化的表现并不好.
@@ -107,7 +107,7 @@ Softmax函数中参数$\bm z$的产生方法有两种.第一种是由前一层�
 
 从神经科学角度看softmax单元,可以将其视为竞争关系.极端情况下就是$\textit{winner-take-all}$形式.
 
-Softmax名称可以解释为\textit{"softened" version of the} $\arg \max$.
+Softmax名称可以解释为\textit{"softened" version of the} $\mathop{\arg\max}$.
 
 \subsubsection{Other Output Types}
 

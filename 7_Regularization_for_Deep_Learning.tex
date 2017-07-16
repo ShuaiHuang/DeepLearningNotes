@@ -28,7 +28,7 @@ $L^2$正则化又被称为\textit{岭回归}(ridge regression)或者\textit{Tikh
 \end{equation}
 可以看出正则化对于单步优化的影响为减小了步长.
 
-通过对$J$在点$\bm w^\ast={\arg\min}_{\bm w}J(\bm w)$做二次展开,并加上正则化项求导,设在$\tilde{\bm w}$导数为0,有
+通过对$J$在点$\bm w^\ast=\mathop{\arg\min}_{\bm w}J(\bm w)$做二次展开,并加上正则化项求导,设在$\tilde{\bm w}$导数为0,有
 \begin{equation}\begin{split}
 \tilde{\bm w}&=(\bm H+\alpha\bm I)^{-1}\bm{Hw}^\ast\\
 &=\bm Q(\bm\Lambda+\alpha\bm I)^{-1}\bm\Lambda\bm Q^T\bm w^\ast
@@ -75,7 +75,7 @@ w_i=\text{sign}(w_i^\ast)\max\{|w_i^\ast|-\frac{\alpha}{H_{i,i}},0\}
 \end{equation}
 相应的,解为
 \begin{equation}
-{\bm\theta}^\ast={\arg\min}_{\bm\theta}\max_{\alpha,\alpha\ge 0}\mathcal L({\bm\theta},\alpha)
+{\bm\theta}^\ast=\mathop{\arg\min}_{\bm\theta}\max_{\alpha,\alpha\ge 0}\mathcal L({\bm\theta},\alpha)
 \end{equation}
 定性地分析,最优值$\alpha^\ast$会使$\Omega({\bm\theta})$的值不断减小,但还没有到达让$\Omega({\bm\theta})$小于$k$的程度.因此,我们可以将范数补偿视为在目标函数上增加限制条件.如果不知道限制区域的大小,可以通过调节$\alpha$对限制区域的大小进行调节.
 

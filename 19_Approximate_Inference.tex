@@ -30,7 +30,7 @@ EM算法有两点本质:
 
 推断也可以指计算条件概率的过程.另外一种推断是计算出缺失变量的一个最可能的取值,而不是推断出在所有可能取值上的概率分布,即
 \begin{equation}
-\bm h^\ast={\arg\max}_{\bm h}p(\bm{h|v})
+\bm h^\ast=\mathop{\arg\max}_{\bm h}p(\bm{h|v})
 \end{equation}
 这又被称为\textit{最大后验概率推断}(maximum a posteriori inference, MAP inference).
 
@@ -97,7 +97,7 @@ q(\bm{h|v})=\prod_iq(h_i|\bm v)
 
 \section{Learned Approximate Inference}
 
-在之前的章节我们可以看到,推断可以被视为增大$\mathcal L$数值的优化过程.这一过程的计算代价会很大而且会很耗时.许多推断方法则会避免进行近似推断.特别地,我们可以将优化过程视为一个函数$f$,它将输入$\bm v$映射到一个近似分布$q^\ast={\arg\max}_q\mathcal L(\bm v,q)$.
+在之前的章节我们可以看到,推断可以被视为增大$\mathcal L$数值的优化过程.这一过程的计算代价会很大而且会很耗时.许多推断方法则会避免进行近似推断.特别地,我们可以将优化过程视为一个函数$f$,它将输入$\bm v$映射到一个近似分布$q^\ast=\mathop{\arg\max}_q\mathcal L(\bm v,q)$.
 
 \subsection{Wake-Sleep}
 
