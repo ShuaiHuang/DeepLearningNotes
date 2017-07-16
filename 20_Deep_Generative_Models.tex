@@ -144,3 +144,236 @@ MP-DBM将平均场等式视为recurrent网络族用以近似解决所有可能�
     \item 训练过程和近似推断过程统一;
     \item 逆传播计算损失函数的精确梯度.
 \end{itemize}
+
+\section{Boltzmann Machines for Real-Valued Data}
+
+Boltzmann机在最初是用于处理二值数据的,但是随着诸如图像和音频数据的建模要求,逐渐拓展至实值数据的范围.本节笔记重点关注能量方程是如何定义的.
+
+\subsection{Gaussian-Bernoulli RBMs}
+
+实值数据最常见的形式是二值隐层,实值可见层的RBM,其中可见单元的条件分布是高斯分布,平均值是隐单元的函数.因此能量函数定义为
+\begin{equation}
+E(\bm{v,h})=\frac{1}{2}\bm{v^T(\beta\odot v)}-\bm{(v\odot\beta)^TWh}-\bm{b^Th}
+\end{equation}
+
+\textbf{能量函数是由RBM的结构,隐变量,可见变量的分布共同推导出的.}
+
+\subsection{Undirected Models of Conditional Covariance}
+
+Gaussian RBM不能捕捉条件协方差信息.基于这个缺陷,就有了以下方法:
+
+\paragraph{Mean and Covariance RBM}mcRBM使用隐单元独立地对所有可见单元的条件均值和方差进行编码.能量函数定义为
+\begin{equation}
+E_{mc}(\bm{x,h^{(m)},h^{(c)}})=E_m(\bm{x,h^{(m)}})+E_c(\bm{x,h^{(c)}})
+\end{equation}
+其中,$E_m$是标准Gaussian-Bernoulli RBM能量方程
+\begin{equation}\label{eq:standard_gb_energy_equation}
+E_m(\bm{x,h^{(m)}})=\frac{1}{2}\bm{x^Tx}-\sum_j\bm{x^TW}_{:j}h^{(m)}_j-\sum_jb^{(m)}_jh^{(m)}_j
+\end{equation}
+$E_c$是cRBM的能量方程,用以对条件协方差进行建模
+\begin{equation}
+E_c(\bm{x,h}^{(c)})=\frac{1}{2}\sum_jh_j^{(c)}(\bm{x^Tr^{(j)}})^2-\sum_jb_j^{(c)}h_j^{(c)}
+\end{equation}
+
+\paragraph{Mean-Product of Student's $t$-distributions}
+
+mPoT的能量方程定义为
+\begin{equation}\begin{split}
+E_{mPoT}&(\bm{x,h^{(m)},h^{(c)}})\\
+&=E_m(\bm{x,h}^{(m)})+\sum_j\Big(h_j^{(c)}\Big(1+\frac{1}{2}(\bm r^{(j)T}\bm x)^2\Big)+(1-\gamma_j)\log h_j^{(c)}\Big)
+\end{split}\end{equation}
+其中,$\bm r^{(j)T}$是与$h_j^{(c)}$相关的协方差权重向量;$E_m(\bm{x,h}^{(m)})$的定义同式\ref{eq:standard_gb_energy_equation}.
+
+\paragraph{Spike and Stab Restricted Boltzmann Machines}
+
+ssRBM模型的能量函数定义为
+\begin{equation}\begin{split}
+E_{ss}(\bm{x,s,h})=&-\sum_i\bm{x^TW}_{:,is_ih_i}+\frac{1}{2}\bm x^T(\bm{\Lambda}+\sum_i\bm{\Phi_i}h_i\bm x)\\
+&+\frac{1}{2}\sum_i\alpha_is_i^2-\sum_i\alpha_i\mu_is_ih_i-\sum_ib_ih_i+\sum_i\alpha_i\mu_i^2h_i
+\end{split}\end{equation}
+其中$b_i$是spike $h_i$的偏移量;$\bm\Lambda$是观测量$\bm x$的对角精度矩阵.
+
+\section{Convolutional Boltzmann Machines}
+
+基于能量的模型需要pooling操作来减少计算量,但是策略并不明确.\textit{Probabilistic max pooling}就解决了这一问题,其主要目的是对检测单元进行限制,这样在同一时刻至多只有一个单元被激活.Probabilistic max pooling操作可能使用有效的正则化手段,也可能是限制模型capacity overlapping场景.
+
+尽管构思很巧妙,但是它的缺陷也很明显,在实际中的表现并不好.
+\begin{itemize}
+    \item 输入尺寸不能随意改变;
+    \item 原始方式直接计算pooling的计算代价太大;
+    \item 边缘需要使用zero-pad填充.
+\end{itemize}
+
+\section{Boltzmann Machine for Structured or Sequential Outputs}
+
+表示$\bm y$间各个元素间关系的一种方式是使用概率分布$P(\mathbf y|\bm x)$.
+
+Boltzmann即可以以$P(\mathbf x^{(t)}|\mathbf x^{(1)},\cdots,\mathbf x^{(t-1)})$相乘的形式完成条件概率建模任务.
+
+\section{Other Boltzmann Machines}
+
+Boltzmann机也有许多其他类型的变体.为了最大化$\log p(y|\bm v)$,可以基于判别式去训练RBM,但是RBM并不是一种理想的有监督学习器.
+
+能量方程中的高阶交互是一个热门的研究方向.
+
+\section{Back-Propagation through Random Operation}
+
+对于生成式模型,希望对输入进行随机变换,一种最直接的方法是扩充输入,加入随机变量.具体举例可见原书P$687$-$688$.这种技术经常被称为\textit{reparameterization trick}, \textit{stochastic back-propagation}或者\textit{perturbation analysis}.
+
+\subsection{Back-Propagating through Discrete Stochastic Operations}
+
+当一个模型输出一个离散变量$\bm y$,reparameterization trick方法就不可行了.但是在这种情况下,有两大问题,一个是阶跃函数的在任意一点上的导数都不可用;另一个更大的问题是在阶跃边界间的区域,导数处处为$0$.
+
+\textit{REINFORCE}算法(REward Increment $=$ Non-negative Factor $\times$ Offset Reinforcement $\times$ Characteristic Eligibility)提供了一个强大的解决方案.其核心思想在于,尽管$J(f(\bm{z;w}))$是一个阶跃函数,并且其导数并没有太大用处,但是其$\mathbb E_{\bm z\sim p(\bm z)}J(f(\bm{z;w}))$是一个光滑函数,并且可以使用梯度下降法.
+
+这种方法的缺点是方差较大,但是可以使用variace reduction方法消除此影响,或者使用variance normalization方法消除此影响.
+
+\section{Directed Generative Nets}
+
+\subsection{Sigmoid Belief Nets}
+
+\textit{Sigmoid belief 网络}(Sigmoid Belief Nets)是一种有着特定条件概率分布的简单有向图模型.通常情况下,我们可以将sigmoid belief网络是为一个有二值状态$\bm s$响亮的网络,每一个状态元素受其祖先元素影响
+\begin{equation}
+p(s_i)=\sigma(\sum_{j<i}W_{j,i}s_j+b_i)
+\end{equation}
+
+这种网络采样效率高,但是推断操作效率低.有两种解决方法:
+\begin{itemize}
+    \item 对sigmoid belief网络建立一个不同的下界,专门用来执行推断操作;
+    \item 使用学习推断机制.
+\end{itemize}
+
+\subsection{Differentiable Generator Nets}
+
+许多生成式模型就是基于\textit{differentiable generator network},该模型将样本的隐变量$\mathbf z$转换为$\mathbf x$或者基于$\mathbf x$的分布.通常包含三个部分
+\begin{itemize}
+    \item  variational autoencoders;
+    \item generative adversarial networks;
+    \item techniques that train generator networks in isolation.
+\end{itemize}
+
+Generator networks本质上是参数化计算过程,用以生成样本.
+\begin{itemize}
+    \item 提供分布族用以采样;
+    \item 通过参数从分布族中选取合适的分布.
+\end{itemize}
+
+一种方法是使用非线性变换$g$将关于$\mathbf z$的分布转换成关于$\mathbf x$的分布.
+\begin{equation}
+p_{x}(\bm x)=\frac{p_z(g^{-1}(\bm x))}{|\det (\frac{\partial g}{\partial z})|}
+\end{equation}
+
+另一种方法是将$g$定义为一个以$\mathbf z$为条件$\mathbf x$为变量的条件分布.通过边际化$\mathbf z$求取关于$\mathbf x$的分布.
+
+上述两种方法的优劣互补.相比于分类模型或者回归模型,生成式模型的优化准则并不明确,应为输入和输出并不明确.这就要求differentiable generator networks必须有足够的capacity,这样优化算法才能得到足够好的优化结果.这样难点就在于对应于每一个$\bm x$的$\bm z$在预先并不是已知且固定的.
+
+\subsection{Variational Autoencoders}
+
+\textit{Variational autoencoder}(VAE)是一种有向图模型,使用学习策略进行近似推断,并且可以基于梯度方法进行训练.VAE的采样步骤为
+\begin{enumerate}
+    \item 从$p_{model}(z)$中采样一个样本$z$;
+    \item 执行differentiable generator network $g(z)$;
+    \item 最终从$p_{model}(\bm x;g(z))=p_{model}(\bm x|z)$中采样出$\bm x$.
+\end{enumerate}
+
+VAE核心思想是训练一个参数化编码器,用以产生$q$的参数.
+
+VAE的优势非常简洁,理论上可解释以及易于实现.此外,这个框架还可以应用到其他范围的模型架构上.
+
+\subsection{Generative Adversarial Networks}
+
+GAN基于博弈论,生成网络必须与对手竞争.生成网络生成样本,分辨网络区分样本是真实样本还是生成的样本.
+
+生成器网络(generator network)直接产生样本$\bm x=g(\bm z;\bm\theta^{(g)})$;判别器网络(discriminator network)区分样本的来源,结果用$d(\bm x;\bm\theta^{(d)})$表示.这两者间是零和博弈,$v(\bm\theta^{(g)},\bm\theta^{(d)})$决定了判别器的代价;相应的,生成器的代价为$-v(\bm\theta^{(g)},\bm\theta^{(d)})$.在学习过程中,每一方面都确保最大化自己的代价,最终使得
+\begin{equation}
+g^\ast=\mathop{\arg\min}_g\max_dv(g,d)
+\end{equation}
+收敛.通常$v$采取的形式为
+\begin{equation}
+v(\bm\theta^{(g)},\bm\theta^{(d)})=\mathbb E_{\mathbf x\sim p_{data}}\log d(\bm x)+\mathbb E_{\mathbf x\sim p_{model}}\log (1-d(\bm x))
+\end{equation}
+
+最终在收敛时,生成器的样本不可区分,判别器也分不清样本的来源.
+
+GAN遇到的困难在于,当$d$和$g$是神经网络时,$\max_d v(g,d)$是非凸的.同时对两者执行梯度下降算法并不能保证达到平衡状态.因此产生了替代零和博弈的策略,即生成器增大对数概率犯错的概率.
+
+GAN学习算法的稳定性是一个开放问题,但是可以通过精心选择模型结构和超参数得到解决.GAN学习问题可以通过拆分生成过程加以简化.
+
+GAN框架也可以用与其他模型.
+
+\subsection{Generative Moment Matching Networks}
+
+Generative moment matching networks不需要与其他网络进行配对.它基于\textit{动量匹配}(moment matching)技术进行训练.它的通过最小化\textit{maximum mean discrepancy}损失函数达到训练的目的.
+
+\subsection{Convolutional Generative Networks}
+
+在处理图像的场景时,将卷积结构引入生成网络.为了使得pooling过程可逆,引入un-pooling操作.
+
+\subsection{Auto-Regressive Networks}
+
+Auto-regression网络是不包含隐变量的有向图模型.它们将联合概率使用链式法则按照$P(x_d|x_{d-1},\cdots,x_1)$的形式进行分解.
+
+\subsection{Linear Auto-Regressive Networks}
+
+形势最简单的auto-regressive网络是没有隐藏单元和共享参数或者特征的.
+
+\subsection{Neural Auto-Regressive Networks}
+
+与auto-regressive有相同的图结构,但是对条件概率有不同的参数化方法.
+
+\subsection{NADE}
+
+\textit{neural autoregressive density estimator}(NADE)是近期一种非常成功的auto-regressive网络.NADE的连接与原始auto-regressive网络相同,但是NADE引入了附加的共享参数策略.使用共享参数策略的原因是NADE模型使用平均场推断方法去填充RBM输入中的缺失值.如果拓展至连续情形,则使用高斯混合模型.
+
+auto-regressive结构另外一个非常有趣的拓展是其避免使用任意阶数的观测变量.
+
+\section{Drawing Samples from Autoencoders}
+
+本节研究如何从autoencoder中进行采样.
+
+\subsection{Markov Chain Associated with any Denoising Autoencoder}
+
+P$711$叙述了如何从估计分布中生成Markov链的步骤.
+
+\subsection{Clamping and Conditional Sampling}
+
+与Boltzmann机非常类似,denoising autoencoders和它们的一般形式可以用来从条件概率分布$p(\mathbf x_f|\mathbf x_o)$中进行采样.其策略是截断观测变量$\mathbf x_o$,在给定$\mathbf x_o$的条件下对$\mathbf x_f$以及隐变量进行重采样.
+
+\subsection{Walk-Back Training Procedure}
+
+\textit{Walk-back}训练过程是加速生成式训练收敛的策略.
+
+\section{Generative Stochastic Networks}
+
+\textit{Generative stochastic networks}(GSNs)是denoising autoencoder的拓展,在Markov链中引入了隐变量.
+
+GSN参数化过程可见P$715$.
+
+GSN与传统概率模型的不同之处在于其对生成式过程本身进行参数化.
+
+\subsection{Discriminant GSNs}
+
+可以对GSN进行又该用以优化$p(\mathbf y|\bm x)$.
+
+\section{Other Generation Schemes}
+
+一种方法是使用热力学不等式提出diffusion inversion训练策略去学习生成式模型.这种方法的核心思想在于我们希望从结构化的分布中进行采样.因此,对模型进行训练,逐步还原分布的结构.
+
+另外一种方法是使用\textit{approximate Baysian computation}框架去采样.
+
+\section{Evaluating Generative Models}
+
+生成式模型间的对比比较困难的微妙,只能近似对比,但是要明确对比指标.但是评价指标一般也很难确定.原因有
+\begin{itemize}
+    \item 输入数据的预处理方式可能会影响评价结果;
+    \item 相同预处理方式的方法才能进行对比,否则相似度度量空间就不是同一个了;
+    \item 过拟合或者欠拟合的单独结果可能会非常好,但是要从全局上进行评价;
+    \item 样本视觉质量评价并不可靠,常使用测试样本的对数似然度进行评价;
+    \item 度量方式必须符合模型的使用意图.
+\end{itemize}
+
+即便如此,所有的度量准则都有严重的缺陷.
+
+\section{Conclusion}
+
+生成式模型提供了解决AI系统问题的希望,因为这种框架提供了一种解决不同直观概念的框架,并且对这些概念以不确定性的方式进行推理.
