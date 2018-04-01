@@ -36,7 +36,7 @@ g(z)=\max\{0,z\}
 
 交叉熵损失函数定义为
 \begin{equation}
-J({\bm\theta})=-\mathbb E_{\bm{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm y|\bm x)
+J({\bm\theta})=-\mathbbm E_{\bm{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm y|\bm x)
 \end{equation}
 其中$\log p_{\text{model}}(\cdot)$的具体形式与模型本身有关.
 
@@ -48,16 +48,16 @@ J({\bm\theta})=-\mathbb E_{\bm{x,y}\sim\hat p_{\text{data}}}\log p_{\text{model}
 
 如果通过最小化均方误差的方法求取$\bm y$的均值$\bm x$,则可以解下面的问题
 \begin{equation}
-f^\ast=\mathop{\arg\min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|^2
+f^\ast=\mathop{\arg\min}_{f}\mathbbm E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|^2
 \end{equation}
 等价于
 \begin{equation}
-f^\ast(\bm x)=\mathbb E_{\bm y\sim p_{\text{data}}(\bm y|\bm x)}[\bm y]
+f^\ast(\bm x)=\mathbbm E_{\bm y\sim p_{\text{data}}(\bm y|\bm x)}[\bm y]
 \end{equation}
 
 通过最小化\textit{绝对均值误差}(mean absolute error)求取$\bm y$的中值$\bm x$,可以使用下面的优化问题
 \begin{equation}
-f^\ast=\mathop{\arg\min}_{f}\mathbb E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|_1
+f^\ast=\mathop{\arg\min}_{f}\mathbbm E_{\bm{x,y}\sim p_{\text{data}}}\|\bm y-f(\bm x)\|_1
 \end{equation}
 
 上述上述两种问题的缺点是,MSE和MAE使用梯度优化的表现并不好.
@@ -146,9 +146,9 @@ h_i=g(z,\alpha)_i=\max(0,z_i)+\alpha_i\min(0,z_i)
 
 更进一步,有\textit{maxout units}
 \begin{equation}
-g(z)_i=\max_{j\in\mathbb G^{(i)}}z_j
+g(z)_i=\max_{j\in\mathbbm G^{(i)}}z_j
 \end{equation}
-其中$\mathbb G^{(i)}$第$i$组输入下标集合,$\{(i-1)k+1,\cdots,ik\}$.Maxout的本质是在空间上拟合出分段线性方程,也可视为自己学习激活函数.相比于rectified,maxout需要更多正则化项,但是数据较多且$k$较小时,可以省去正则化项.
+其中$\mathbbm G^{(i)}$第$i$组输入下标集合,$\{(i-1)k+1,\cdots,ik\}$.Maxout的本质是在空间上拟合出分段线性方程,也可视为自己学习激活函数.相比于rectified,maxout需要更多正则化项,但是数据较多且$k$较小时,可以省去正则化项.
 
 Maxout的优势为,参数少统计便利;可以用作无损特征融合或降维;有冗余,避免\textit{灾难性遗忘}(catastrophic forgetting).
 

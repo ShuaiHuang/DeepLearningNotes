@@ -74,18 +74,18 @@ I(\bm x)=-\log P(\bm x)
 
 我们通常使用\textit{Shannon entropy}量化\textbf{整个概率分布的不确定性}
 \begin{equation}
-    H(\mathbf x)=\mathbb E_{\mathbf x\sim P}[I(x)]=\mathbb E_{\mathbf x\sim P}[\log P(x)]
+    H(\mathbf x)=\mathbbm E_{\mathbf x\sim P}[I(x)]=\mathbbm E_{\mathbf x\sim P}[\log P(x)]
 \end{equation}
 也就是说，一个概率分布的Shannon熵也就是基于该分布的事件所包含信息的期望值。
 
 使用\textit{Kullback-Leibler divergence}度量两个分布$P(\mathbf x)$和$Q(\mathbf x)$的差异程度
 \begin{equation}
-D_{\text{KL}}(P\|Q)=\mathbb E_{\mathbf x\sim P}\Big[\log\frac{P(x)}{Q(x)}\Big]=
-    \mathbb E_{\mathbf x\sim P}[\log P(x)-\log Q(x)]\end{equation}
+D_{\text{KL}}(P\|Q)=\mathbbm E_{\mathbf x\sim P}\Big[\log\frac{P(x)}{Q(x)}\Big]=
+    \mathbbm E_{\mathbf x\sim P}[\log P(x)-\log Q(x)]\end{equation}
 需要注意的是$D_{\text{KL}}(P\|Q)\ne D_{\text{KL}}(Q\|P)$.
 
 与\textit{Kullback-Leibler divergence}类似的还有\textit{cross-entropy}
 \begin{equation}
-    H(P,Q)=H(P)+D_{\text{KL}}(P\|Q)=-\mathbb E_{\mathbf x\sim P}\log Q(x)
+    H(P,Q)=H(P)+D_{\text{KL}}(P\|Q)=-\mathbbm E_{\mathbf x\sim P}\log Q(x)
 \end{equation}
 通常情况下，规定$\lim_{x\to 0}\,x\log x=0$.

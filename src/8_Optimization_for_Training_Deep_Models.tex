@@ -12,18 +12,18 @@
 
 对于机器学习算法中的损失函数$J$,其目的是用来提升机器学习效果$P$的,但是对于传统优化问题来说,$J$仅仅只是一个优化目标.通常情况下,损失函数是在所有训练样本上取平均
 \begin{equation}
-J(\bm\theta)=\mathbb E_{(\bm x,y)\sim\hat p_{data}}L(f(\bm x;\bm\theta),y)
+J(\bm\theta)=\mathbbm E_{(\bm x,y)\sim\hat p_{data}}L(f(\bm x;\bm\theta),y)
 \end{equation}
 但是我们希望得到的是在数据生成模型分布上的期望泛化误差
 \begin{equation}\label{eq:expected_generalization_error}
-J^\ast(\bm\theta)=\mathbb E_{(\bm x,y)\sim p_{data}}L(f(\bm x;\bm\theta),y)
+J^\ast(\bm\theta)=\mathbbm E_{(\bm x,y)\sim p_{data}}L(f(\bm x;\bm\theta),y)
 \end{equation}
 
 \subsection{Empirical Risk Minimization}
 
 机器学习的目标是降低期望泛化误差,又被称为\textit{风险}(risk),但是通过观察式\ref{eq:expected_generalization_error}可以看出,真实数据分布$p_{data}$未知,因此期望泛化误差不能通过计算直接得到.因此一个替代方案就是最小化\textit{经验风险}(empirical risk)
 \begin{equation}
-\mathbb E_{(\bm x,y)\sim\hat p_{data}}\left[L(f(\bm x;\bm\theta),y)\right]=\frac{1}{m}\sum_{i=1}^mL(f(\bm x^{(i)};\bm\theta),y^{(i)})
+\mathbbm E_{(\bm x,y)\sim\hat p_{data}}\left[L(f(\bm x;\bm\theta),y)\right]=\frac{1}{m}\sum_{i=1}^mL(f(\bm x^{(i)};\bm\theta),y^{(i)})
 \end{equation}
 其中$m$是训练样本的数目.
 

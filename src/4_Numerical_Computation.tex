@@ -12,7 +12,7 @@ Conditioning是指一个函数的输入发生微小变化时,其对应的输出�
 大多数深度学习算法都会涉及到某些种类的优化过程.我们通常沿着目标函数的梯度下降方向搜索全局最小值但是如果参数选取不当的话,会收敛到局部极小值或者鞍点上.
 
 \subsection{Beyond the Gradient: Jacobian and Hessian Matrics}
-对于输入和输出都是向量的函数,如果要计算其偏导数,就需要用\textbf{Jacobian矩阵}进行表示.设$f:\mathbb R^m\rightarrow\mathbb R^n$,则有Jacboian矩阵$\bm J\in\mathbb R^{m\times n}$.其中,
+对于输入和输出都是向量的函数,如果要计算其偏导数,就需要用\textbf{Jacobian矩阵}进行表示.设$f:\mathbbm R^m\rightarrow\mathbbm R^n$,则有Jacboian矩阵$\bm J\in\mathbbm R^{m\times n}$.其中,
 \begin{equation}\label{eq:jacobian_matrix}
 J_{i,j}=\frac{\partial}{\partial x_j}f(\bm x)_i
 \end{equation}

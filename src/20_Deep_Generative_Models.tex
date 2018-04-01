@@ -60,10 +60,10 @@ RBM可以使用第\ref{ch:partition_function}章中任意一种具有难以计�
 
 深度信念网络使用逐层训练的方法进行训练
 \begin{enumerate}
-    \item 使用constractive divergence或者stochastic maximum likelihood方法最大化$\mathbb E_{\mathbf v\sim p_{data}}\log p(\bm v)$来训练一个RBM
+    \item 使用constractive divergence或者stochastic maximum likelihood方法最大化$\mathbbm E_{\mathbf v\sim p_{data}}\log p(\bm v)$来训练一个RBM
     \item 第二个RBM使用近似地最大化
     \begin{equation}
-    \mathbb E_{\mathbf v\sim p_{data}}\mathbb E_{\mathbf h^{(1)}\sim p^{(1)}(\bm h^{(1)}|\bm v)}\log p^{(2)}(\bm h^(1))
+    \mathbbm E_{\mathbf v\sim p_{data}}\mathbbm E_{\mathbf h^{(1)}\sim p^{(1)}(\bm h^{(1)}|\bm v)}\log p^{(2)}(\bm h^(1))
     \end{equation}
     其中$p^{(1)}$是第一个RBM所代表的概率分布,$p^{(2)}$是第二个RBM所代表的概率分布.
     \item 重复以上过程,直到深度信念网络达到预期的层数.
@@ -224,7 +224,7 @@ Boltzmann机也有许多其他类型的变体.为了最大化$\log p(y|\bm v)$,�
 
 当一个模型输出一个离散变量$\bm y$,reparameterization trick方法就不可行了.但是在这种情况下,有两大问题,一个是阶跃函数的在任意一点上的导数都不可用;另一个更大的问题是在阶跃边界间的区域,导数处处为$0$.
 
-\textit{REINFORCE}算法(REward Increment $=$ Non-negative Factor $\times$ Offset Reinforcement $\times$ Characteristic Eligibility)提供了一个强大的解决方案.其核心思想在于,尽管$J(f(\bm{z;w}))$是一个阶跃函数,并且其导数并没有太大用处,但是其$\mathbb E_{\bm z\sim p(\bm z)}J(f(\bm{z;w}))$是一个光滑函数,并且可以使用梯度下降法.
+\textit{REINFORCE}算法(REward Increment $=$ Non-negative Factor $\times$ Offset Reinforcement $\times$ Characteristic Eligibility)提供了一个强大的解决方案.其核心思想在于,尽管$J(f(\bm{z;w}))$是一个阶跃函数,并且其导数并没有太大用处,但是其$\mathbbm E_{\bm z\sim p(\bm z)}J(f(\bm{z;w}))$是一个光滑函数,并且可以使用梯度下降法.
 
 这种方法的缺点是方差较大,但是可以使用variace reduction方法消除此影响,或者使用variance normalization方法消除此影响.
 
@@ -290,7 +290,7 @@ g^\ast=\mathop{\arg\min}_g\max_dv(g,d)
 \end{equation}
 收敛.通常$v$采取的形式为
 \begin{equation}
-v(\bm\theta^{(g)},\bm\theta^{(d)})=\mathbb E_{\mathbf x\sim p_{data}}\log d(\bm x)+\mathbb E_{\mathbf x\sim p_{model}}\log (1-d(\bm x))
+v(\bm\theta^{(g)},\bm\theta^{(d)})=\mathbbm E_{\mathbf x\sim p_{data}}\log d(\bm x)+\mathbbm E_{\mathbf x\sim p_{model}}\log (1-d(\bm x))
 \end{equation}
 
 最终在收敛时,生成器的样本不可区分,判别器也分不清样本的来源.

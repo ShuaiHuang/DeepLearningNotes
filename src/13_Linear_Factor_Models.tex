@@ -1,6 +1,6 @@
 \chapter{Linear Factor Models}
 
-许多深度学习学者对输入建立起概率模型$p_{\text{model}}(\bm x)$,借助于该模型使用\textit{概率推断}(probabilistic inference)\footnote{Probabilistic inference is the task of deriving the probability of one or more random variables taking a specific value or set of values. For example, a Bernoulli (Boolean) random variable may describe the event that John has cancer. Such a variable could take a value of $1$ (John has cancer) or $0$ (John does not have cancer). DeepDive uses probabilistic inference to estimate the probability that the random variable takes value $1$: a probability of $0.78$ would mean that John is $78\%$ likely to have cancer.}可以利用环境中的变量去预测环境中的其他变量.这其中许多模型包含隐变量$\bm h$,即$p_{\text{model}}(\bm x)=\mathbb E_{\bm h}p_{\text{model}}(\bm x|\bm h)$.包含隐变量的分布式表达可以囊括深度前向网络和RNN的所有优势.
+许多深度学习学者对输入建立起概率模型$p_{\text{model}}(\bm x)$,借助于该模型使用\textit{概率推断}(probabilistic inference)\footnote{Probabilistic inference is the task of deriving the probability of one or more random variables taking a specific value or set of values. For example, a Bernoulli (Boolean) random variable may describe the event that John has cancer. Such a variable could take a value of $1$ (John has cancer) or $0$ (John does not have cancer). DeepDive uses probabilistic inference to estimate the probability that the random variable takes value $1$: a probability of $0.78$ would mean that John is $78\%$ likely to have cancer.}可以利用环境中的变量去预测环境中的其他变量.这其中许多模型包含隐变量$\bm h$,即$p_{\text{model}}(\bm x)=\mathbbm E_{\bm h}p_{\text{model}}(\bm x|\bm h)$.包含隐变量的分布式表达可以囊括深度前向网络和RNN的所有优势.
 
 包含隐变量的最简单模型是\textit{线性因子模型}(linear factor model).它可以用来组成其他更加复杂的模型.它的数学表达式为
 \begin{equation}\label{eq:linear_factor_model}
@@ -58,13 +58,13 @@ SFA通过是学信号学习不变特征.相比于单个度量指标,环境中的
 
 SFA算法可以归纳为如下的优化问题
 \begin{equation}\begin{split}
-\min_{\theta}&\mathbb E_t(f(\bm x^{(t+1)})_i-f(\bm x^{(t)})_i)^2\\
-s.t.&\mathbb E_tf(\bm x^{(t)})_i=0\\
-&\mathbb E_t[f(\bm x^{(t)})_i^2]=1
+\min_{\theta}&\mathbbm E_t(f(\bm x^{(t+1)})_i-f(\bm x^{(t)})_i)^2\\
+s.t.&\mathbbm E_tf(\bm x^{(t)})_i=0\\
+&\mathbbm E_t[f(\bm x^{(t)})_i^2]=1
 \end{split}\end{equation}
 其中,第一个限制条件确保该优化问题有唯一解;第二个限制条件防止病态问题将所有特征坍缩至$0$.对于多特征的情形,还需要添加限制条件
 \begin{equation}
-\forall i<j,\mathbb E_t[f(\bm x^{(t+1)})_i,f(\bm x^{(t)})_j]=0
+\forall i<j,\mathbbm E_t[f(\bm x^{(t+1)})_i,f(\bm x^{(t)})_j]=0
 \end{equation}
 这条限制条件对不同特征进行解耦合.
 
@@ -76,7 +76,7 @@ SFA的一大优势是可以很容易预测出它所学习到的特征形式,但�
 
 稀疏编码是一种线性因子模型,在无监督特征学习和特征提取机制中被广泛研究.稀疏编码假设噪声服从精度为$\beta$的各向同性Gaussian分布.
 \begin{equation}
-p(\bm{x|h})=\mathbb N(\bm{x;Wh+b},\frac{1}{\beta}\bm I)
+p(\bm{x|h})=\mathbbm N(\bm{x;Wh+b},\frac{1}{\beta}\bm I)
 \end{equation}
 $p(\bm h)$通常选定为在$0$附近有尖锐峰值的分布,如Laplace分布和Sutdent-t分布.
 
@@ -103,7 +103,7 @@ $p(\bm h)$通常选定为在$0$附近有尖锐峰值的分布,如Laplace分布�
 
 线性encoder和decoder的选择可以最小化重构误差
 \begin{equation}
-\mathbb E[\|\bm{x-\hat x}\|^2]
+\mathbbm E[\|\bm{x-\hat x}\|^2]
 \end{equation}
 
 本章介绍的线性因子模型可以被拓展至autoencoder网络和深度概率模型,在同样的任务中可以有更强大的功能和模型族的自由度.

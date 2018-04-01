@@ -19,7 +19,7 @@ p(\bm x;\bm\theta)=\frac{1}{Z(\bm\theta)}\tilde p(\bm x;\bm\theta)
 这就是我们所熟知的\textit{positive phase}和\textit{negative phase}分解\footnote{The term positive and negative do not refer to the sign of each term in equation, but rather reflect to their effect on the probability density defined by the model.(\href{http://deeplearning.net/tutorial/rbm.html\#rbm}{http://deeplearning.net})}.
 
 \begin{equation}\label{eq:gradient_of_log_partition_function}
-\nabla_{\bm\theta}\log Z=\mathbb E_{\bm x\sim p(\bm x)}\nabla_{\bm\theta}\log\tilde p(\bm x)
+\nabla_{\bm\theta}\log Z=\mathbbm E_{\bm x\sim p(\bm x)}\nabla_{\bm\theta}\log\tilde p(\bm x)
 \end{equation}
 上述等式是Monte Carolo方法估计极大似然的基础.
 
@@ -63,10 +63,10 @@ p(\bm a|\bm b)=\frac{p(\bm{a,b})}{p(\bm b)}=\frac{p(\bm{a,b})}{\sum_{\bm{a,c}}p(
 \end{equation}
 将计算复杂度向偏差让渡,可得\textit{generalized pseudolikelihood}估计
 \begin{equation}
-\sum_{i=1}^m\log p(x_{\mathbb S^{(i)}}|\bm x_{-{\mathbb S^{(i)}}})
+\sum_{i=1}^m\log p(x_{\mathbbm S^{(i)}}|\bm x_{-{\mathbbm S^{(i)}}})
 \end{equation}
 
-基于pseudolikelihood的方法表现很大程度上取决于模型如何使用.generalized pseudolikelihood适用的情形为$\mathbb S$捕捉到了变量间的重要耦合关系.但是它的缺点为,当与其他近似估计方法一起使用时,仅能提供$\tilde p(\bm x)$的下限.
+基于pseudolikelihood的方法表现很大程度上取决于模型如何使用.generalized pseudolikelihood适用的情形为$\mathbbm S$捕捉到了变量间的重要耦合关系.但是它的缺点为,当与其他近似估计方法一起使用时,仅能提供$\tilde p(\bm x)$的下限.
 
 它也不能用于深度模型.但是它可以用于深度网络的单层神经元训练以及不基于下限的近似推断方法.
 
@@ -77,7 +77,7 @@ p(\bm a|\bm b)=\frac{p(\bm{a,b})}{p(\bm b)}=\frac{p(\bm{a,b})}{\sum_{\bm{a,c}}p(
 \paragraph{Score Matching}在训练模型时可以不用对$Z$及其导数进行估计.$\nabla_{\bm x}\log p(\bm x)$被称为\textit{score}.\textit{score matching}是指
 \begin{equation}\begin{split}
 L(\bm x,\bm\theta)&=\frac{1}{2}\|\nabla_{\bm x}\log p_{model}(\bm x;\bm\theta)-\nabla_{\bm x}\log p_{data}(\bm x;\bm\theta)\|_2^2\\
-J(\bm\theta)&=\frac{1}{2}\mathbb E_{p_{data}(\bm x)}L(\bm x,\bm\theta)\\
+J(\bm\theta)&=\frac{1}{2}\mathbbm E_{p_{data}(\bm x)}L(\bm x,\bm\theta)\\
 {\bm\theta}^\ast&=\min_{\bm\theta} J(\bm\theta)
 \end{split}\end{equation}
 同时可以看出,score matching需要知道真实的数据分布$p_{data}$.但是在一定条件下\footnote{见P618},$L(\bm x,\theta)$等价于
@@ -124,7 +124,7 @@ p_{joint}(\bm x|y=0)&=p_{noise}(\bm x)
 \end{split}\end{equation}
 其中$y$是一个开关变量,决定是从模型分布还是噪声分布中产生$\bm x$.这样就可以使用最大似然度解决上述问题
 \begin{equation}
-\bm\theta,c=\mathop{\arg\max}_{\bm\theta,c}\mathbb E_{\bm{x,y}\sim p_{train}}\log p_{joint}(y|\bm x)
+\bm\theta,c=\mathop{\arg\max}_{\bm\theta,c}\mathbbm E_{\bm{x,y}\sim p_{train}}\log p_{joint}(y|\bm x)
 \end{equation}
 
 NCE使用最为成功的是没有太多随机变量的情形,但是这些随机变量可以有很数目的数值.同时它的缺陷是$p_{noise}$必须容易估计,并且很容易从过度限制中进行采样.

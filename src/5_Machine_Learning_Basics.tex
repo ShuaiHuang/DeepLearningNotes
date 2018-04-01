@@ -35,7 +35,7 @@ A computer program is said to learn from experience \textit E with respect to so
 
 \textbf{根据学习过程中获取到的经验种类,机器学习可以分为\textit{有监督学习}和\textit{无监督学习}两大类.}并且机器学习所获取到的经验是从整个数据集上获取到的.从数学模型上来看,无监督学习所学到的模型是样本的分布$p(\bm x)$,有监督学习所学到的模型是根据样本$\bm x$求其对应样本标记$\bm y$的分布$p(\bm y|\bm x)$.
 
-有监督学习和无监督学习并没有严格的区分界限.假设有向量$\bm x\in\mathbb R^n$,根据概率链式法则
+有监督学习和无监督学习并没有严格的区分界限.假设有向量$\bm x\in\mathbbm R^n$,根据概率链式法则
 \begin{equation}
 p(\bm x)=\prod_{i=1}^np(x_i|x_1,\cdots,x_{i-1})
 \end{equation}
@@ -107,7 +107,7 @@ NFL定理从本质上表明没有普适的正则化标准,需要根据不同的�
 
 偏差的定义为
 \begin{equation}
-\text{bias}(\hat{\bm\theta}_m)=\mathbb E(\hat{\bm\theta}_m)-{\bm\theta}
+\text{bias}(\hat{\bm\theta}_m)=\mathbbm E(\hat{\bm\theta}_m)-{\bm\theta}
 \end{equation}
 其中${\bm\theta}$是产生数据模型的真实参数;$\hat{\bm\theta}$是估计量.如果有$\text{bias}(\hat{\bm\theta}_m)=0$,则称估计是\textit{无偏的}(unbiased).如果有$\lim_{m\to\infty}\text{bias}(\hat{\bm\theta}_m)=0$,则称估计是\textit{渐进无偏的}(asymptotically unbiased).
 
@@ -123,7 +123,7 @@ NFL定理从本质上表明没有普适的正则化标准,需要根据不同的�
 
 偏差和方差描述了两种不同类型的统计量,在实际的机器学习算法中需要对这两者进行适当的权衡.常用的两种方式为:交叉验证和均方误差比较.
 \begin{equation}\begin{split}
-\text{MSE}&=\mathbb E[(\hat{\bm\theta}_m-{\bm\theta})^2]\\
+\text{MSE}&=\mathbbm E[(\hat{\bm\theta}_m-{\bm\theta})^2]\\
 &=\text{Bias}(\hat{\bm\theta}_m)^2+\text{Var}(\hat{\bm\theta}_m)
 \end{split}\end{equation}
 理想估计的偏差和方差都很小,直接反映就是均方差小.
@@ -141,20 +141,20 @@ NFL定理从本质上表明没有普适的正则化标准,需要根据不同的�
 
 通常使用\textit{极大似然估计}(Maximum Likelihood Estimation)对待估计参数进行估计.假设$p_{\text{model}}(\bm x;{\bm\theta})$是由样本估计出的整体分布,以${\bm\theta}$为参数.其目的就是将$\bm x$映射到真实的分布$p_{\text{data}}(\bm x)$.极大似然度估计定义为
 \begin{equation}\begin{split}
-{\bm\theta}_{ML}&=\mathop{\arg\max}_{{\bm\theta}}p_{\text{model}}(\mathbb X;{\bm\theta})\\
+{\bm\theta}_{ML}&=\mathop{\arg\max}_{{\bm\theta}}p_{\text{model}}(\mathbbm X;{\bm\theta})\\
 &=\mathop{\arg\max}_{{\bm\theta}}\prod_{i=1}^mp_{\text{model}}(\bm x^{(i)};{\bm\theta})
 \end{split}\end{equation}
 进行适当的尺度变换和归一化后,可以得到
 \begin{equation}
-{\bm\theta}_{ML}=\mathop{\arg\max}_{{\bm\theta}}\mathbb E_{\bm x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm x;{\bm\theta})
+{\bm\theta}_{ML}=\mathop{\arg\max}_{{\bm\theta}}\mathbbm E_{\bm x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm x;{\bm\theta})
 \end{equation}
 其中,$\hat p_{\text{data}}$是样本在训练集上的经验分布(empirical distribution).定性地看,极大似然估计是通过选择${\bm\theta}$使得$p_{\text{model}}$逐步逼近$\hat p_{\text{data}}$.上述两个分布间差异程度可以通过KL散度进行量化:
 \begin{equation}
-D_{KL}=(\hat p_{\text{data}}\|p_{\text{model}})=\mathbb E_{\bm x\sim\hat p_{\text{data}}}[\log\hat p_{\text{data}}(\bm x)-\log p_{\text{model}}(\bm x)]
+D_{KL}=(\hat p_{\text{data}}\|p_{\text{model}})=\mathbbm E_{\bm x\sim\hat p_{\text{data}}}[\log\hat p_{\text{data}}(\bm x)-\log p_{\text{model}}(\bm x)]
 \end{equation}
 令上式最小,即最小化
 \begin{equation}
--\mathbb E_{\bm x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm x)
+-\mathbbm E_{\bm x\sim\hat p_{\text{data}}}\log p_{\text{model}}(\bm x)
 \end{equation}
 也就是最小化交叉熵.需要强调的是,任何一个包含负对数似然的损失函数都是训练集经验分布和模型真实分布之间的交叉熵.
 
